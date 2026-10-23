@@ -1,0 +1,922 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<title>Decision Arena · Electrum Decisions — экономика Amber</title>
+<meta name="description" content="Interactive 3D illustration of the Decision Arena / Electrum Decisions token economy.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22%3E%3Ccircle cx=%228%22 cy=%228%22 r=%226%22 fill=%22%23f6c75a%22/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0f24;--panel:rgba(14,20,48,.82);--line:#2a3566;--txt:#dfe5f5;--mut:#9fb0d8;--vio:#8b5cf6;--vio2:#c4b5fd;--teal:#2dd4bf;--gold:#f6c75a;--pink:#f472b6;--burn:#ff7a3d;--fiat:#60a5fa}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;background:radial-gradient(1200px 800px at 50% 45%,#141b44 0%,#0a0f24 60%,#060918 100%);color:var(--txt);font-family:Inter,system-ui,sans-serif;font-size:14px}
+canvas#c{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
+.pn{background:var(--panel);border:1px solid var(--line);border-radius:14px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 10px 40px rgba(0,0,0,.35)}
+button{font:inherit;color:var(--txt);background:#1a2350;border:1px solid var(--line);border-radius:9px;padding:7px 11px;cursor:pointer;white-space:nowrap}
+button:hover{border-color:var(--vio);background:#222c62}button.on{background:linear-gradient(135deg,#5b3fd1,#2a8f8a);border-color:#7c6af0}
+button.gold{background:linear-gradient(135deg,#b8862a,#f6c75a);color:#1a1405;border-color:#f6c75a;font-weight:600}
+#brand{position:fixed;top:14px;left:16px;z-index:5;pointer-events:none}
+#brand .t1{font-size:11px;letter-spacing:.28em;color:var(--gold);font-weight:700}
+#brand .t2{font-size:20px;font-weight:800;letter-spacing:.01em;background:linear-gradient(90deg,#e9e3ff,#c4b5fd 50%,#5eead4);-webkit-background-clip:text;background-clip:text;color:transparent}
+#brand .t3{font-size:12px;color:var(--mut)}
+#topr{position:fixed;top:12px;right:12px;z-index:6;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+#stats{position:fixed;left:14px;top:92px;z-index:5;padding:12px 14px;width:238px}
+#stats h4,#legend h4{margin:0 0 8px;font-size:11px;letter-spacing:.16em;color:var(--mut);font-weight:600;text-transform:uppercase}
+.st{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;padding:3px 0;border-bottom:1px dashed rgba(42,53,102,.6)}.st:last-child{border:0}
+.st b{font-variant-numeric:tabular-nums;font-weight:600}.st i{font-style:normal;color:var(--mut)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:1px;box-shadow:0 0 8px currentColor}
+#clock{font-size:11px;color:var(--mut);margin-top:6px}
+#legend{position:fixed;left:14px;bottom:108px;z-index:5;padding:10px 14px;width:238px;font-size:12px}
+#legend div{padding:2px 0}
+#ctrl{position:fixed;left:50%;transform:translateX(-50%);bottom:30px;z-index:6;padding:10px 12px;display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:center;max-width:min(1120px,96vw)}
+#ctrl label{font-size:12px;color:var(--mut);display:flex;align-items:center;gap:6px}
+#ctrl input[type=range]{width:120px;accent-color:#8b5cf6}
+.grp{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.sep{width:1px;height:26px;background:var(--line)}
+#foot{position:fixed;left:0;right:0;bottom:6px;text-align:center;font-size:11px;color:#7f8db8;z-index:5;pointer-events:none;padding:0 8px}
+#card{position:fixed;top:70px;right:14px;width:370px;max-height:calc(100% - 190px);overflow:auto;z-index:7;padding:18px 18px 14px;transform:translateX(120%);transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+#card.open{transform:none}
+#card .k{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:600}
+#card h3{margin:4px 0 10px;font-size:20px}
+#card p{margin:0 0 10px;line-height:1.55;color:#d3daf0}
+#card .x{position:absolute;top:10px;right:10px;padding:3px 9px}
+.nums{margin:10px 0 6px;border-top:1px solid var(--line)}
+.nums div{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid rgba(42,53,102,.55);font-size:13px}
+.nums span{color:var(--mut)}.nums b{text-align:right;font-weight:600;color:#fff}
+.note{font-size:11.5px;color:#8f9cc4;line-height:1.45;margin-top:8px}
+a{color:#5eead4}
+.bar{display:flex;height:12px;border-radius:6px;overflow:hidden;margin:6px 0 4px;border:1px solid var(--line)}
+#card .btns{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+#labels{position:fixed;inset:0;pointer-events:none;z-index:4}
+.lb{position:absolute;left:0;top:0;transform:translate(-50%,-50%);pointer-events:auto;cursor:pointer;font-size:12px;font-weight:600;padding:3px 9px;border-radius:20px;background:rgba(10,15,36,.62);border:1px solid rgba(139,92,246,.35);white-space:nowrap;color:#eef;transition:border-color .2s,box-shadow .2s;user-select:none}
+.lb:hover,.lb.hl{border-color:var(--gold);box-shadow:0 0 14px rgba(246,199,90,.45)}
+#tip{position:fixed;z-index:9;pointer-events:none;padding:7px 10px;font-size:12px;border-radius:9px;background:rgba(10,15,36,.92);border:1px solid var(--line);display:none;max-width:260px;line-height:1.4}
+#tip b{color:var(--gold)}
+#cap{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:8;padding:12px 16px;width:min(560px,92vw);display:none}
+#cap .s{font-size:11px;letter-spacing:.14em;color:var(--gold);text-transform:uppercase;font-weight:600}
+#cap .m{font-size:15px;line-height:1.5;margin:4px 0 8px}
+#cap .split{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:6px 0}
+#cap .split div{background:#141c46;border:1px solid var(--line);border-radius:8px;padding:6px;font-size:11px;color:var(--mut);text-align:center}
+#cap .split div.act{border-color:var(--gold);box-shadow:0 0 10px rgba(246,199,90,.35)}
+#cap .split b{display:block;color:#fff;font-size:13px;margin-top:2px}
+#cap .row{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}
+.modal{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;background:rgba(5,8,20,.55)}
+.modal .pn{padding:24px 26px;width:min(560px,92vw);max-height:92vh;overflow:auto}
+.modal h2{margin:0 0 4px;font-size:24px}
+.modal .k{color:var(--gold);font-size:11px;letter-spacing:.22em;font-weight:700}
+.modal p{line-height:1.6;color:#d3daf0;margin:8px 0}
+.hidden{display:none!important}
+#play .opts{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+#play input[type=number]{width:140px;font:inherit;color:#fff;background:#141c46;border:1px solid var(--line);border-radius:8px;padding:7px}
+#mintbar{position:fixed;right:14px;bottom:108px;z-index:5;width:270px;padding:10px 14px;display:none}
+.pb{height:8px;border-radius:5px;background:#141c46;border:1px solid var(--line);overflow:hidden;margin:5px 0}
+.pb i{display:block;height:100%;width:0;background:linear-gradient(90deg,#8b5cf6,#f6c75a)}
+#err{display:none}
+#mtoggle{display:none}
+@media (max-width:820px){
+ #brand{top:10px;left:12px}#brand .t2{font-size:16px}#brand .t3{display:none}
+ #topr{max-width:60vw}
+ #stats{top:96px;left:8px;width:auto;max-width:56vw;padding:8px 10px;font-size:11px}
+ #stats .st{font-size:11px}#stats.min .st.x2{display:none}
+ #legend{display:none}#legend.show{display:block;bottom:auto;top:96px;left:auto;right:8px;width:200px}
+ #ctrl{bottom:24px;padding:8px;gap:6px;max-height:42vh;overflow:auto}
+ #ctrl.min .more{display:none}#mtoggle{display:inline-block}
+ #ctrl input[type=range]{width:92px}.sep{display:none}
+ #card{top:auto;bottom:0;right:0;left:0;width:auto;max-height:62%;border-radius:16px 16px 0 0;transform:translateY(110%)}
+ #card.open{transform:none}
+ .lb{font-size:10.5px;padding:2px 7px}
+ #mintbar{right:8px;bottom:auto;top:96px;width:200px}
+ #cap{top:auto;bottom:84px}
+ button{padding:6px 9px;font-size:12.5px}
+}
+</style>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
+</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="labels"></div>
+<div id="brand"><div class="t1">ELECTRUM DECISIONS</div><div class="t2">Decision Arena</div><div class="t3" data-i="sub"></div></div>
+<div id="topr">
+ <button id="bTour" data-i="tour"></button>
+ <button id="bHelp" data-i="about"></button>
+ <button id="bSound" data-i="soundOff"></button>
+ <button id="bReset" data-i="resetView"></button>
+ <button id="bLang">EN</button>
+</div>
+<div id="stats" class="pn min">
+ <h4 data-i="session"></h4>
+ <div class="st"><i data-i="cMatches"></i><b id="sM">0</b></div>
+ <div class="st"><i><span class="dot" style="color:var(--burn)"></span><span data-i="cBurn"></span></i><b id="sB">0</b></div>
+ <div class="st"><i><span class="dot" style="color:var(--teal)"></span><span data-i="cStake"></span></i><b id="sS">0</b></div>
+ <div class="st"><i><span class="dot" style="color:var(--gold)"></span><span data-i="cBank"></span></i><b id="sK">0</b></div>
+ <div class="st x2"><i><span class="dot" style="color:var(--pink)"></span><span data-i="cTour"></span></i><b id="sT">0</b></div>
+ <div class="st x2"><i><span class="dot" style="color:#ffb347"></span><span data-i="cMine"></span></i><b id="sN">0</b></div>
+ <div id="clock"></div>
+</div>
+<div id="legend" class="pn"><h4 data-i="legend"></h4><div id="legI"></div></div>
+<div id="mintbar" class="pn">
+ <div style="font-size:12px;font-weight:600" data-i="mintTitle"></div>
+ <div style="font-size:11px;color:var(--mut)" id="mintTxt"></div>
+ <div class="pb"><i id="mintP"></i></div>
+ <div style="font-size:11px;color:var(--mut)" id="mineTxt"></div>
+ <div class="pb"><i id="mineP"></i></div>
+</div>
+<div id="ctrl" class="pn min">
+ <button id="mtoggle">⚙</button>
+ <div class="grp">
+  <button id="bPause" data-i="pause"></button>
+  <button id="bPlay" class="gold" data-i="playMatch"></button>
+  <button id="bFollow" data-i="follow"></button>
+ </div>
+ <div class="sep"></div>
+ <div class="grp more">
+  <label><span data-i="players"></span> <input id="rP" type="range" min="0" max="100" value="50"><b id="vP">15 000</b></label>
+  <label><span data-i="speed"></span> <input id="rS" type="range" min="0" max="100" value="40"><b id="vS">1×</b></label>
+ </div>
+ <div class="sep"></div>
+ <div class="grp more">
+  <button id="tTok" class="on" data-i="tTok"></button>
+  <button id="tTour" class="on" data-i="tTour"></button>
+  <button id="tMine" class="on" data-i="tMine"></button>
+  <button id="tFiat" class="on" data-i="tFiat"></button>
+ </div>
+ <div class="sep"></div>
+ <div class="grp more">
+  <button id="bTourn" data-i="launchTour"></button>
+  <button id="bMint" data-i="mintBtn"></button>
+  <button id="bLeg" data-i="legendBtn" class="hidden"></button>
+  <button id="bRst" data-i="resetSim"></button>
+ </div>
+</div>
+<div id="foot" data-i="foot"></div>
+<div id="card" class="pn"><button class="x" id="cX">✕</button><div id="cBody"></div></div>
+<div id="tip"></div>
+<div id="cap" class="pn"><div class="s" id="capS"></div><div class="m" id="capM"></div><div id="capX"></div><div class="row" id="capR"></div></div>
+<div id="intro" class="modal"><div class="pn">
+ <div class="k">ELECTRUM DECISIONS · DECISION ARENA</div>
+ <h2 data-i="introH"></h2>
+ <p data-i="intro1"></p><p data-i="intro2"></p><p data-i="intro3"></p><p data-i="intro4"></p>
+ <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px"><button class="gold" id="iGo" data-i="start"></button><button id="iTour" data-i="tourStart"></button><button id="iLang">English</button></div>
+</div></div>
+<div id="play" class="modal hidden"><div class="pn">
+ <div class="k" data-i="playK"></div>
+ <h2 data-i="playH"></h2>
+ <p data-i="playP"></p>
+ <div class="opts" id="pOpts"></div>
+ <label style="font-size:12px;color:var(--mut)"><span data-i="playOwn"></span> <input id="pIn" type="number" min="10" max="250000" step="10" value="10000"></label>
+ <p id="pSplit" style="font-size:13px"></p>
+ <p id="pSel" style="font-size:13px;color:var(--mut)"></p>
+ <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="gold" id="pGo" data-i="playGo"></button><button id="pPick" data-i="playPick"></button><button id="pCancel" data-i="cancel"></button></div>
+</div></div>
+<div id="err" class="modal"><div class="pn"><h2>WebGL</h2><p data-i="noGL"></p></div></div>
+<script type="module">
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
+import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
+import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
+import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
+
+/* ===== Numbers from financial_model_studio.xlsx (cell refs in README.md) ===== */
+const M={
+ contract:'0x8865bc57c58be23137ace9ed1ae1a05fe5c8b209',     // Токеномика!A4
+ supply:10e9, burned:2495212348.28, circ:6499787651.72, reserve:1e9, prizeRes:5e6, // Токеномика!B6:B9, H15
+ win:.90, burn:.06, stake:.03, studio:.01,                  // Токеномика!B23:B26
+ exEntry:10000, exPool:20000, exWin:18000, exBurn:1200, exStake:600, exStudio:200, // Токеномика!B28, C29:G29
+ avgEntry:7420, entryMin:10, entryMax:250000,              // Токеномика!B20, H13
+ buckets:[[10,100,.4],[100,1000,.3],[1000,10000,.2],[10000,100000,.09],[100000,250000,.01]], // Токеномика!B12:E16
+ histMatches:11592,                                        // Токеномика!H11
+ tN:128, tEntry:10000, tPool:1280000, tP:[.45,.25,.10,.10], tBank:.05, tOpen:.05, // Токеномика!B32:B39, C41
+ tStart:15,                                                // Допущения!D167
+ gnomes:9999, gStaked:.8, mineMonths:60, perGnome:2083.54168750208, mineThr:7999, monthRel:16666666.6666667, // Токеномика!B45:B49, H78; Минт гномов!B9
+ mintAvail:5555, mintPx:300, mintBurn:.8, mintRev:1666500, mintBB:1333200, // Минт гномов!B6:B8, B66:B67
+ roy:.01,                                                  // Допущения!D72
+ lock:[[6,1],[12,1.5],[18,2],[24,3]], early:[[1,1.5],[7,1.25],[13,1.1],[25,1]], // Стейкинг!A5:B8, A11:B14
+ payer:.015, arppu:9, rw:2.5                               // Допущения!E67, E68, E62 (базовый сценарий)
+};
+const SIM_SEC=300;           // 1 real second at 1x = 5 simulated minutes
+const MATCH_PER_PLAYER_DAY=1;// illustrative tempo
+
+/* ===== i18n ===== */
+const T={ru:{
+ sub:'Как работает экономика токена Amber',
+ tour:'Экскурсия',about:'О схеме',soundOff:'Звук: выкл',soundOn:'Звук: вкл',resetView:'Сбросить вид',
+ session:'Эта сессия (симуляция)',cMatches:'Сыграно матчей',cBurn:'Сожжено, Amber',cStake:'Стейкерам, Amber',cBank:'В Банк ED, Amber',cTour:'В турнирах, Amber',cMine:'Намайнено, Amber',
+ clock:'Время в симуляции: {d} д {h} ч {m} мин',legend:'Обозначения',
+ pause:'Пауза',resume:'Продолжить',playMatch:'Сыграть матч',follow:'Проследить матч',stopFollow:'Выйти из матча',
+ players:'Игроков',speed:'Скорость',tTok:'Токен-режим',tTour:'Турниры',tMine:'Майнинг',tFiat:'Фиат-кольцо',
+ launchTour:'Запустить турнир',mintBtn:'Минт гномов',legendBtn:'Легенда',resetSim:'Сбросить счётчики',
+ foot:'Иллюстрация механики, не реальные данные блокчейна. Токен-режим доступен только там, где он законен.',
+ introH:'Живая схема экономики Amber',
+ intro1:'В центре смарт-контракт Amber в сети Polygon. Вокруг него вращаются 15 000 симулированных кошельков игроков.',
+ intro2:'Игроки сходятся 1 на 1 и вносят равные суммы Amber в пул матча. Контракт сам делит пул: 90% победителю, 6% сжигается, 3% стейкерам, фиксированный 1% студии.',
+ intro3:'Внешнее спокойное кольцо — бесплатный фиат-режим. Это основной доход студии, токенов в нём нет.',
+ intro4:'Нажмите на любой элемент, чтобы узнать, как он работает. Сыграйте матч сами или пройдите экскурсию.',
+ start:'Смотреть',tourStart:'Экскурсия по схеме',
+ noGL:'Браузер не поддерживает WebGL. Откройте страницу в свежем Chrome, Safari или Edge.',
+ lWallet:'Кошельки игроков (симуляция)',lEntry:'Взнос в пул матча',lWin:'Доля победителя',lBurn:'Сжигание',lStake:'Стейкинг',lBank:'Банк Electrum Decisions',lTour:'Турниры',lMine:'Майнинг гномов',lMint:'Минт гномов (USDC)',lRoy:'Перепродажа NFT, роялти',lFiat:'Фиат-режим (без токенов)',
+ nContract:'Смарт-контракт Amber',nPool:'Пул матча',nBurn:'Сжигание',nStake:'Стейкинг',nBank:'Банк Electrum Decisions',nTour:'Турниры',nGnome:'Гномы-NFT',nReserve:'Резерв майнинга',nMint:'Минт гномов',nMarket:'P2P-рынок NFT',nFiat:'Фиат-режим · free-to-play',
+ tipClick:'Нажмите — подробности, двойной клик — приблизить',simWallet:'Симулированный кошелёк',
+ playK:'СЫГРАЙТЕ САМИ',playH:'Матч 1 на 1',playP:'Выберите размер взноса в пул матча. Оба игрока вносят одинаково, контракт делит пул по фиксированным долям.',
+ playOwn:'Свой взнос, Amber (10 – 250 000):',playGo:'Начать матч',playPick:'Выбрать два кошелька на схеме',cancel:'Отмена',
+ pickHint:'Нажмите на два кошелька на схеме. Выбрано: {n} из 2.',pickRand:'Пара будет выбрана случайно.',pickDone:'Пара выбрана: {a} и {b}.',
+ splitLine:'Пул {pool}: победителю {w} · сжигание {b} · стейкерам {s} · Банку {k}',
+ step:'Шаг {i} из {n}',next:'Дальше',back:'Назад',close:'Закрыть',again:'Ещё матч',
+ sW:'Победителю',sB:'Сжигание',sS:'Стейкерам',sK:'Банку ED',
+ f1:'Контракт свёл в матч два кошелька: {a} и {b}.',
+ f2:'Каждый вносит {e} Amber в пул матча. В контракте теперь {p} Amber, и до конца матча доступа к ним нет ни у кого.',
+ f3:'Матч сыгран. Результат фиксирует контракт. Студия не играет против игроков, и ей всё равно, кто победит.',
+ f4:'Победитель {w} получает 90% пула: {v} Amber.',
+ f5:'6% пула, {v} Amber, уходят на сжигание и исчезают навсегда.',
+ f6:'3% пула, {v} Amber, распределяются между стейкерами.',
+ f7:'Фиксированный 1%, {v} Amber, уходит в Банк Electrum Decisions. Так с каждого матча.',
+ f8:'Итог: пул {p} Amber разделён полностью. 90% победителю, 6% сожжено, 3% стейкерам, 1% студии.',
+ mintTitle:'Минт гномов (симуляция)',mintTxt:'Сминчено {n} из 5 555 доступных · 5 555 × $300; 80% → покупка и сжигание Amber',mineWait:'Майнинг стартует при 7 999 из 9 999',mineOn:'7 999 из 9 999 достигнуто — майнинг включён',
+ toastTour:'Турнир: 128 игроков собираются в контракт',toastMine:'7 999 из 9 999 достигнуто — майнинг включён',
+ tourNo:'Турнир уже идёт — дождитесь финала.',
+ wHist:'Мини-история (симуляция)',wPlayed:'Сыграно матчей',wWon:'Побед',wIn:'Получено, Amber',wOut:'Внесено в пулы, Amber',wNote:'Это условный кошелёк из симуляции, не реальный адрес. Цифры — только за эту сессию.',
+ wPlay:'Сыграть этим кошельком',
+ t1h:'Ядро: смарт-контракт',t1:'Всё, что связано с Amber, проходит через один контракт в Polygon. Он принимает взносы, держит пул матча и сам делит результат. Доли зашиты в код.',
+ t2h:'Кошельки игроков',t2:'Вокруг ядра 15 000 симулированных кошельков. Каждый может сыграть матч 1 на 1 с другим игроком.',
+ t3h:'Пул матча',t3:'Оба игрока вносят одинаковую сумму, пул равен двум взносам. Победителю уходит 90%.',
+ t4h:'Сжигание',t4:'6% каждого пула сгорает навсегда. Новых Amber не выпускается, поэтому предложение со временем только сокращается.',
+ t5h:'Стейкинг и Банк',t5:'3% пула получают стейкеры, фиксированный 1% — Банк Electrum Decisions. Студия зарабатывает на обороте, а не на проигрышах.',
+ t6h:'Турниры',t6:'Сетка на выбывание на 128 игроков. 45/25/10/10% призёрам, 5% Банку студии.',
+ t7h:'Гномы: минт и майнинг',t7:'5 555 гномов доступно к минту по $300; 80% сразу покупает и сжигает Amber. С 7 999 из 9 999 гномов включается майнинг из резерва в 1 млрд Amber.',
+ t8h:'Фиат-кольцо',t8:'Основа бизнеса: бесплатная игра, реклама и покупки в магазинах приложений. Токенов здесь нет. Всё, что внутри кольца, — дополнительный потенциал.'
+},en:{
+ sub:'How the Amber token economy works',
+ tour:'Guided tour',about:'About',soundOff:'Sound: off',soundOn:'Sound: on',resetView:'Reset view',
+ session:'This session (simulated)',cMatches:'Matches played',cBurn:'Burned, Amber',cStake:'To stakers, Amber',cBank:'To the ED Bank, Amber',cTour:'In tournaments, Amber',cMine:'Mined, Amber',
+ clock:'Simulated time: {d} d {h} h {m} min',legend:'Legend',
+ pause:'Pause',resume:'Resume',playMatch:'Play a match',follow:'Follow one match',stopFollow:'Leave the match',
+ players:'Players',speed:'Speed',tTok:'Token mode',tTour:'Tournaments',tMine:'Mining',tFiat:'Fiat ring',
+ launchTour:'Launch tournament',mintBtn:'Mint gnomes',legendBtn:'Legend',resetSim:'Reset counters',
+ foot:'Illustration of the mechanics, not real blockchain data. Token mode is available only where it is legal.',
+ introH:'A living map of the Amber economy',
+ intro1:'At the centre is the Amber smart contract on Polygon. Around it orbit 15,000 simulated player wallets.',
+ intro2:'Players meet 1v1 and each puts the same amount of Amber into the match pool. The contract splits the pool itself: 90% to the winner, 6% burned, 3% to stakers, a fixed 1% to the studio.',
+ intro3:'The calm outer ring is the free-to-play fiat mode. It is the studio’s main revenue and uses no tokens.',
+ intro4:'Click any element to see how it works. Play a match yourself or take the guided tour.',
+ start:'Explore',tourStart:'Take the tour',
+ noGL:'This browser does not support WebGL. Please open the page in a recent Chrome, Safari or Edge.',
+ lWallet:'Player wallets (simulated)',lEntry:'Match pool entry',lWin:'Winner’s share',lBurn:'Burn',lStake:'Staking',lBank:'Electrum Decisions Bank',lTour:'Tournaments',lMine:'Gnome mining',lMint:'Gnome mint (USDC)',lRoy:'NFT resale, royalty',lFiat:'Fiat mode (no tokens)',
+ nContract:'Amber smart contract',nPool:'Match pool',nBurn:'Burn',nStake:'Staking',nBank:'Electrum Decisions Bank',nTour:'Tournaments',nGnome:'Gnome NFTs',nReserve:'Mining reserve',nMint:'Gnome mint',nMarket:'P2P NFT market',nFiat:'Fiat mode · free-to-play',
+ tipClick:'Click for details, double-click to zoom in',simWallet:'Simulated wallet',
+ playK:'PLAY IT YOURSELF',playH:'A 1v1 match',playP:'Pick the match pool entry. Both players put in the same amount and the contract splits the pool by fixed shares.',
+ playOwn:'Your own entry, Amber (10 – 250,000):',playGo:'Start the match',playPick:'Pick two wallets on the map',cancel:'Cancel',
+ pickHint:'Click two wallets on the map. Selected: {n} of 2.',pickRand:'A random pair will be picked.',pickDone:'Pair selected: {a} and {b}.',
+ splitLine:'Pool {pool}: winner {w} · burn {b} · stakers {s} · Bank {k}',
+ step:'Step {i} of {n}',next:'Next',back:'Back',close:'Close',again:'Another match',
+ sW:'Winner',sB:'Burn',sS:'Stakers',sK:'ED Bank',
+ f1:'The contract has matched two wallets: {a} and {b}.',
+ f2:'Each puts {e} Amber into the match pool. The contract now holds {p} Amber, and nobody can touch it until the match ends.',
+ f3:'The match is played. The contract records the result. The studio never plays against players and does not care who wins.',
+ f4:'The winner {w} receives 90% of the pool: {v} Amber.',
+ f5:'6% of the pool, {v} Amber, goes to the burn and is gone for good.',
+ f6:'3% of the pool, {v} Amber, is shared among stakers.',
+ f7:'A fixed 1%, {v} Amber, goes to the Electrum Decisions Bank. Same for every match.',
+ f8:'Done: the {p} Amber pool is fully split. 90% to the winner, 6% burned, 3% to stakers, 1% to the studio.',
+ mintTitle:'Gnome mint (simulated)',mintTxt:'Minted {n} of 5,555 available · 5,555 × $300; 80% → buy & burn Amber',mineWait:'Mining starts at 7,999 of 9,999',mineOn:'7,999 of 9,999 reached — mining is on',
+ toastTour:'Tournament: 128 players gather in the contract',toastMine:'7,999 of 9,999 reached — mining switches on',
+ tourNo:'A tournament is already running — wait for the final.',
+ wHist:'Mini-history (simulated)',wPlayed:'Matches played',wWon:'Wins',wIn:'Received, Amber',wOut:'Put into pools, Amber',wNote:'This is a simulated wallet, not a real address. Figures cover this session only.',
+ wPlay:'Play with this wallet',
+ t1h:'The core: smart contract',t1:'Everything involving Amber goes through one contract on Polygon. It takes the entries, holds the match pool and splits the result itself. The shares are written into the code.',
+ t2h:'Player wallets',t2:'Around the core are 15,000 simulated wallets. Any of them can play a 1v1 match against another player.',
+ t3h:'Match pool',t3:'Both players put in the same amount, so the pool equals two entries. The winner gets 90%.',
+ t4h:'Burn',t4:'6% of every pool is burned for good. No new Amber is issued, so supply can only shrink over time.',
+ t5h:'Staking and the Bank',t5:'Stakers get 3% of the pool and the Electrum Decisions Bank a fixed 1%. The studio earns on volume, not on players losing.',
+ t6h:'Tournaments',t6:'A 128-player single-elimination bracket. 45/25/10/10% to the top four, 5% to the studio’s Bank.',
+ t7h:'Gnomes: mint and mining',t7:'5,555 gnomes are available to mint at $300; 80% immediately buys and burns Amber. From 7,999 of 9,999 gnomes, mining switches on from the 1 bn Amber reserve.',
+ t8h:'The fiat ring',t8:'The core of the business: free play, ads and in-store purchases. No tokens here. Everything inside the ring is extra upside.'
+}};
+let L='ru';try{L=localStorage.getItem('ed_lang')||(new URLSearchParams(location.search).get('lang'))||'ru'}catch(e){}
+{const q=new URLSearchParams(location.search).get('lang');if(q)L=q}
+if(!T[L])L='ru';
+const t=(k,v)=>{let s=T[L][k]??k; if(v)for(const a in v)s=s.split('{'+a+'}').join(v[a]); return s};
+const clean=s=>s.replace(/\u00a0|\u202f/g,' ');
+const fmt=n=>clean(new Intl.NumberFormat(L==='ru'?'ru-RU':'en-US',{maximumFractionDigits:0}).format(Math.round(n)));
+const fmt2=(n,d)=>clean(new Intl.NumberFormat(L==='ru'?'ru-RU':'en-US',{minimumFractionDigits:d,maximumFractionDigits:d}).format(n));
+const big=n=>{const r=L==='ru';if(n>=1e9){const v=n/1e9;return (Number.isInteger(v)?fmt(v):fmt2(v,2))+(r?' млрд':' bn')}if(n>=1e6){const v=n/1e6;return (Number.isInteger(v)?fmt(v):fmt2(v,2))+(r?' млн':' M')}return fmt(n)};
+const pct=x=>{const v=+(x*100).toFixed(4);return (Number.isInteger(v)?fmt(v):fmt2(v,1))+'%'};
+const usd=n=>'$'+fmt(n);
+const mult=x=>'×'+(Number.isInteger(x)?fmt(x):fmt2(x,String(x).split('.')[1].length));
+
+/* ===== Cards ===== */
+function rows(a){return '<div class="nums">'+a.map(r=>`<div><span>${r[0]}</span><b>${r[1]}</b></div>`).join('')+'</div>'}
+const scan='https://polygonscan.com/token/'+M.contract;
+function supplyBar(){const s=[[M.burned,'#ff7a3d'],[M.circ,'#8b5cf6'],[M.reserve,'#ffb347'],[M.prizeRes,'#f472b6']];
+ return '<div class="bar">'+s.map(x=>`<i style="width:${x[0]/M.supply*100}%;background:${x[1]}"></i>`).join('')+'</div><div class="note">'+(L==='ru'?'<span style="color:#ff7a3d">■</span> сожжено · <span style="color:#8b5cf6">■</span> в обращении · <span style="color:#ffb347">■</span> резерв майнинга · <span style="color:#f472b6">■</span> призы':'<span style="color:#ff7a3d">■</span> burned · <span style="color:#8b5cf6">■</span> circulating · <span style="color:#ffb347">■</span> mining reserve · <span style="color:#f472b6">■</span> prizes')+'</div>'}
+function card(key){
+ const r=L==='ru';
+ const C={
+ contract:()=>({k:r?'Ядро · сеть Polygon':'Core · Polygon network',h:t('nContract'),b:r?
+ `<p>Всё, что связано с Amber, проходит через один контракт в сети Polygon. Он принимает взносы обоих игроков, держит пул, пока идёт матч, и сам раздаёт результат: победителю, на сжигание, стейкерам и студии. Доли зашиты в код, вручную их никто не меняет.</p><p>Новых Amber не выпускается: все 10 млрд уже выпущены. Дальше предложение может только уменьшаться.</p>`:
+ `<p>Everything involving Amber goes through one contract on Polygon. It takes both players’ entries, holds the pool while the match runs and pays out the result itself: winner, burn, stakers and studio. The shares are written into the code; nobody changes them by hand.</p><p>No new Amber is issued: all 10 bn already exist. From here supply can only go down.</p>`,
+ n:[[r?'Общая эмиссия':'Total supply',big(M.supply)+(r?' (выпущена полностью)':' (fully issued)')],[r?'Сожжено (по модели)':'Burned (per model)',big(M.burned)],[r?'В обращении':'In circulation',big(M.circ)],[r?'Резерв майнинга':'Mining reserve',big(M.reserve)],[r?'Призовой резерв турниров':'Tournament prize reserve',big(M.prizeRes)],[r?'Матчей на Amber уже сыграно':'Amber matches played so far',fmt(M.histMatches)],[r?'Взнос в пул матча':'Match pool entry',fmt(M.entryMin)+' – '+fmt(M.entryMax)+' Amber']],
+ x:supplyBar()+`<p class="note">${r?'Контракт':'Contract'}: <a href="${scan}" target="_blank" rel="noopener">${M.contract.slice(0,10)}…${M.contract.slice(-6)} · Polygonscan ↗</a><br>${r?'«Сожжено» — по финансовой модели, с учётом первого шага плана.':'“Burned” is per the financial model, including the first step of the plan.'}</p>`}),
+ pool:()=>({k:r?'1 на 1 · внутри контракта':'1v1 · inside the contract',h:t('nPool'),b:r?
+ `<p>Два игрока вносят в пул одинаковую сумму, так что пул всегда равен двум взносам. Пока идёт матч, Amber лежат в контракте, и ни у одной из сторон нет к ним доступа.</p><p>Студия в матче не участвует и против игроков не играет. Она получает фиксированный 1% с пула, кто бы ни победил.</p>`:
+ `<p>Two players put the same amount into the pool, so the pool always equals two entries. While the match runs, the Amber sits in the contract and neither side can touch it.</p><p>The studio takes no part in the match and never plays against players. It gets a fixed 1% of the pool whoever wins.</p>`,
+ n:[[r?'Победителю':'To the winner',pct(M.win)],[r?'Сжигание':'Burn',pct(M.burn)],[r?'Стейкерам':'To stakers',pct(M.stake)],[r?'Студии (фиксированно)':'Studio (fixed)',pct(M.studio)],[r?'Пример: взносы 2 × 10 000':'Example: entries 2 × 10,000',(r?'пул ':'pool ')+fmt(M.exPool)],[r?'Из пула 20 000':'From a 20,000 pool',`${fmt(M.exWin)} / ${fmt(M.exBurn)} / ${fmt(M.exStake)} / ${fmt(M.exStudio)}`],[r?'Средний взнос в модели':'Average entry in the model',fmt(M.avgEntry)+' Amber']],
+ x:`<p class="note">${r?'Средний взнос — допущение модели по распределению взносов от 10 до 250 000 Amber.':'The average entry is a model assumption based on a spread of entries from 10 to 250,000 Amber.'}</p><div class="btns"><button onclick="window.__play()">${t('playMatch')}</button></div>`}),
+ burn:()=>({k:r?'6% каждого пула':'6% of every pool',h:t('nBurn'),b:r?
+ `<p>6% каждого пула контракт отправляет на адрес сжигания (0x…dead). Оттуда Amber не возвращаются никогда. Чем больше сыграно матчей, тем меньше Amber остаётся в обращении.</p><p>Сюда же уходит Amber, купленный на 80% от минта гномов. Сколько Amber при этом сгорит, зависит от рынка, поэтому в Amber мы это не прогнозируем.</p>`:
+ `<p>The contract sends 6% of every pool to the burn address (0x…dead). Amber never comes back from there. The more matches are played, the less Amber stays in circulation.</p><p>Amber bought with 80% of the gnome mint goes here too. How much Amber that burns depends on the market, so we do not forecast it in Amber.</p>`,
+ n:[[r?'С каждого пула':'From every pool',pct(M.burn)],[r?'Из пула 20 000':'From a 20,000 pool',fmt(M.exBurn)+' Amber'],[r?'Минт гномов: на покупку и сжигание':'Gnome mint: buy & burn',usd(M.mintBB)],[r?'Новая эмиссия':'New issuance',r?'нет':'none']]}),
+ staking:()=>({k:r?'3% каждого пула':'3% of every pool',h:t('nStake'),b:r?
+ `<p>3% каждого пула получают те, кто застейкал Amber в LP-стейкинге. Доля зависит от суммы, срока блокировки и того, насколько рано человек вошёл. Чем дольше блокировка, тем выше множитель.</p>`:
+ `<p>3% of every pool goes to people who have staked Amber in LP staking. Each share depends on the amount, the lock-up term and how early they joined. The longer the lock-up, the higher the multiplier.</p>`,
+ n:[[r?'С каждого пула':'From every pool',pct(M.stake)],[r?'Из пула 20 000':'From a 20,000 pool',fmt(M.exStake)+' Amber'],...M.lock.map(l=>[(r?'Блокировка ':'Lock-up ')+l[0]+(r?' мес.':' months'),mult(l[1])]),[r?'Бонус раннего входа':'Early-entry bonus',M.early.map(e=>mult(e[1])).join(' → ')]],
+ x:`<p class="note">${r?'Бонус раннего входа — предложение и допущение модели. Механика доступна только там, где это законно.':'The early-entry bonus is a proposal and a model assumption. Available only where legal.'}</p>`}),
+ bank:()=>({k:r?'Доход студии в Amber':'Studio income in Amber',h:t('nBank'),b:r?
+ `<p>Студия зарабатывает на обороте, а не на проигрышах игроков. В Банк идёт фиксированный 1% с каждого пула матча и 5% призового пула каждого турнира.</p><p>Студия не играет против игроков, и исход матча на её доход не влияет. Отдельно студия получает роялти 1% с перепродаж NFT.</p>`:
+ `<p>The studio earns on volume, not on players losing. The Bank gets a fixed 1% of every match pool and 5% of every tournament prize pool.</p><p>The studio never plays against players, and the result of a match does not change its income. Separately, the studio earns a 1% royalty on NFT resales.</p>`,
+ n:[[r?'С пула матча':'From a match pool',pct(M.studio)],[r?'С призового пула турнира':'From a tournament prize pool',pct(M.tBank)],[r?'Пул 20 000':'A 20,000 pool',fmt(M.exStudio)+' Amber'],[r?'Турнир 1 280 000':'A 1,280,000 tournament',fmt(M.tPool*M.tBank)+' Amber'],[r?'Роялти с P2P-перепродаж NFT':'Royalty on P2P NFT resales',pct(M.roy)]]}),
+ tour:()=>({k:r?'На выбывание · примерно с '+M.tStart+'-го месяца плана':'Single elimination · from about month '+M.tStart,h:t('nTour'),b:r?
+ `<p>Турнир на выбывание: 128 игроков, 7 раундов, проигравший в каждом матче выбывает. Взносы всех участников собираются в призовой пул в контракте, а после финала контракт раздаёт его четырём лучшим и Банку студии.</p>`:
+ `<p>A single-elimination tournament: 128 players, 7 rounds, the loser of each match is out. All entries go into a prize pool in the contract, and after the final the contract pays it out to the top four and the studio’s Bank.</p>`,
+ n:[[r?'Игроков в сетке (пример модели)':'Players in the bracket (model example)',fmt(M.tN)],[r?'Взнос':'Entry',fmt(M.tEntry)+' Amber'],[r?'Призовой пул':'Prize pool',fmt(M.tPool)+' Amber'],[r?'1-е место':'1st place',pct(M.tP[0])+' · '+fmt(M.tPool*M.tP[0])],[r?'2-е место':'2nd place',pct(M.tP[1])+' · '+fmt(M.tPool*M.tP[1])],[r?'3-е место':'3rd place',pct(M.tP[2])+' · '+fmt(M.tPool*M.tP[2])],[r?'4-е место':'4th place',pct(M.tP[3])+' · '+fmt(M.tPool*M.tP[3])],[r?'Банк Electrum Decisions':'Electrum Decisions Bank',pct(M.tBank)+' · '+fmt(M.tPool*M.tBank)],[r?'Оставшиеся 5%':'Remaining 5%',(r?'решение не принято · ':'not yet decided · ')+fmt(M.tPool*M.tOpen)]],
+ x:`<p class="note">${r?'Куда пойдут оставшиеся 5% (сжигание, стейкинг, призы или Банк), студия ещё решает. Пока они остаются в пуле.':'The studio has not yet decided where the remaining 5% goes (burn, staking, prizes or Bank). For now it stays in the pool.'}</p><div class="btns"><button onclick="window.__tour()">${t('launchTour')}</button></div>`}),
+ gnome:()=>({k:r?'Коллекция 9 999 NFT':'A 9,999 NFT collection',h:t('nGnome'),b:r?
+ `<p>Гномы — коллекция из 9 999 NFT. Застейканный гном майнит Amber, то есть получает их из резерва майнинга. Новые Amber при этом не выпускаются: раздаётся уже существующий резерв.</p><p>Майнинг включается, когда сминчено 7 999 из 9 999 гномов.</p>`:
+ `<p>Gnomes are a collection of 9,999 NFTs. A staked gnome mines Amber, meaning it receives Amber from the mining reserve. No new Amber is created: the existing reserve is paid out.</p><p>Mining switches on once 7,999 of 9,999 gnomes are minted.</p>`,
+ n:[[r?'Тираж':'Collection size',fmt(M.gnomes)],[r?'Старт майнинга':'Mining starts at',fmt(M.mineThr)+(r?' из ':' of ')+fmt(M.gnomes)+' (80%)'],[r?'Резерв майнинга':'Mining reserve',big(M.reserve)+' Amber'],[r?'Срок раздачи (допущение)':'Payout period (assumption)','~'+M.mineMonths+(r?' мес.':' months')],[r?'Из резерва в месяц':'Released per month',big(M.monthRel)+' Amber'],[r?'На застейканного гнома в месяц':'Per staked gnome per month','≈'+fmt(M.perGnome)+' Amber']],
+ x:`<p class="note">${r?'Расчёт модели: 80% гномов застейканы, раздача равномерная.':'Model calculation: 80% of gnomes staked, even payout.'}</p><div class="btns"><button onclick="window.__mint()">${t('mintBtn')}</button></div>`}),
+ reserve:()=>({k:r?'1 млрд Amber':'1 bn Amber',h:t('nReserve'),b:r?
+ `<p>Это 1 млрд Amber, отложенный под майнинг гномов. Он входит в уже выпущенные 10 млрд и новой эмиссией не является. Резерв раздаётся постепенно, равными долями, примерно за 5 лет.</p>`:
+ `<p>This is 1 bn Amber set aside for gnome mining. It is part of the 10 bn already issued, not new issuance. The reserve is paid out gradually, in equal parts, over about 5 years.</p>`,
+ n:[[r?'Размер':'Size',big(M.reserve)+' Amber'],[r?'В месяц':'Per month',big(M.monthRel)+' Amber'],[r?'Срок (допущение)':'Period (assumption)','~'+M.mineMonths+(r?' мес.':' months')]]}),
+ mint:()=>({k:r?'5 555 доступно · $300':'5,555 available · $300',h:t('nMint'),b:r?
+ `<p>К минту доступно 5 555 гномов по $300 в USDC. 80% от каждого минта сразу уходит на покупку Amber в пуле, и купленные Amber сжигаются. То есть каждый минт ещё и сокращает предложение Amber.</p><p>Минт может разойтись за день. Сценарии — не обещание: быстрый — 1 день, базовый — около месяца, осторожный — около 3 месяцев.</p>`:
+ `<p>5,555 gnomes are available to mint at $300 in USDC. 80% of every mint immediately buys Amber in the pool, and that Amber is burned. So every mint also shrinks the Amber supply.</p><p>The mint can sell out in a day. Scenarios, not promises: fast — 1 day, base — about a month, cautious — about 3 months.</p>`,
+ n:[[r?'Доступно к минту':'Available to mint',fmt(M.mintAvail)],[r?'Цена минта':'Mint price',usd(M.mintPx)+' USDC'],[r?'Выручка минта':'Mint revenue',fmt(M.mintAvail)+' × '+usd(M.mintPx)+' = '+usd(M.mintRev)],[r?'На покупку и сжигание Amber (80%)':'Buy & burn Amber (80%)',usd(M.mintBB)]],
+ x:`<div class="btns"><button onclick="window.__mint()">${t('mintBtn')}</button></div>`}),
+ market:()=>({k:r?'Роялти 1%':'1% royalty',h:t('nMarket'),b:r?
+ `<p>Игроки перепродают друг другу NFT, например гномов. С каждой такой перепродажи студия получает роялти 1%. Это доход от активности игроков, а не от их проигрышей.</p>`:
+ `<p>Players resell NFTs to each other, such as gnomes. The studio gets a 1% royalty on every such resale. It is income from player activity, not from players losing.</p>`,
+ n:[[r?'Роялти студии':'Studio royalty',pct(M.roy)]]}),
+ fiat:()=>({k:r?'Основной доход студии · без токенов':'The studio’s main revenue · no tokens',h:t('nFiat'),b:r?
+ `<p>Большинство игроков играет бесплатно, без кошелька и без Amber. Студия зарабатывает на рекламе (rewarded и межстраничной) и на покупках в магазинах приложений.</p><p>На этом кольце построена вся финансовая модель. Токен-режим идёт сверху как дополнительный потенциал и в оценку не входит.</p>`:
+ `<p>Most players play for free, with no wallet and no Amber. The studio earns from ads (rewarded and interstitial) and purchases in the app stores.</p><p>The whole financial model is built on this ring. Token mode sits on top as extra upside and is not part of the valuation.</p>`,
+ n:[[r?'Платящих в месяц (базовый)':'Paying users per month (base)',pct(M.payer)+' MAU'],[r?'ARPPU в месяц (базовый)':'ARPPU per month (base)',usd(M.arppu)],[r?'Rewarded-показов на DAU в день':'Rewarded views per DAU per day',fmt2(M.rw,1)]],
+ x:`<p class="note">${r?'Базовый сценарий финансовой модели, это допущения.':'Base scenario of the financial model; these are assumptions.'}</p>`})
+ };
+ return C[key]();
+}
+
+/* ===== Setup ===== */
+const $=id=>document.getElementById(id);
+const MOBILE=matchMedia('(pointer:coarse)').matches||innerWidth<820;
+const MAXW=50000, NB=6, PER=Math.ceil(MAXW/NB);
+const canvas=$('c');
+let renderer;
+try{renderer=new THREE.WebGLRenderer({canvas,antialias:!MOBILE,powerPreference:'high-performance'})}catch(e){$('err').style.display='flex';throw e}
+const DPR=Math.min(devicePixelRatio||1,MOBILE?1.25:2);
+renderer.setPixelRatio(DPR);renderer.setSize(innerWidth,innerHeight);
+renderer.setClearColor(0x070b1d,1);
+const scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x070b1d,0.006);
+const camera=new THREE.PerspectiveCamera(55,innerWidth/innerHeight,0.1,600);
+const HOME={p:MOBILE?new THREE.Vector3(0,36,92):new THREE.Vector3(0,20,50),t:new THREE.Vector3(0,0,0)};
+camera.position.copy(HOME.p);
+const controls=new OrbitControls(camera,canvas);
+controls.enableDamping=true;controls.dampingFactor=.08;controls.minDistance=4;controls.maxDistance=160;controls.screenSpacePanning=true;controls.rotateSpeed=.6;
+const composer=new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene,camera));
+const bloom=new UnrealBloomPass(new THREE.Vector2(innerWidth*(MOBILE?.5:1),innerHeight*(MOBILE?.5:1)),.75,.5,.22);
+composer.addPass(bloom);composer.addPass(new OutputPass());
+function uScale(){return innerHeight*DPR/(2*Math.tan(THREE.MathUtils.degToRad(camera.fov/2)))}
+
+/* stars */
+{const n=MOBILE?700:1600,g=new THREE.BufferGeometry(),p=new Float32Array(n*3);
+ for(let i=0;i<n;i++){const v=new THREE.Vector3().randomDirection().multiplyScalar(160+Math.random()*200);p.set([v.x,v.y,v.z],i*3)}
+ g.setAttribute('position',new THREE.BufferAttribute(p,3));
+ scene.add(new THREE.Points(g,new THREE.PointsMaterial({color:0x6e7bb8,size:1.1,sizeAttenuation:false,transparent:true,opacity:.55,fog:false})))}
+
+/* ===== Nodes ===== */
+const COL={vio:0x8b5cf6,teal:0x2dd4bf,gold:0xf6c75a,pink:0xf472b6,burn:0xff7a3d,amber:0xffb347,lil:0xc4b5fd,usdc:0x7dd3fc,fiat:0x60a5fa};
+const bmat=(c,o=1)=>new THREE.MeshBasicMaterial({color:c,transparent:o<1,opacity:o});
+const wire=(geo,c,o=.55)=>new THREE.LineSegments(new THREE.EdgesGeometry(geo),new THREE.LineBasicMaterial({color:c,transparent:true,opacity:o}));
+const hitMat=new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false});
+const NODES={};const hitList=[];
+function addNode(key,pos,build,hitGeo,opt={}){
+ const g=new THREE.Group();g.position.copy(pos);scene.add(g);
+ const inner=new THREE.Group();g.add(inner);build(inner);
+ const hit=new THREE.Mesh(hitGeo,hitMat);hit.userData.key=key;g.add(hit);hitList.push(hit);
+ NODES[key]={key,g,inner,pos:g.position,hit,lab:opt.lab??2.4,dist:opt.dist??12,glow:0,lines:[]};
+ if(opt.rot)hit.rotation.copy(opt.rot);
+ return NODES[key];
+}
+const V=(x,y,z)=>new THREE.Vector3(x,y,z);
+addNode('contract',V(0,0,0),g=>{
+ g.add(new THREE.Mesh(new THREE.SphereGeometry(1.5,32,24),bmat(0x4c2fb0)));
+ g.add(new THREE.Mesh(new THREE.SphereGeometry(.75,24,16),bmat(COL.gold)));
+ const w=wire(new THREE.IcosahedronGeometry(2.4,1),COL.gold,.6);w.name='spin';g.add(w);
+ const w2=wire(new THREE.IcosahedronGeometry(3.0,0),COL.lil,.25);w2.name='spin2';g.add(w2);
+},new THREE.SphereGeometry(2.8,12,8),{lab:3.6,dist:14});
+addNode('pool',V(0,0,0),g=>{
+ const tr=new THREE.Mesh(new THREE.TorusGeometry(4.6,.07,8,180),bmat(COL.teal));tr.rotation.x=Math.PI/2;g.add(tr);
+ const tr2=new THREE.Mesh(new THREE.TorusGeometry(4.6,.25,8,180),bmat(COL.teal,.12));tr2.rotation.x=Math.PI/2;tr2.name='pulse';g.add(tr2);
+},new THREE.TorusGeometry(4.6,.8,6,48),{lab:-1.4,dist:16,rot:new THREE.Euler(Math.PI/2,0,0)});
+NODES.pool.labOff=V(0,-1.3,4.6);
+addNode('burn',V(-14,-2,6),g=>{
+ g.add(new THREE.Mesh(new THREE.SphereGeometry(1.1,24,16),bmat(COL.burn)));
+ const c=new THREE.Mesh(new THREE.ConeGeometry(.75,2.0,20,1,true),bmat(0xffb070,.35));c.position.y=1.2;c.name='flame';g.add(c);
+ const r=new THREE.Mesh(new THREE.TorusGeometry(1.7,.04,6,64),bmat(COL.burn,.6));r.rotation.x=Math.PI/2;g.add(r);
+},new THREE.SphereGeometry(2,10,8));
+addNode('staking',V(13,1,7),g=>{
+ g.add(new THREE.Mesh(new THREE.OctahedronGeometry(1.2),bmat(COL.teal)));
+ const r=new THREE.Mesh(new THREE.TorusGeometry(1.9,.04,6,64),bmat(COL.teal,.6));r.rotation.x=1.2;r.name='spinr';g.add(r);
+},new THREE.SphereGeometry(2,10,8));
+addNode('bank',V(3,7,-13),g=>{
+ const b=new THREE.BoxGeometry(1.8,1.8,1.8);g.add(new THREE.Mesh(b,bmat(0xb8862a)));g.add(wire(b.clone().scale(1.15,1.15,1.15),COL.gold,.9));
+},new THREE.SphereGeometry(2,10,8));
+addNode('tour',V(-10,7,-10),g=>{
+ const r=new THREE.Mesh(new THREE.TorusGeometry(1.3,.12,10,64),bmat(COL.pink));r.name='spinr';g.add(r);
+ g.add(new THREE.Mesh(new THREE.SphereGeometry(.45,16,12),bmat(0xffd1ea)));
+},new THREE.SphereGeometry(2.2,10,8),{lab:3.2});
+addNode('gnome',V(20,3,-8),g=>{
+ [[-0.9,0,0],[0.9,0,.2],[0,0,-0.9]].forEach((p,i)=>{const c=new THREE.Mesh(new THREE.ConeGeometry(.45,1.5,16),bmat(i==1?COL.pink:COL.vio));c.position.set(...p);g.add(c);
+  const s=new THREE.Mesh(new THREE.SphereGeometry(.14,10,8),bmat(COL.gold));s.position.set(p[0],.85,p[2]);g.add(s)});
+},new THREE.SphereGeometry(2,10,8));
+addNode('reserve',V(21,-6,-2),g=>{
+ g.add(new THREE.Mesh(new THREE.DodecahedronGeometry(1.0),bmat(0xb96f1a)));
+ const w=wire(new THREE.DodecahedronGeometry(1.7),COL.amber,.8);w.name='spin';g.add(w);
+},new THREE.SphereGeometry(2.1,10,8));
+addNode('mint',V(9,-12,-12),g=>{
+ const c=new THREE.Mesh(new THREE.CylinderGeometry(1.2,1.2,.22,40),bmat(COL.usdc));c.rotation.x=Math.PI/2;c.name='coin';g.add(c);
+},new THREE.SphereGeometry(1.9,10,8));
+addNode('market',V(-17,-12,4),g=>{
+ const a=new THREE.Mesh(new THREE.SphereGeometry(.55,16,12),bmat(COL.lil)),b=a.clone();a.position.x=.9;b.position.x=-.9;
+ const o=new THREE.Group();o.add(a,b);o.name='spinr';g.add(o);
+ const r=new THREE.Mesh(new THREE.TorusGeometry(.9,.03,6,48),bmat(COL.lil,.5));r.rotation.x=Math.PI/2;g.add(r);
+},new THREE.SphereGeometry(1.9,10,8));
+/* fiat ring */
+const DOT=(()=>{const c=document.createElement('canvas');c.width=c.height=64;const x=c.getContext('2d'),g=x.createRadialGradient(32,32,0,32,32,32);g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(.4,'rgba(255,255,255,.6)');g.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=g;x.fillRect(0,0,64,64);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;return t})();
+const FIAT_R=40;
+const fiatGroup=new THREE.Group();fiatGroup.rotation.set(1.25-Math.PI/2,0,.18);scene.add(fiatGroup);
+{const n=MOBILE?1400:3200,g=new THREE.BufferGeometry(),p=new Float32Array(n*3),c=new Float32Array(n*3);
+ const ca=new THREE.Color(COL.fiat),cb=new THREE.Color(0x93c5fd),cc=new THREE.Color(COL.teal);
+ for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,r=FIAT_R+(Math.random()-.5)*3.2;p.set([Math.cos(a)*r,(Math.random()-.5)*1.2,Math.sin(a)*r],i*3);
+  const k=Math.random(),col=k<.7?ca:k<.9?cb:cc;c.set([col.r,col.g,col.b],i*3)}
+ g.setAttribute('position',new THREE.BufferAttribute(p,3));g.setAttribute('color',new THREE.BufferAttribute(c,3));
+ const pts=new THREE.Points(g,new THREE.PointsMaterial({size:.4,map:DOT,alphaTest:.02,vertexColors:true,transparent:true,opacity:.5,depthWrite:false}));pts.name='fp';fiatGroup.add(pts);
+ const ring=new THREE.Mesh(new THREE.TorusGeometry(FIAT_R,.05,6,240),bmat(COL.fiat,.35));ring.rotation.x=Math.PI/2;fiatGroup.add(ring);}
+{const hit=new THREE.Mesh(new THREE.TorusGeometry(FIAT_R,1.8,6,96),hitMat);hit.rotation.x=Math.PI/2;hit.userData.key='fiat';fiatGroup.add(hit);hitList.push(hit);
+ NODES.fiat={key:'fiat',g:fiatGroup,inner:fiatGroup,pos:new THREE.Vector3(),hit,lab:0,dist:95,glow:0,lines:[],labOff:null};}
+
+/* ===== Static flow lines ===== */
+function poolPt(to){const d=V(to.x,0,to.z).normalize().multiplyScalar(4.6);return d}
+const FLOWS=[['pool','burn',COL.burn],['pool','staking',COL.teal],['pool','bank',COL.gold],['contract','tour',COL.pink],['tour','bank',COL.gold],['reserve','gnome',COL.amber],['mint','burn',COL.burn],['market','bank',COL.gold],['gnome','market',COL.lil],['contract','reserve',COL.amber]];
+const flowLines=[];
+for(const [a,b,c] of FLOWS){
+ const pa=a==='pool'?poolPt(NODES[b].pos):NODES[a].pos.clone(),pb=NODES[b].pos.clone();
+ const mid=pa.clone().add(pb).multiplyScalar(.5);mid.y+=pa.distanceTo(pb)*.18;
+ const cur=new THREE.QuadraticBezierCurve3(pa,mid,pb);
+ const ln=new THREE.Line(new THREE.BufferGeometry().setFromPoints(cur.getPoints(48)),new THREE.LineBasicMaterial({color:c,transparent:true,opacity:.16}));
+ scene.add(ln);const o={a,b,ln,base:.16};flowLines.push(o);NODES[a].lines.push(o);NODES[b].lines.push(o);
+ if(a==='pool')NODES.contract.lines.push(o);
+}
+
+/* ===== Wallet bands ===== */
+const wVS=`attribute float sz;attribute float hl;uniform float uS;uniform float uM;varying float vH;
+void main(){vec4 mv=modelViewMatrix*vec4(position,1.);gl_Position=projectionMatrix*mv;gl_PointSize=clamp(uS*.15*sz*(1.+hl*1.8)/-mv.z,1.2,uM*(1.+hl*1.5));vH=hl;}`;
+const wFS=`uniform vec3 uC;uniform float uO;varying float vH;
+void main(){vec2 p=gl_PointCoord-.5;float d=length(p);if(d>.5)discard;float a=smoothstep(.5,.05,d);
+vec3 c=mix(uC,vec3(1.,.82,.42),clamp(vH,0.,1.));gl_FragColor=vec4(c*(.5+vH*1.3),a*min(1.,uO+vH*.6));}`;
+const BAND_R=[8,10.6,13.2,15.8,18.6,21.6];
+const BAND_C=[0xa78bfa,0x8b5cf6,0x5eead4,0x7c9cff,0xc4b5fd,0x2dd4bf];
+const bands=[];
+for(let b=0;b<NB;b++){
+ const outer=new THREE.Group();outer.rotation.set((Math.random()-.5)*.5,b*.9,(Math.random()-.5)*.45);scene.add(outer);
+ const spin=new THREE.Group();outer.add(spin);
+ const g=new THREE.BufferGeometry(),p=new Float32Array(PER*3),sz=new Float32Array(PER),hl=new Float32Array(PER);
+ for(let j=0;j<PER;j++){const a=Math.random()*Math.PI*2,r=BAND_R[b]+(Math.random()-.5)*2.2*(1+b*.15);p.set([Math.cos(a)*r,(Math.random()-.5)*(1.2+b*.25),Math.sin(a)*r],j*3);sz[j]=.6+Math.random()*.8}
+ g.setAttribute('position',new THREE.BufferAttribute(p,3));g.setAttribute('sz',new THREE.BufferAttribute(sz,1));const ha=new THREE.BufferAttribute(hl,1);ha.setUsage(THREE.DynamicDrawUsage);g.setAttribute('hl',ha);
+ const m=new THREE.ShaderMaterial({vertexShader:wVS,fragmentShader:wFS,uniforms:{uS:{value:uScale()},uM:{value:7*DPR},uC:{value:new THREE.Color(BAND_C[b])},uO:{value:.55}},transparent:true,depthWrite:false,blending:THREE.AdditiveBlending});
+ const pts=new THREE.Points(g,m);pts.userData.band=b;pts.frustumCulled=false;spin.add(pts);
+ bands.push({outer,spin,pts,g,hl,ha,m,w:(.05+.03*(NB-b))*(b%2?1:1.15),dirty:false});
+}
+let PLAYERS=15000;
+function setPlayers(n){PLAYERS=n;for(let b=0;b<NB;b++){bands[b].g.setDrawRange(0,n>b?Math.floor((n-1-b)/NB)+1:0)}}
+setPlayers(PLAYERS);
+const _v=new THREE.Vector3();
+function wPos(i,out=new THREE.Vector3()){const b=bands[i%NB],j=Math.floor(i/NB),a=b.g.attributes.position.array;out.set(a[j*3],a[j*3+1],a[j*3+2]);return out.applyMatrix4(b.pts.matrixWorld)}
+function setHL(i,v){const b=bands[i%NB];b.hl[Math.floor(i/NB)]=v;b.dirty=true}
+function getHL(i){return bands[i%NB].hl[Math.floor(i/NB)]}
+const WS={pl:new Uint16Array(MAXW),wn:new Uint16Array(MAXW),inA:new Float64Array(MAXW),outA:new Float64Array(MAXW)};
+const wid=i=>'W-'+String(i+1).padStart(5,'0');
+
+/* ===== Particles ===== */
+const PN=MOBILE?2500:7000;
+const pVS=`attribute float sz;attribute vec3 col;uniform float uS;uniform float uD;varying vec3 vC;
+void main(){vec4 mv=modelViewMatrix*vec4(position,1.);gl_Position=projectionMatrix*mv;gl_PointSize=sz>0.?clamp(uS*.3*sz/-mv.z,2.,22.*uD):0.;vC=col;}`;
+const pFS=`varying vec3 vC;void main(){vec2 p=gl_PointCoord-.5;float d=length(p);if(d>.5)discard;float a=smoothstep(.5,0.,d);gl_FragColor=vec4(vC*(1.2+a),a);}`;
+const PG=new THREE.BufferGeometry(),PP=new Float32Array(PN*3),PC=new Float32Array(PN*3),PS=new Float32Array(PN);
+PG.setAttribute('position',new THREE.BufferAttribute(PP,3).setUsage(THREE.DynamicDrawUsage));
+PG.setAttribute('col',new THREE.BufferAttribute(PC,3).setUsage(THREE.DynamicDrawUsage));
+PG.setAttribute('sz',new THREE.BufferAttribute(PS,1).setUsage(THREE.DynamicDrawUsage));
+const PM=new THREE.ShaderMaterial({vertexShader:pVS,fragmentShader:pFS,uniforms:{uS:{value:uScale()},uD:{value:DPR}},transparent:true,depthWrite:false,blending:THREE.AdditiveBlending});
+const PTS=new THREE.Points(PG,PM);PTS.frustumCulled=false;scene.add(PTS);
+const P=[];const FREE=[];for(let i=PN-1;i>=0;i--){FREE.push(i);P.push(null)}
+let aClock=0;
+function spawn(o){ // o:{from:Vector3|wallet idx via fw, to, tw, c, s, d, arc, cb}
+ if(!FREE.length)return false;const i=FREE.pop();
+ const c=new THREE.Color(o.c);PC[i*3]=c.r;PC[i*3+1]=c.g;PC[i*3+2]=c.b;PS[i]=o.s||1;
+ P[i]={t0:aClock+(o.delay||0),d:o.d||1.4,f:o.from?o.from.clone():null,fw:o.fw??-1,to:o.to?o.to.clone():null,tw:o.tw??-1,arc:o.arc??2,cb:o.cb,s:o.s||1,started:!(o.delay>0)};
+ if(o.delay>0)PS[i]=0;
+ return true;
+}
+const live=()=>PN-FREE.length;
+const _a=new THREE.Vector3(),_b=new THREE.Vector3(),_m=new THREE.Vector3();
+function updParticles(){
+ for(let i=0;i<PN;i++){const q=P[i];if(!q)continue;
+  let u=(aClock-q.t0)/q.d;
+  if(u<0){PS[i]=0;continue}PS[i]=q.s;
+  if(u>=1){P[i]=null;PS[i]=0;FREE.push(i);if(q.cb)try{q.cb()}catch(e){console.error(e)}continue}
+  const A=q.fw>=0?wPos(q.fw,_a):_a.copy(q.f),B=q.tw>=0?wPos(q.tw,_b):_b.copy(q.to);
+  _m.copy(A).add(B).multiplyScalar(.5);_m.y+=q.arc;
+  const e=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2,k=1-e;
+  PP[i*3]=k*k*A.x+2*k*e*_m.x+e*e*B.x;PP[i*3+1]=k*k*A.y+2*k*e*_m.y+e*e*B.y;PP[i*3+2]=k*k*A.z+2*k*e*_m.z+e*e*B.z;
+ }
+ PG.attributes.position.needsUpdate=PG.attributes.col.needsUpdate=PG.attributes.sz.needsUpdate=true;
+}
+
+/* ===== State ===== */
+const S={paused:false,speed:1,tok:true,tourOn:true,mine:true,fiat:true,simT:0,acc:0,
+ cM:0,cB:0,cS:0,cK:0,cT:0,cN:0,sound:false};
+const fmtA=n=>clean(new Intl.NumberFormat(L==='ru'?'ru-RU':'en-US',{maximumFractionDigits:2}).format(n));
+function sampleEntry(){let r=Math.random(),acc=0;for(const [lo,hi,w] of M.buckets){acc+=w;if(r<=acc){return Math.round(Math.exp(Math.log(lo)+Math.random()*(Math.log(hi)-Math.log(lo))))}}return M.avgEntry}
+function randW(ex){let i;do{i=Math.floor(Math.random()*PLAYERS)}while(i===ex);return i}
+function book(a,b,e,win){const pool=2*e;S.cM++;S.cB+=pool*M.burn;S.cS+=pool*M.stake;S.cK+=pool*M.studio;
+ WS.pl[a]++;WS.pl[b]++;WS.outA[a]+=e;WS.outA[b]+=e;WS.wn[win]++;WS.inA[win]+=pool*M.win;}
+const featured=new Set();
+function poolPoint(A){const d=_v.set(A.x,0,A.z);if(d.lengthSq()<1e-6)d.set(1,0,0);return d.normalize().multiplyScalar(4.6).clone()}
+function visMatch(){
+ const a=randW(-1),b=randW(a),e=sampleEntry(),win=Math.random()<.5?a:b,s=.55+Math.log10(e)*.18;
+ const pa=wPos(a),pp=poolPoint(pa);let n=0;
+ if(!featured.has(a))setHL(a,.9);if(!featured.has(b))setHL(b,.9);
+ const arrive=()=>{if(++n<2)return;book(a,b,e,win);pulse=1;
+  const lose=win===a?b:a;if(!featured.has(lose))setHL(lose,0);
+  spawn({from:pp,tw:win,c:COL.gold,s:s*1.1,d:1.3,arc:1.5,cb:()=>{if(!featured.has(win))setHL(win,0)}});
+  spawn({from:pp,to:NODES.burn.pos,c:COL.burn,s:s*.8,d:1.5,arc:2.5,cb:()=>{NODES.burn.glow=Math.min(1,NODES.burn.glow+.25)}});
+  spawn({from:pp,to:NODES.staking.pos,c:COL.teal,s:s*.7,d:1.5,arc:2.5,cb:()=>{NODES.staking.glow=Math.min(1,NODES.staking.glow+.2)}});
+  spawn({from:pp,to:NODES.bank.pos,c:COL.gold,s:s*.6,d:1.6,arc:3,cb:()=>{NODES.bank.glow=Math.min(1,NODES.bank.glow+.2)}});
+ };
+ if(!spawn({fw:a,to:pp,c:COL.vio,s,d:1.1,arc:1,cb:arrive})){book(a,b,e,win);setHL(a,0);setHL(b,0);return}
+ if(!spawn({fw:b,to:pp,c:COL.vio,s,d:1.1,arc:1,cb:arrive}))arrive();
+}
+function numMatch(){const a=randW(-1),b=randW(a),e=sampleEntry();book(a,b,e,Math.random()<.5?a:b)}
+let pulse=0;
+
+/* ===== Sound ===== */
+let AC=null;
+function beep(f=660,d=.12,v=.05,type='sine'){if(!S.sound)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.value=f;g.gain.setValueAtTime(v,AC.currentTime);g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+d);o.connect(g).connect(AC.destination);o.start();o.stop(AC.currentTime+d+.02)}catch(e){}}
+
+/* ===== Toast ===== */
+const toastEl=document.createElement('div');toastEl.id='toast';toastEl.className='pn';
+toastEl.style.cssText='position:fixed;left:50%;bottom:'+(MOBILE?'150px':'176px')+';transform:translateX(-50%);z-index:9;padding:9px 14px;font-size:13px;display:none;max-width:90vw;text-align:center';
+document.body.appendChild(toastEl);let toastT=0;
+function toast(s,ms=2600){toastEl.style.bottom=($('ctrl').offsetHeight+44)+'px';toastEl.innerHTML=s;toastEl.style.display='block';clearTimeout(toastT);toastT=setTimeout(()=>toastEl.style.display='none',ms)}
+
+/* ===== Camera fly ===== */
+let fly=null,track=null;
+function flyTo(target,dist,trackFn){
+ const dir=camera.position.clone().sub(controls.target);if(dir.lengthSq()<1e-4)dir.set(0,.4,1);dir.normalize();
+ if(dir.y<.15){dir.y=.25;dir.normalize()}
+ fly={t0:performance.now(),d:1100,fT:controls.target.clone(),fP:camera.position.clone(),toT:target.clone(),dir,dist,trackFn};track=null;
+}
+function focusNode(k){const n=NODES[k];if(k==='fiat'){flyTo(V(0,0,0),MOBILE?120:95);return}flyTo(n.pos,MOBILE?n.dist*1.5:n.dist)}
+function resetView(){track=null;fly={t0:performance.now(),d:1100,fT:controls.target.clone(),fP:camera.position.clone(),toT:HOME.t.clone(),toP:HOME.p.clone()}}
+function updFly(){
+ if(fly){let u=Math.min(1,(performance.now()-fly.t0)/fly.d);const e=1-Math.pow(1-u,3);
+  if(fly.trackFn)fly.toT.copy(fly.trackFn());
+  const toP=fly.toP||fly.toT.clone().add(fly.dir.clone().multiplyScalar(fly.dist));
+  controls.target.lerpVectors(fly.fT,fly.toT,e);camera.position.lerpVectors(fly.fP,toP,e);
+  if(u>=1){if(fly.trackFn){track={fn:fly.trackFn,last:fly.toT.clone()}}fly=null}}
+ else if(track){const p=track.fn(),d=p.clone().sub(track.last);controls.target.add(d);camera.position.add(d);track.last.copy(p)}
+}
+controls.addEventListener('start',()=>{fly=null;track=null});
+
+/* ===== Card ===== */
+let cardKey=null;
+function openCard(k){
+ cardKey=k;let h;
+ if(k.startsWith('w:')){const i=+k.slice(2);
+  h=`<div class="k">${t('simWallet')}</div><h3>${wid(i)}</h3><p>${t('wNote')}</p><div class="k" style="margin-top:8px">${t('wHist')}</div>`+
+  rows([[t('wPlayed'),fmt(WS.pl[i])],[t('wWon'),fmt(WS.wn[i])],[t('wIn'),fmtA(WS.inA[i])],[t('wOut'),fmtA(WS.outA[i])]])+
+  `<div class="btns"><button id="wPlayB">${t('wPlay')}</button></div>`;
+ }else{const c=card(k);h=`<div class="k">${c.k}</div><h3>${c.h}</h3>${c.b}${rows(c.n)}${c.x||''}`}
+ $('cBody').innerHTML=h;$('card').classList.add('open');
+ const wb=$('wPlayB');if(wb)wb.onclick=()=>{pickSel=[+k.slice(2)];openPlay()};
+}
+function closeCard(){cardKey=null;$('card').classList.remove('open')}
+$('cX').onclick=closeCard;
+function walletClick(i){openCard('w:'+i);flyTo(wPos(i),MOBILE?30:20,()=>wPos(i));beep(880,.08)}
+
+/* ===== Caption panel ===== */
+let capMode=null; // 'fm' | 'tour'
+function showCap(s,m,x,btns){$('capS').textContent=s;$('capM').innerHTML=m;$('capX').innerHTML=x||'';const r=$('capR');r.innerHTML='';
+ for(const b of btns){const e=document.createElement('button');e.textContent=b[0];if(b[2])e.className=b[2];e.onclick=b[1];r.appendChild(e)}$('cap').style.display='block'}
+function hideCap(){$('cap').style.display='none';capMode=null}
+
+/* ===== Featured match (play / follow) ===== */
+let FM=null,pickSel=[],pickMode=false,followAuto=false,fmTimer=0;
+function splitHTML(pool,act){const it=[['sW',M.win],['sB',M.burn],['sS',M.stake],['sK',M.studio]];
+ return '<div class="split">'+it.map((x,j)=>`<div class="${act===j?'act':''}">${t(x[0])} · ${pct(x[1])}<b>${fmtA(pool*x[1])}</b></div>`).join('')+'</div>'}
+function startFM(e,pair,auto){
+ endFM(true);closeCard();
+ const a=pair&&pair[0]!=null?pair[0]:randW(-1),b=pair&&pair[1]!=null?pair[1]:randW(a);
+ FM={a,b,e,win:Math.random()<.5?a:b,step:0,booked:false};featured.add(a);featured.add(b);setHL(a,2);setHL(b,2);
+ followAuto=!!auto;capMode='fm';fmStep(0);updBtns();
+}
+function endFM(silent){if(!FM)return;featured.delete(FM.a);featured.delete(FM.b);setHL(FM.a,0);setHL(FM.b,0);FM=null;followAuto=false;if(capMode==='fm')hideCap();track=null;if(!silent)resetView();updBtns()}
+function fmStep(k){
+ if(!FM)return;FM.step=k;fmTimer=aClock;const {a,b,e,win}=FM,pool=2*e,pa=()=>wPos(a),pp=poolPoint(wPos(a));
+ const nm={a:wid(a),b:wid(b),w:wid(win),e:fmtA(e),p:fmtA(pool)};let act=-1;
+ switch(k){
+  case 0:flyTo(wPos(a).add(wPos(b)).multiplyScalar(.5),MOBILE?40:28);beep(520);break;
+  case 1:spawn({fw:a,to:pp,c:COL.vio,s:2.2,d:1.4,arc:1.5});spawn({fw:b,to:pp,c:COL.vio,s:2.2,d:1.4,arc:1.5});flyTo(V(0,0,0),MOBILE?26:18);beep(600);break;
+  case 2:pulse=1.5;NODES.contract.glow=1;beep(700);break;
+  case 3:act=0;spawn({from:pp,tw:win,c:COL.gold,s:2.6,d:1.6,arc:2});flyTo(wPos(win),MOBILE?30:20,()=>wPos(win));beep(880);break;
+  case 4:act=1;spawn({from:pp,to:NODES.burn.pos,c:COL.burn,s:2.2,d:1.6,arc:2.5,cb:()=>NODES.burn.glow=1});flyTo(NODES.burn.pos,MOBILE?24:15);beep(300,.2,.05,'triangle');break;
+  case 5:act=2;spawn({from:pp,to:NODES.staking.pos,c:COL.teal,s:2,d:1.6,arc:2.5,cb:()=>NODES.staking.glow=1});flyTo(NODES.staking.pos,MOBILE?24:15);beep(760);break;
+  case 6:act=3;spawn({from:pp,to:NODES.bank.pos,c:COL.gold,s:1.8,d:1.6,arc:3,cb:()=>NODES.bank.glow=1});flyTo(NODES.bank.pos,MOBILE?24:15);beep(990);break;
+  case 7:if(!FM.booked){FM.booked=true;book(a,b,e,win)}flyTo(V(0,1,0),MOBILE?50:34);beep(1180,.18);break;
+ }
+ const vals=[null,null,null,pool*M.win,pool*M.burn,pool*M.stake,pool*M.studio,null];
+ const msg=t('f'+(k+1),{...nm,v:vals[k]!=null?fmtA(vals[k]):''});
+ const btns=[];if(k>0)btns.push([t('back'),()=>fmStep(k-1)]);
+ if(k<7)btns.push([t('next'),()=>{followAuto=false;fmStep(k+1)},'gold']);else{btns.push([t('again'),()=>startFM(sampleEntry(),null,followAuto),'gold']);}
+ btns.push([t('close'),()=>endFM()]);
+ showCap(t('step',{i:k+1,n:8})+' · '+t('playH'),msg,k>=3?splitHTML(pool,act===-1&&k===7?-1:act):`<div style="font-size:12px;color:var(--mut)">${t('splitLine',{pool:fmtA(pool),w:fmtA(pool*M.win),b:fmtA(pool*M.burn),s:fmtA(pool*M.stake),k:fmtA(pool*M.studio)})}</div>`,btns);
+}
+
+/* ===== Play modal ===== */
+const PRE=[10,100,1000,10000,100000,250000];
+function openPlay(){pickMode=false;const o=$('pOpts');o.innerHTML='';
+ for(const v of PRE){const b=document.createElement('button');b.textContent=fmt(v);b.onclick=()=>{$('pIn').value=v;updPlay()};o.appendChild(b)}
+ $('play').classList.remove('hidden');updPlay()}
+function entryVal(){let v=Math.round(+$('pIn').value||0);return Math.max(M.entryMin,Math.min(M.entryMax,v))}
+function updPlay(){const e=entryVal(),p=2*e;$('pSplit').textContent=t('splitLine',{pool:fmtA(p),w:fmtA(p*M.win),b:fmtA(p*M.burn),s:fmtA(p*M.stake),k:fmtA(p*M.studio)});
+ $('pSel').textContent=pickSel.length===2?t('pickDone',{a:wid(pickSel[0]),b:wid(pickSel[1])}):pickSel.length===1?t('pickHint',{n:1}):t('pickRand');
+ [...$('pOpts').children].forEach((b,j)=>b.classList.toggle('on',PRE[j]===e))}
+$('pIn').oninput=updPlay;
+$('pGo').onclick=()=>{$('play').classList.add('hidden');const sel=pickSel.slice();pickSel.forEach(i=>{if(!featured.has(i))setHL(i,0)});pickSel=[];startFM(entryVal(),sel,false)};
+$('pCancel').onclick=()=>{$('play').classList.add('hidden');pickSel.forEach(i=>setHL(i,0));pickSel=[];pickMode=false};
+$('pPick').onclick=()=>{$('play').classList.add('hidden');pickSel.forEach(i=>setHL(i,0));pickSel=[];pickMode=true;closeCard();toast(t('pickHint',{n:0}),5000)};
+function pickWallet(i){if(pickSel.includes(i))return;pickSel.push(i);setHL(i,2);beep(700,.08);
+ if(pickSel.length>=2){pickMode=false;toast(t('pickDone',{a:wid(pickSel[0]),b:wid(pickSel[1])}),2000);openPlay()}else toast(t('pickHint',{n:pickSel.length}),5000)}
+
+/* ===== Tournament ===== */
+const TB={g:null,n:128,pts:null,pos:null,col:null,alive:[],wal:[],round:0,running:false,next:0,phase:0,elim:[]};
+{const g=new THREE.BufferGeometry();TB.pos=new Float32Array(128*3);TB.col=new Float32Array(128*3);TB.tgt=new Float32Array(128*3);
+ g.setAttribute('position',new THREE.BufferAttribute(TB.pos,3));g.setAttribute('color',new THREE.BufferAttribute(TB.col,3));
+ TB.pts=new THREE.Points(g,new THREE.PointsMaterial({size:.5,map:DOT,alphaTest:.02,vertexColors:true,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));
+ TB.pts.visible=false;TB.pts.frustumCulled=false;NODES.tour.g.add(TB.pts);}
+function ringPos(k,n,r,out,o){const a=k/n*Math.PI*2;out[o]=Math.cos(a)*r;out[o+1]=Math.sin(a)*r;out[o+2]=0}
+function launchTour(){
+ if(TB.running){toast(t('tourNo'));return}
+ TB.running=true;TB.round=0;TB.alive=[...Array(128).keys()];TB.wal=[];const used=new Set();
+ while(TB.wal.length<128){const w=Math.floor(Math.random()*PLAYERS);if(!used.has(w)||PLAYERS<200){used.add(w);TB.wal.push(w)}}
+ TB.place=[];
+ for(let k=0;k<128;k++){ringPos(k,128,3.4,TB.tgt,k*3);TB.pos[k*3]=TB.tgt[k*3]*3;TB.pos[k*3+1]=TB.tgt[k*3+1]*3;TB.pos[k*3+2]=0;TB.col[k*3]=1;TB.col[k*3+1]=.45;TB.col[k*3+2]=.75}
+ TB.pts.visible=true;
+ for(let k=0;k<128;k++){const w=TB.wal[k];WS.outA[w]+=M.tEntry;spawn({fw:w,to:NODES.tour.pos,c:COL.pink,s:.9,d:1.6,arc:3,delay:Math.random()*.6})}
+ S.cT+=M.tPool;TB.next=aClock+2.2;toast(t('toastTour'),2400);beep(440,.25,.05,'triangle');updBtns();
+}
+function tourRound(){
+ if(TB.alive.length<=1){tourPay();return}
+ TB.round++;const nx=[];const lost=[];
+ for(let j=0;j<TB.alive.length;j+=2){const a=TB.alive[j],b=TB.alive[j+1],w=Math.random()<.5?a:b,l=w===a?b:a;nx.push(w);lost.push(l)}
+ if(nx.length===2)TB.semis=lost.slice();if(nx.length===1)TB.final=lost[0];
+ for(const l of lost){TB.col[l*3]=.18;TB.col[l*3+1]=.1;TB.col[l*3+2]=.25;TB.tgt[l*3+2]=-1.2-Math.random()}
+ const r=3.4*Math.pow(nx.length/128,.32);nx.forEach((k,j)=>ringPos(j,nx.length,nx.length===1?0:r,TB.tgt,k*3));
+ TB.alive=nx;beep(500+TB.round*60,.1);
+ toast((L==='ru'?`Турнир · раунд ${TB.round} из 7 · в игре ${nx.length}`:`Tournament · round ${TB.round} of 7 · ${nx.length} left`),1300);
+ TB.next=aClock+(TB.alive.length<=4?1.5:1.1);
+}
+function tourPay(){
+ const champ=TB.alive[0],pl=[champ,TB.final,...(TB.semis||[])];
+ pl.forEach((k,j)=>{const w=TB.wal[k],v=M.tPool*M.tP[j];WS.inA[w]+=v;WS.wn[w]++;spawn({from:NODES.tour.pos,tw:w,c:j?COL.pink:COL.gold,s:2.4-j*.3,d:1.8,arc:3})});
+ spawn({from:NODES.tour.pos,to:NODES.bank.pos,c:COL.gold,s:2,d:1.6,arc:2,cb:()=>NODES.bank.glow=1});
+ S.cK+=M.tPool*M.tBank;
+ toast(L==='ru'?`Финал: ${wid(TB.wal[champ])} получает ${fmt(M.tPool*M.tP[0])} Amber · Банку ${fmt(M.tPool*M.tBank)} · 5% — решение не принято`:`Final: ${wid(TB.wal[champ])} receives ${fmt(M.tPool*M.tP[0])} Amber · Bank ${fmt(M.tPool*M.tBank)} · 5% not yet decided`,4200);
+ beep(1320,.3);TB.running=false;TB.hideAt=aClock+3;TB.auto=aClock+28;updBtns();
+}
+function updTour(dt){
+ if(TB.pts.visible){const k=Math.min(1,dt*4);for(let i=0;i<384;i++)TB.pos[i]+=(TB.tgt[i]-TB.pos[i])*k;TB.pts.geometry.attributes.position.needsUpdate=TB.pts.geometry.attributes.color.needsUpdate=true;
+  TB.pts.rotation.z+=dt*.2; if(!TB.running&&TB.hideAt&&aClock>TB.hideAt){TB.pts.visible=false;TB.hideAt=0}}
+ if(TB.running&&aClock>=TB.next)tourRound();
+ if(!TB.running&&S.tourOn&&S.tok&&!capMode&&aClock>(TB.auto??14))launchTour();
+}
+
+/* ===== Mint & mining ===== */
+const MS={minted:0,running:false,mineOn:false,acc:0,vis:0};
+const MINE_AT=M.mineThr-(M.gnomes-M.mintAvail); // threshold expressed within the available mint
+function mint(){
+ if(MS.minted>=M.mintAvail){toast(t('mintTxt',{n:fmt(MS.minted)}));return}
+ MS.running=true;$('mintbar').style.display='block';beep(620,.15);updBtns();
+}
+function updMint(dt){
+ if(MS.running){const prev=MS.minted;MS.minted=Math.min(M.mintAvail,MS.minted+dt*M.mintAvail/7);
+  MS.vis+=dt;if(MS.vis>.05){MS.vis=0;spawn({from:NODES.mint.pos,to:NODES.burn.pos,c:COL.burn,s:1.2,d:1.4,arc:3,cb:()=>NODES.burn.glow=Math.min(1,NODES.burn.glow+.15)});spawn({from:NODES.mint.pos,to:NODES.gnome.pos,c:COL.usdc,s:.9,d:1.2,arc:1.5})}
+  if(prev<MINE_AT&&MS.minted>=MINE_AT&&!MS.mineOn){MS.mineOn=true;toast(t('toastMine'),3200);beep(990,.3);NODES.gnome.glow=1}
+  if(MS.minted>=M.mintAvail){MS.running=false;updBtns()}
+  updMintBar()}
+ if(MS.mineOn&&S.mine&&S.tok){S.cN+=M.monthRel/(30.4*86400)*dt*SIM_SEC*S.speed;MS.acc+=dt;
+  if(MS.acc>.16){MS.acc=0;spawn({from:NODES.reserve.pos,to:NODES.gnome.pos,c:COL.amber,s:1,d:1.3,arc:1.5});
+   if(Math.random()<.6)spawn({from:NODES.gnome.pos,tw:randW(-1),c:COL.amber,s:.8,d:2,arc:3,delay:1.2})}}
+}
+function updMintBar(){$('mintTxt').textContent=t('mintTxt',{n:fmt(MS.minted)});$('mintP').style.width=(MS.minted/M.mintAvail*100)+'%';
+ $('mineTxt').textContent=MS.mineOn?t('mineOn'):t('mineWait');$('mineP').style.width=Math.min(100,MS.minted/MINE_AT*100)+'%'}
+
+/* ===== Guided tour ===== */
+const TOUR=[['contract',14],['wallets',46],['pool',17],['burn',11],['staking',30],['tour',14],['gnome',24],['fiat',95]];
+let tourI=0;
+function tourStep(i){
+ endFM(true);closeCard();tourI=i;capMode='tour';const [k,d]=TOUR[i];
+ if(k==='wallets')flyTo(V(0,0,0),MOBILE?70:d);else if(k==='fiat')flyTo(V(0,0,0),MOBILE?125:d);
+ else if(k==='staking')flyTo(NODES.staking.pos.clone().add(NODES.bank.pos).multiplyScalar(.5),MOBILE?40:d);
+ else if(k==='gnome')flyTo(NODES.gnome.pos.clone().add(NODES.mint.pos).add(NODES.reserve.pos).divideScalar(3),MOBILE?36:d);
+ else flyTo(NODES[k].pos,MOBILE?d*1.5:d);
+ if(k==='tour'&&!TB.running&&S.tok)launchTour();
+ if(k==='gnome'&&MS.minted<M.mintAvail&&!MS.running)mint();
+ const btns=[];if(i>0)btns.push([t('back'),()=>tourStep(i-1)]);
+ btns.push(i<7?[t('next'),()=>tourStep(i+1),'gold']:[t('close'),()=>{hideCap();resetView()},'gold']);
+ if(i<7)btns.push([t('close'),()=>{hideCap();resetView()}]);
+ showCap(t('step',{i:i+1,n:8})+' · '+t('tour'),'<b>'+t('t'+(i+1)+'h')+'</b><br>'+t('t'+(i+1)),'',btns);beep(560,.08);
+}
+
+/* ===== Labels ===== */
+const LBL={contract:'nContract',pool:'nPool',burn:'nBurn',staking:'nStake',bank:'nBank',tour:'nTour',gnome:'nGnome',reserve:'nReserve',mint:'nMint',market:'nMarket',fiat:'nFiat'};
+const labEls={};
+for(const k in LBL){const e=document.createElement('div');e.className='lb';e.dataset.k=k;$('labels').appendChild(e);labEls[k]=e;
+ e.addEventListener('click',ev=>{ev.stopPropagation();openCard(k);beep(760,.06)});
+ e.addEventListener('dblclick',ev=>{ev.stopPropagation();focusNode(k)});
+ e.addEventListener('mouseenter',()=>setHover(k));e.addEventListener('mouseleave',()=>setHover(null));}
+const _p=new THREE.Vector3();
+const _fq=new THREE.Vector3();
+const _v2=new THREE.Vector3();function fiatLab(out){fiatGroup.updateMatrixWorld();let best=null,bs=1e9;
+ for(let j=0;j<36;j++){const an=j/36*Math.PI*2;_fq.set(Math.cos(an)*FIAT_R,0,Math.sin(an)*FIAT_R).applyMatrix4(fiatGroup.matrixWorld);const w=_fq.clone();_fq.project(camera);
+  if(_fq.z>1||Math.abs(_fq.x)>(innerWidth<700?.6:.8)||_fq.y<-.45||_fq.y>.8)continue;let sc=Math.abs(_fq.x+.55)+Math.abs(_fq.y+.25);const fx=_fq.x,fy=_fq.y;for(const k in NODES){if(k==='fiat')continue;_v2.copy(NODES[k].pos).project(camera);const dx=(_v2.x-fx)*innerWidth/2,dy=(_v2.y-fy)*innerHeight/2;if(Math.abs(dx)<190&&Math.abs(dy)<70)sc+=5}if(sc<bs){bs=sc;best=w}}
+ return best&&bs<5?out.copy(best):out.set(0,0,9999)}
+function labWorld(k,out){const n=NODES[k];if(k==='fiat')return fiatLab(out);
+ if(n.labOff)return out.copy(n.pos).add(n.labOff);return out.copy(n.pos).add(_v.set(0,n.lab,0))}
+function updLabels(){
+ for(const k in labEls){const e=labEls[k];if(k==='fiat'&&!S.fiat){e.style.display='none';continue}
+  labWorld(k,_p);_p.project(camera);
+  if(_p.z>1||_p.x<-1.2||_p.x>1.2||_p.y<-1.2||_p.y>1.2){e.style.display='none';continue}
+  e.style.display='block';const hw=(e.offsetWidth||80)/2+4;const lx=Math.min(innerWidth-hw,Math.max(hw,(_p.x*.5+.5)*innerWidth));e.style.transform=`translate(${lx}px,${(-_p.y*.5+.5)*innerHeight}px) translate(-50%,-50%)`;}
+}
+function nodeScreen(k){labWorld(k,_p);const q=NODES[k].pos.clone().project(camera);return {x:(q.x*.5+.5)*innerWidth,y:(-q.y*.5+.5)*innerHeight}}
+
+/* ===== Hover & picking ===== */
+const ray=new THREE.Raycaster();ray.params.Points.threshold=.45;
+const ndc=new THREE.Vector2();let hoverK=null,hoverW=-1,mouseMoved=false,mx=0,my=0;
+function setHover(k){if(hoverK===k)return;
+ if(hoverK){labEls[hoverK]?.classList.remove('hl');NODES[hoverK].lines.forEach(o=>o.hov=false)}
+ hoverK=k;if(k){labEls[k]?.classList.add('hl');NODES[k].lines.forEach(o=>o.hov=true)}}
+function pick(x,y){
+ ndc.set(x/innerWidth*2-1,-(y/innerHeight)*2+1);ray.setFromCamera(ndc,camera);
+ const hn=ray.intersectObjects(hitList.filter(h=>h.userData.key!=='fiat'||S.fiat),false);
+ let node=hn.length?hn[0]:null;
+ let w=null;if(S.tok){const hw=ray.intersectObjects(bands.map(b=>b.pts),false);if(hw.length){const h=hw[0];w={i:h.index*NB+h.object.userData.band,d:h.distance}}}
+ if(w&&(!node||node.object.userData.key==='fiat'))return {w:w.i};
+ if(node)return {k:node.object.userData.key};
+ return null;
+}
+const tip=$('tip');
+function showTip(){
+ if(hoverK){const c=card(hoverK);tip.innerHTML=`<b>${t(LBL[hoverK])}</b><br>${c.k}<br><span style="color:#8f9cc4">${t('tipClick')}</span>`}
+ else if(hoverW>=0){tip.innerHTML=`<b>${wid(hoverW)}</b> · ${t('simWallet')}<br>${t('wPlayed')}: ${fmt(WS.pl[hoverW])} · ${t('wWon')}: ${fmt(WS.wn[hoverW])}`}
+ else{tip.style.display='none';canvas.style.cursor='grab';return}
+ tip.style.display='block';canvas.style.cursor='pointer';
+ const w=tip.offsetWidth;tip.style.left=Math.min(innerWidth-w-8,mx+14)+'px';tip.style.top=(my+16)+'px';
+}
+canvas.addEventListener('pointermove',e=>{if(e.pointerType!=='mouse')return;mx=e.clientX;my=e.clientY;mouseMoved=true});
+canvas.addEventListener('pointerleave',()=>{setHover(null);hoverW=-1;tip.style.display='none'});
+let pd=null,lastTap=0;
+canvas.addEventListener('pointerdown',e=>{pd={x:e.clientX,y:e.clientY,t:performance.now()}});
+canvas.addEventListener('pointerup',e=>{
+ if(!pd)return;const moved=Math.hypot(e.clientX-pd.x,e.clientY-pd.y),dt=performance.now()-pd.t;pd=null;
+ if(moved>6||dt>600)return;const h=pick(e.clientX,e.clientY);const now=performance.now();
+ if(e.pointerType!=='mouse'&&now-lastTap<320&&h&&h.k){focusNode(h.k);lastTap=0;return}lastTap=now;
+ if(!h){return}
+ if(h.w!=null){if(pickMode)pickWallet(h.w);else walletClick(h.w)}
+ else{openCard(h.k);beep(760,.06)}
+});
+canvas.addEventListener('dblclick',e=>{const h=pick(e.clientX,e.clientY);if(h&&h.k)focusNode(h.k);else if(h&&h.w!=null)walletClick(h.w)});
+window.addEventListener('keydown',e=>{if(e.key==='Escape'){closeCard();$('play').classList.add('hidden');$('intro').classList.add('hidden')}});
+
+/* ===== i18n apply ===== */
+const LEG=[['lWallet','#a78bfa'],['lEntry','#8b5cf6'],['lWin','#f6c75a'],['lBurn','#ff7a3d'],['lStake','#2dd4bf'],['lBank','#f6c75a'],['lTour','#f472b6'],['lMine','#ffb347'],['lMint','#7dd3fc'],['lRoy','#c4b5fd'],['lFiat','#60a5fa']];
+function applyI18n(){
+ document.documentElement.lang=L;
+ document.querySelectorAll('[data-i]').forEach(e=>{e.textContent=t(e.dataset.i)});
+ $('legI').innerHTML=LEG.map(x=>`<div><span class="dot" style="color:${x[1]};background:${x[1]}"></span>${t(x[0])}</div>`).join('');
+ for(const k in labEls)labEls[k].textContent=t(LBL[k]);
+ $('bLang').textContent=L==='ru'?'EN':'RU';$('iLang').textContent=L==='ru'?'English':'Русский';
+ document.title=L==='ru'?'Decision Arena · Electrum Decisions — экономика Amber':'Decision Arena · Electrum Decisions — the Amber economy';
+ updBtns();updMintBar();updRanges();
+ if(cardKey)openCard(cardKey);
+ if(capMode==='fm'&&FM)fmStep(FM.step);else if(capMode==='tour')tourStep(tourI);
+ if(!$('play').classList.contains('hidden'))updPlay();
+}
+function setLang(l){L=l;try{localStorage.setItem('ed_lang',l)}catch(e){}applyI18n()}
+function updBtns(){
+ $('bPause').textContent=S.paused?t('resume'):t('pause');$('bPause').classList.toggle('on',S.paused);
+ $('bSound').textContent=S.sound?t('soundOn'):t('soundOff');$('bSound').classList.toggle('on',S.sound);
+ $('bFollow').textContent=FM&&followAuto?t('stopFollow'):t('follow');$('bFollow').classList.toggle('on',!!(FM&&followAuto));
+ [['tTok','tok'],['tTour','tourOn'],['tMine','mine'],['tFiat','fiat']].forEach(([id,k])=>$(id).classList.toggle('on',S[k]));
+ $('bTourn').classList.toggle('on',TB.running);$('bMint').classList.toggle('on',MS.running);
+}
+
+/* ===== Controls ===== */
+const sliderToPlayers=v=>{v=+v;const n=v<=50?1000+v/50*14000:15000+(v-50)/50*35000;return Math.round(n/500)*500};
+const sliderToSpeed=v=>Math.pow(10,(+v-40)/40);
+function updRanges(){$('vP').textContent=fmt(PLAYERS);const s=S.speed;$('vS').textContent=(s<1?fmt2(s,1):s<10?fmt2(s,1):fmt(s))+'×'}
+$('rP').oninput=e=>{setPlayers(sliderToPlayers(e.target.value));updRanges()};
+$('rS').oninput=e=>{S.speed=sliderToSpeed(e.target.value);updRanges()};
+$('bPause').onclick=()=>{S.paused=!S.paused;updBtns()};
+$('bPlay').onclick=()=>{hideCapTour();openPlay()};
+function hideCapTour(){if(capMode==='tour')hideCap()}
+$('bFollow').onclick=()=>{if(FM&&followAuto){endFM()}else{hideCapTour();startFM(sampleEntry(),null,true)}};
+$('tTok').onclick=()=>{S.tok=!S.tok;bands.forEach(b=>b.m.uniforms.uO.value=S.tok?.55:.1);updBtns()};
+$('tTour').onclick=()=>{S.tourOn=!S.tourOn;updBtns()};
+$('tMine').onclick=()=>{S.mine=!S.mine;updBtns();if(S.mine&&!MS.mineOn)toast(t('mineWait'))};
+$('tFiat').onclick=()=>{S.fiat=!S.fiat;fiatGroup.visible=S.fiat;updBtns()};
+$('bTourn').onclick=()=>{if(!S.tok){S.tok=true;bands.forEach(b=>b.m.uniforms.uO.value=.55);updBtns()}launchTour()};
+$('bMint').onclick=()=>{$('mintbar').style.display='block';updMintBar();mint()};
+$('bRst').onclick=()=>{S.cM=S.cB=S.cS=S.cK=S.cT=S.cN=0;S.simT=0;WS.pl.fill(0);WS.wn.fill(0);WS.inA.fill(0);WS.outA.fill(0);updStats()};
+$('bReset').onclick=()=>{resetView()};
+$('bSound').onclick=()=>{S.sound=!S.sound;updBtns();beep(660,.1)};
+$('bLang').onclick=()=>setLang(L==='ru'?'en':'ru');
+$('iLang').onclick=()=>setLang(L==='ru'?'en':'ru');
+$('bTour').onclick=()=>{$('intro').classList.add('hidden');tourStep(0)};
+$('bHelp').onclick=()=>$('intro').classList.remove('hidden');
+$('iGo').onclick=()=>$('intro').classList.add('hidden');
+$('iTour').onclick=()=>{$('intro').classList.add('hidden');tourStep(0)};
+$('mtoggle').onclick=()=>{$('ctrl').classList.toggle('min')};
+$('stats').onclick=()=>{if(MOBILE)$('stats').classList.toggle('min')};
+if(MOBILE)$('bLeg').classList.remove('hidden');
+$('bLeg').onclick=()=>$('legend').classList.toggle('show');
+if(!MOBILE)$('ctrl').classList.remove('min');
+window.__play=()=>{closeCard();openPlay()};window.__tour=()=>{closeCard();launchTour()};window.__mint=()=>{closeCard();$('bMint').onclick()};
+
+/* ===== Stats ===== */
+function updStats(){$('sM').textContent=fmt(S.cM);$('sB').textContent=fmt(S.cB);$('sS').textContent=fmt(S.cS);$('sK').textContent=fmt(S.cK);$('sT').textContent=fmt(S.cT);$('sN').textContent=fmt(S.cN);
+ const s=S.simT,d=Math.floor(s/86400),h=Math.floor(s%86400/3600),m=Math.floor(s%3600/60);$('clock').textContent=t('clock',{d,h,m})}
+
+/* ===== Loop ===== */
+const clock=new THREE.Clock();let frame=0,fpsAcc=0,fpsN=0,statT=0;window.__fps=0;
+function tick(){
+ requestAnimationFrame(tick);
+ const dt=Math.min(clock.getDelta(),.1);frame++;
+ fpsAcc+=dt;fpsN++;if(fpsAcc>1){window.__fps=Math.round(fpsN/fpsAcc);fpsAcc=0;fpsN=0}
+ if(!S.paused){
+  aClock+=dt;const sd=dt*SIM_SEC*S.speed;S.simT+=sd;
+  for(const b of bands)b.spin.rotation.y+=dt*b.w*Math.min(3,.6+.4*S.speed);
+  fiatGroup.rotation.y+=dt*.01;
+  if(S.tok){S.acc+=PLAYERS/2*MATCH_PER_PLAYER_DAY/86400*sd;let vis=0;const cap=MOBILE?6:14;
+   while(S.acc>=1){S.acc--;if(vis<cap&&live()<PN*.7){visMatch();vis++}else numMatch()}}
+  updTour(dt);updMint(dt);
+  if(FM&&followAuto&&aClock-fmTimer>(FM.step===7?4:2.8)){if(FM.step<7)fmStep(FM.step+1);else startFM(sampleEntry(),null,true)}
+ }
+ bands.forEach(b=>b.pts.updateMatrixWorld());
+ updParticles();
+ for(const b of bands)if(b.dirty){b.ha.needsUpdate=true;b.dirty=false}
+ /* node animation */
+ const tm=performance.now()/1000;
+ for(const k in NODES){const n=NODES[k];if(k==='fiat')continue;
+  const target=(hoverK===k?1:0)+n.glow;n.glow*=.95;const sc=1+Math.min(.35,target*.18)+(k==='contract'?Math.sin(tm*2)*.03:0);n.inner.scale.setScalar(sc);
+  n.inner.traverse(o=>{if(o.name==='spin'){o.rotation.y+=dt*.3;o.rotation.x+=dt*.1}if(o.name==='spin2'){o.rotation.y-=dt*.15}if(o.name==='spinr'){o.rotation.z+=dt*.8;o.rotation.y+=dt*.3}if(o.name==='coin'){o.rotation.z+=dt*1.5}if(o.name==='flame'){o.scale.y=1+Math.sin(tm*9)*.15+n.glow*.4}});
+ }
+ if(!S.paused)pulse*=.94;const pz=NODES.pool.inner.getObjectByName('pulse');pz.material.opacity=.1+Math.min(.6,pulse*.35);pz.scale.setScalar(1+pulse*.03);
+ NODES.gnome.inner.children.forEach(c=>c.material.opacity=1);
+ for(const o of flowLines){const want=o.hov?.85:((o.a==='reserve'||o.a==='contract'&&o.b==='reserve')&&!MS.mineOn?.06:o.base);o.ln.material.opacity+=(want-o.ln.material.opacity)*.15}
+ if(mouseMoved&&frame%2===0){mouseMoved=false;const h=pick(mx,my);if(h&&h.k){setHover(h.k);hoverW=-1}else{setHover(null);hoverW=h&&h.w!=null?h.w:-1}showTip()}
+ updFly();controls.update();
+ updLabels();
+ if((statT+=dt)>.2){statT=0;updStats()}
+ composer.render();
+}
+function onResize(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);composer.setSize(innerWidth,innerHeight);
+ bloom.resolution.set(innerWidth*(MOBILE?.5:1),innerHeight*(MOBILE?.5:1));const u=uScale();bands.forEach(b=>b.m.uniforms.uS.value=u);PM.uniforms.uS.value=u}
+addEventListener('resize',onResize);
+
+/* ===== Boot ===== */
+applyI18n();updStats();
+const QS=new URLSearchParams(location.search);
+if(QS.has('nointro'))$('intro').classList.add('hidden');
+window.__ed={openCard,closeCard,nodeScreen,walletScreen:i=>{const q=wPos(i).project(camera);return {x:(q.x*.5+.5)*innerWidth,y:(-q.y*.5+.5)*innerHeight}},
+ pick,startFM,fmStep,endFM,launchTour,mint,tourStep,setLang,focusNode,resetView,walletClick,setPlayers,S,M,MS,TB,get FM(){return FM},get cardKey(){return cardKey},PLAYERS:()=>PLAYERS,live,ready:true};
+tick();
+</script>
+</body>
+</html>
