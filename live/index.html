@@ -216,24 +216,25 @@ button.gold{background:linear-gradient(135deg,#b8862a,#f6c75a 42%,#efe9d6 60%,#d
 <div id="labels"></div>
 <div id="brand"><div class="t1">ELECTRUM DECISIONS</div><div class="t2">Decision Arena<span class="ed" id="edTag"></span></div><div class="t3" data-i="sub"></div></div>
 <div id="topr">
- <button id="bTour" data-i="tour"></button>
  <button id="bFind" data-i="find"></button>
- <button id="bMode"></button>
  <button id="bSound" data-i="soundOff"></button>
- <button id="bReset" data-i="resetView"></button>
+ <button id="bAuth"><span data-i="authBtn"></span> <small class="soon" data-i="soonS"></small></button>
  <button id="bHelp">?</button>
  <button id="bLang">EN</button>
- <div id="modeMenu" class="pn"></div>
 </div>
+<div id="modeMenu" class="pn"></div>
 <div id="eraTag"></div>
 <div id="ringLab"></div>
 <div id="banner" class="pn"></div>
 <div id="prog" class="pn"><div id="progT"></div><div class="pb"><i id="progP"></i></div></div>
 <div id="stats" class="pn min">
- <h4 data-i="dataH"></h4>
+ <div id="stHandle"><i></i></div>
+ <div class="sthd"><h4 data-i="dataH"></h4><button class="stMin" title="▾">▾</button></div>
  <div class="src"><button id="srcSim" data-i="srcSim"></button><button id="srcChain" data-i="srcChain"></button></div>
- <div id="statRows"></div>
+ <div id="stTabs"><button data-t="eco" class="on" data-i="tabEco"></button><button data-t="mt" data-i="tabMt"></button><button data-t="wal" data-i="tabWal"></button><button data-t="gn" data-i="tabGn"></button></div>
+ <div id="statRows" data-tab="eco"></div>
  <div id="clock"></div>
+ <div id="stFoot"></div>
 </div>
 <div id="legend" class="pn"><h4 data-i="legend"></h4><div id="legI"></div></div>
 <div id="mintbar" class="pn">
@@ -246,43 +247,51 @@ button.gold{background:linear-gradient(135deg,#b8862a,#f6c75a 42%,#efe9d6 60%,#d
 </div>
 <div id="ctrl" class="pn min">
  <button id="mtoggle">⚙</button>
- <div class="grp">
+ <div class="cg" data-g="view"><div class="cgh" data-i="gView"></div><div class="cgb">
   <button id="bPause" data-i="pause"></button>
   <button id="bPlay" class="gold simOnly" data-i="playMatch"></button>
-  <button id="bFollow" class="simOnly" data-i="follow"></button>
- </div>
- <div class="sep"></div>
- <div class="grp more">
-  <label class="simOnly"><span data-i="players"></span> <input id="rP" type="range" min="0" max="100" value="50"><b id="vP">15 000</b></label>
-  <label><span data-i="speed"></span> <input id="rS" type="range" min="0" max="100" value="40"><b id="vS">1×</b></label>
- </div>
- <div class="sep"></div>
- <div class="grp more">
-  <button id="tTok" class="on" data-i="tTok"></button>
-  <button id="tTour" class="on simOnly" data-i="tTour"></button>
-  <button id="tMine" class="on simOnly" data-i="tMine"></button>
-  <button id="tFiat" class="on" data-i="tFiat"></button>
- </div>
- <div class="sep"></div>
- <div class="grp more">
-  <button id="bTourn" class="simOnly" data-i="launchTour"></button>
-  <button id="bMint" class="simOnly" data-i="mintBtn"></button>
-  <button id="bTM" data-i="timeM"></button>
-  <button id="bRebuild" class="chainOnly" data-i="rebuild"></button>
+  <button id="bFollow" class="simOnly more" data-i="follow"></button>
+  <button id="bTour" class="more" data-i="tour"></button>
+  <button id="bReset" class="more" data-i="resetView"></button>
+  <button id="bMode" class="more"></button>
+  <button id="bLb" class="more" data-i="lbBtn"></button>
+  <button id="bTourn" class="simOnly more" data-i="launchTour"></button>
+  <button id="bMint" class="simOnly more" data-i="mintBtn"></button>
+  <button id="bRst" class="simOnly more" data-i="resetSim"></button>
   <button id="bLeg" data-i="legendBtn" class="hidden"></button>
-  <button id="bRst" class="simOnly" data-i="resetSim"></button>
- </div>
- <div class="sep"></div>
- <div class="grp more">
+  <label class="simOnly more"><span data-i="players"></span> <input id="rP" type="range" min="0" max="100" value="50"><b id="vP">15 000</b></label>
+ </div></div>
+ <div class="cg more" data-g="time"><div class="cgh" data-i="gTime"></div><div class="cgb">
+  <button id="bTM" data-i="timeM"></button>
   <button id="tEra"></button>
-  <button id="tNet" class="on"></button>
-  <button id="tGnF"></button>
-  <button id="tCls"></button>
-  <button id="tCc" data-i="tCc"></button>
- </div>
+  <label><span data-i="speed"></span> <input id="rS" type="range" min="0" max="100" value="40"><b id="vS">1×</b></label>
+  <button id="bRebuild" class="chainOnly" data-i="rebuild"></button>
+ </div></div>
+ <div class="cg" data-g="lay"><div class="cgh" data-i="gLay"></div><div class="cgb">
+  <button id="bLay"></button>
+ </div></div>
+</div>
+<div id="layP" class="pn">
+ <button class="x" id="layX">✕</button>
+ <h4 data-i="gLay"></h4>
+ <div class="lsec" data-i="laySecCls"></div>
+ <div class="lrow"><button id="lyP" class="ck on" data-c="p"></button><button id="lyT" class="ck on" data-c="t"></button><button id="lyL" class="ck on" data-c="l"></button><button id="lyB" class="ck on" data-c="b"></button></div>
+ <div class="lrow"><button id="tCls"></button></div>
+ <div class="lsec" data-i="laySecWorld"></div>
+ <div class="lrow"><button id="tTok" class="ck on" data-i="tTok"></button><button id="tNet" class="ck on"></button><button id="tFiat" class="ck on" data-i="tFiat"></button><button id="tTour" class="ck on simOnly" data-i="tTour"></button><button id="tMine" class="ck on simOnly" data-i="tMine"></button></div>
+ <div class="lsec" data-i="laySecCast"></div>
+ <div class="lrow"><button id="tGnF" class="ck"></button><button id="tArc" class="ck on" data-i="tArc"></button><button id="tLgn" class="ck"></button><button id="tGlow" class="ck on" data-i="tGlow"></button><button id="tCc" data-i="tCc"></button></div>
+ <div class="lsec" data-i="laySecView"></div>
+ <div class="lrow"><button id="tCB" class="ck" data-i="tCB"></button></div>
+ <div class="lrow qrow"><span data-i="qLab"></span><button id="qA" data-q="auto" data-i="qAuto"></button><button id="qH" data-q="high" data-i="qHigh"></button><button id="qL" data-q="low" data-i="qLow"></button></div>
+ <div class="sm" id="qInfo"></div>
+ <div id="cbKey"></div>
 </div>
 <div id="tm" class="pn">
- <div class="row"><b style="font-size:12px;letter-spacing:.12em;color:var(--gold)" data-i="timeM"></b><button id="tmPlay" data-i="tmPlay"></button><input id="tmR" type="range" min="0" max="1000" value="1000"><button id="tmNow" data-i="tmNow"></button><button id="tmX">✕</button></div>
+ <div class="row"><b style="font-size:12px;letter-spacing:.12em;color:var(--gold)" data-i="timeM"></b><button id="tmPlay" data-i="tmPlay"></button><span id="tmCur"></span><span style="flex:1"></span><button id="tmNow" data-i="tmNow"></button><button id="tmX">✕</button></div>
+ <div id="tmTL"><div id="tmMk"></div><input id="tmR" type="range" min="0" max="1000" value="1000"></div>
+ <div id="tmDates"><span id="tmD0"></span><span id="tmD1"></span></div>
+ <div id="tmMsList"></div>
  <div id="tmV"></div>
 </div>
 <div id="foot"></div>
@@ -320,6 +329,158 @@ button.gold{background:linear-gradient(135deg,#b8862a,#f6c75a 42%,#efe9d6 60%,#d
  <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="gold" id="pGo" data-i="playGo"></button><button id="pPick" data-i="playPick"></button><button id="pCancel" data-i="cancel"></button></div>
 </div></div>
 <div id="err" class="modal"><div class="pn"><h2>WebGL</h2><p data-i="noGL"></p></div></div>
+<style>
+/* ===== Round 6: grouped controls, data tabs, layers, timeline, feed, leaderboard, share, embed, hubs ===== */
+#modeMenu{position:fixed;top:auto;right:auto;z-index:31}
+#topr #bAuth small.soon{font-size:10px;color:var(--gold);opacity:.85}
+#ctrl{gap:8px 10px;align-items:stretch}
+.cg{display:flex;flex-direction:column;gap:4px;padding:0 4px}
+.cg+.cg{border-left:1px solid rgba(160,170,205,.22);padding-left:12px}
+.cgh{font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--mut);font-weight:600}
+.cgb{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+#bLay b{color:var(--gold);font-weight:600;margin-left:4px}
+.sthd{display:flex;align-items:center;justify-content:space-between}.sthd h4{margin:0!important}
+.stMin{padding:1px 8px;font-size:11px;transition:transform .2s}
+#stats.coll .stMin{transform:rotate(-90deg)}
+#stats.coll #statRows,#stats.coll #clock,#stats.coll .src,#stats.coll #stTabs{display:none}
+#stTabs{display:flex;gap:3px;margin:6px 0 6px}#stTabs button{flex:1;padding:3px 4px;font-size:10.5px;border-radius:7px}
+#statRows[data-tab=eco] .st:not(.tb-eco),#statRows[data-tab=mt] .st:not(.tb-mt),#statRows[data-tab=wal] .st:not(.tb-wal),#statRows[data-tab=gn] .st:not(.tb-gn){display:none}
+#statRows .mtx{font-size:11px;color:var(--mut);padding:4px 0}
+#stHandle{display:none}#stFoot{display:none}
+#layP{position:fixed;z-index:12;width:340px;padding:12px 14px;display:none;max-height:70vh;overflow:auto}
+#layP.open{display:block}
+#layP h4{margin:0 0 6px;font-size:11px;letter-spacing:.16em;color:var(--mut);text-transform:uppercase}
+#layP .x{position:absolute;top:8px;right:8px;padding:2px 8px}
+.lsec{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin:8px 0 4px;opacity:.85}
+.lrow{display:flex;flex-wrap:wrap;gap:5px;margin:2px 0}
+button.ck{padding:4px 9px 4px 7px;font-size:12px;background:transparent}
+button.ck::before{content:'☐';margin-right:6px;color:var(--mut)}
+button.ck.on{background:rgba(91,63,209,.35)}button.ck.on::before{content:'☑';color:var(--gold)}
+button.ck i.sw{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:0}
+.qrow{align-items:center}.qrow span{font-size:12px;color:var(--mut);margin-right:4px}.qrow button{padding:3px 9px;font-size:11.5px}
+#qInfo{font-size:11px;color:var(--mut);margin-top:4px}
+#cbKey{font-size:11.5px;margin-top:6px;display:none}#cbKey.on{display:block}#cbKey span{margin-right:10px;white-space:nowrap}
+/* timeline */
+#tmTL{position:relative;margin:16px 0 0;height:28px}
+#tmTL #tmR{position:absolute;left:0;right:0;top:8px;width:100%;margin:0;z-index:2;accent-color:#f6c75a}
+#tmMk{position:absolute;left:8px;right:8px;top:0;height:28px;z-index:1;pointer-events:none}
+#tmMk .mk{position:absolute;top:-12px;transform:translateX(-50%);pointer-events:auto;cursor:pointer;width:14px;height:14px;padding:0;border:0;background:none;z-index:3}
+#tmMk .mk::after{content:'';position:absolute;left:3px;top:3px;width:8px;height:8px;transform:rotate(45deg);background:var(--gold);box-shadow:0 0 8px rgba(246,199,90,.8)}
+#tmMk .mk.now::after{background:#5eead4;box-shadow:0 0 8px #5eead4}
+#tmMk .mk.past::after{opacity:.55}
+#tmDates{display:flex;justify-content:space-between;font-size:11px;color:var(--mut);margin-top:2px}
+#tmCur{font-size:12px;color:#fff;font-weight:600;margin-left:6px}
+#tmMsList{display:flex;flex-wrap:wrap;gap:4px 6px;margin:6px 0 2px}
+#tmMsList button{font-size:11px;padding:2px 8px;border-radius:999px}
+#tmMsList button b{color:var(--gold);font-weight:600;margin-right:4px}
+#tmMsList button.past{opacity:.75}
+/* feed */
+#feed{position:fixed;right:14px;bottom:150px;width:300px;z-index:6;padding:8px 10px;font-size:12px}
+#feed .fh{display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut);font-weight:600}
+#feed .fh .live{width:7px;height:7px;border-radius:50%;background:#5eead4;display:inline-block;margin-right:6px;box-shadow:0 0 8px #5eead4;animation:fdp 1.6s infinite}
+@keyframes fdp{50%{opacity:.35}}
+#feedL{display:flex;flex-direction:column;gap:3px;margin-top:6px;max-height:230px;overflow:auto}
+#feed.min #feedL{display:none}
+.fe{display:flex;gap:7px;align-items:flex-start;padding:4px 6px;border-radius:8px;cursor:pointer;border:1px solid transparent;background:rgba(20,28,70,.35);animation:fdin .4s}
+.fe:hover{border-color:rgba(246,199,90,.5)}.fe .ic{width:18px;text-align:center;flex:none}.fe .tx{flex:1;line-height:1.3}.fe .tm{font-size:10px;color:var(--mut);display:block}
+@keyframes fdin{from{opacity:0;transform:translateY(-4px)}}
+/* leaderboard */
+#lbP{top:62px;right:14px;width:400px;max-height:calc(100% - 180px);overflow:auto}
+.lbt{display:flex;gap:4px;margin:8px 0}.lbt button{flex:1;font-size:11.5px;padding:4px 6px}
+.lbr{display:grid;grid-template-columns:26px 1fr 58px 58px 58px;gap:4px;align-items:center;padding:5px 6px;border-radius:8px;cursor:pointer;font-size:12px;font-variant-numeric:tabular-nums}
+.lbr:hover{background:rgba(246,199,90,.1)}.lbr.hd{cursor:default;color:var(--mut);font-size:10.5px;text-transform:uppercase;letter-spacing:.08em}.lbr.hd:hover{background:none}
+.lbr b{color:var(--gold)}.lbr span{text-align:right}.lbr .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}
+.soonTag{display:inline-block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#1a1405;background:linear-gradient(135deg,#b8862a,#f6c75a);border-radius:6px;padding:1px 6px;margin-left:6px;vertical-align:1px}
+.demoTag{display:inline-block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#cfe;border:1px dashed #5eead4;border-radius:6px;padding:0 6px;margin-left:6px;vertical-align:1px}
+/* wallet card extras */
+#wx{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 2px}#wx button{font-size:12px;padding:5px 10px}
+/* share */
+#shImg{width:100%;border-radius:10px;border:1px solid var(--line);display:block;margin:8px 0}
+/* hint */
+#hint1{position:fixed;left:50%;transform:translateX(-50%);bottom:150px;z-index:9;width:min(420px,92vw);padding:12px 14px;display:none}
+#hint1.open{display:block}#hint1 .k{font-size:10px}#hint1 p{margin:4px 0 8px;font-size:13px;line-height:1.5}
+#hint1 .row{display:flex;gap:6px;align-items:center}#hint1 .dots{flex:1;font-size:10px;color:var(--mut);letter-spacing:.3em}
+/* hives */
+#hvLab{position:fixed;inset:0;pointer-events:none;z-index:3}
+#hvLab div{position:absolute;transform:translate(-50%,-100%);font-size:11px;font-weight:600;white-space:nowrap;padding:1px 7px;border-radius:999px;background:rgba(10,14,36,.55);border:1px solid rgba(255,255,255,.18);text-shadow:0 0 4px #000;pointer-events:auto;cursor:pointer}
+#hvLab div small{font-weight:400;color:var(--mut);margin-left:4px}
+/* auth / profile */
+#authP .pn{width:min(620px,94vw)}
+.authB{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.authB button{flex:1;min-width:150px}
+.prof{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.prof>.k{grid-column:1/-1}
+.prof .sec{border:1px solid rgba(160,170,205,.22);border-radius:10px;padding:8px 10px;background:rgba(20,28,70,.35);font-size:12.5px}
+.prof .sec h5{margin:0 0 6px;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.sk{height:9px;border-radius:5px;background:linear-gradient(90deg,rgba(160,170,205,.16),rgba(160,170,205,.3),rgba(160,170,205,.16));margin:6px 0}
+.sk.s{width:55%}.sk.m{width:75%}
+.tgl{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--mut);margin-top:6px}.tgl i{width:30px;height:16px;border-radius:9px;background:#2a3566;position:relative;display:inline-block;opacity:.6}.tgl i::after{content:'';position:absolute;left:2px;top:2px;width:12px;height:12px;border-radius:50%;background:#9fb0d8}
+.soc{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}.soc a,.soc span{font-size:11.5px;border:1px solid rgba(160,170,205,.28);border-radius:999px;padding:2px 9px;text-decoration:none;color:var(--txt)}.soc span{opacity:.5}
+/* castle view */
+#cv{position:fixed;inset:0;z-index:25;display:none;background:radial-gradient(ellipse at 50% 40%,rgba(30,40,90,.92),rgba(5,8,22,.97));opacity:0;transition:opacity .5s}
+#cv.open{display:block}#cv.vis{opacity:1}
+#cvTop{position:absolute;top:14px;left:16px;right:16px;display:flex;align-items:flex-start;gap:10px;z-index:2}
+#cvTop .tt{flex:1}#cvTop h2{margin:2px 0;font-size:22px}#cvTop .sm{color:var(--mut);font-size:12px}
+#cvSvg{position:absolute;left:0;right:0;top:70px;bottom:120px;width:calc(100% - 320px);height:calc(100% - 190px)}
+#cvInfo{position:absolute;right:16px;top:90px;width:300px;padding:12px 14px;font-size:12.5px}
+#cvNote{position:absolute;left:50%;transform:translateX(-50%);bottom:18px;width:min(760px,94vw);padding:10px 14px;font-size:12px;color:#c9d2ee;text-align:center}
+.bld{cursor:pointer}.bld:hover .top{filter:brightness(1.25)}
+.blab{font:600 15px Inter,system-ui,sans-serif;text-anchor:middle;fill:#fff;paint-order:stroke;stroke:#050816;stroke-width:3px}
+.blv{font:600 13px Inter,system-ui,sans-serif;text-anchor:middle;fill:#f6c75a;paint-order:stroke;stroke:#050816;stroke-width:3px}
+/* embed */
+#embLogo{display:none;position:fixed;right:12px;bottom:10px;z-index:9;font-size:10.5px;letter-spacing:.22em;font-weight:700;color:rgba(246,199,90,.75);text-decoration:none;padding:4px 8px;border-radius:8px;background:rgba(5,8,22,.35)}
+body.embed #embLogo{display:block}
+body.embed #topr,body.embed #stats,body.embed #legend,body.embed #ctrl,body.embed #foot,body.embed #card,body.embed #mintbar,body.embed #tm,body.embed .ph,body.embed #cap,body.embed #brand,body.embed #banner,body.embed #prog,body.embed #feed,body.embed #hint1,body.embed #layP,body.embed #eraTag,body.embed #intro,body.embed #zHint,body.embed #eyesUI,body.embed #hvLab{display:none!important}
+body.kiosk #feed,body.kiosk #hint1,body.kiosk #layP,body.kiosk #hvLab,body.inv #feed,body.inv #hint1{display:none!important}
+@media (max-width:820px){
+ #stats{left:0;right:0;top:auto!important;bottom:0;width:auto;max-width:none;border-radius:16px 16px 0 0;padding:4px 12px 10px;z-index:8;max-height:62vh;overflow:auto;transition:transform .3s cubic-bezier(.2,.8,.2,1);touch-action:pan-y}
+ #stats.min{transform:translateY(calc(100% - 78px));overflow:hidden}
+ #stHandle{display:block;padding:4px 0 6px;cursor:grab}#stHandle i{display:block;width:40px;height:4px;border-radius:2px;background:rgba(200,210,240,.45);margin:0 auto}
+ .stMin{display:none}#stats.coll #statRows,#stats.coll #clock,#stats.coll .src,#stats.coll #stTabs{display:revert}
+ #stFoot{display:block;font-size:10.5px;color:#7f8db8;margin-top:6px}
+ #foot{display:none}
+ #ctrl{bottom:86px;max-height:38vh}
+ .cg+.cg{border-left:0;padding-left:4px}.cgh{display:none}#ctrl.min .cg{padding:0}
+ #ctrl:not(.min) .cgh{display:block;width:100%}
+ #ctrl:not(.min){flex-direction:column;align-items:stretch}
+ #layP{left:8px!important;right:8px;width:auto;bottom:86px!important;top:auto!important;max-height:56vh}
+ #feed{left:8px;right:8px;width:auto;bottom:auto;top:132px;padding:5px 9px}
+ #feed.min .fh{font-size:10px}#feedL{max-height:30vh}
+ #feed #feedOne{display:block}
+ #lbP{top:auto;bottom:0;left:0;right:0;width:auto;max-height:64%;border-radius:16px 16px 0 0}
+ #hint1{bottom:auto;top:176px}
+ #cvInfo{left:8px;right:8px;width:auto;top:auto;bottom:96px;max-height:30vh;overflow:auto}
+ #cvSvg{top:70px;width:100%;height:calc(100% - 300px)}
+ #cvSvg .blab{font-size:30px;stroke-width:6px}#cvSvg .blv{font-size:26px;stroke-width:6px}
+ #cvNote{bottom:8px;font-size:11px}
+ .prof{grid-template-columns:1fr}
+ #tm{bottom:86px!important}
+ #topr #bAuth small.soon{display:none}
+ body:has(#card.open) #stats,body:has(#tm.open) #stats,body:has(.ph.open) #stats,body:has(#lbP.open) #stats,body:has(#layP.open) #stats{transform:translateY(100%)!important}
+ #topr{max-width:56vw;gap:4px}
+ #ctrl:not(.min){z-index:9}
+ #topr button{padding:5px 8px;font-size:12px}
+}
+#feedOne{display:none;font-size:11.5px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#dfe5f5}
+#feed:not(.min) #feedOne{display:none!important}
+
+.tgl i.on{background:rgba(94,234,212,.45)}.tgl i.on::after{left:16px;background:#5eead4}
+@media (max-width:820px){.lb.gch{white-space:normal!important;width:220px;text-align:center;line-height:1.35}}
+.lb.gch{color:#f6c75a!important;border-color:rgba(246,199,90,.45)!important;background:rgba(40,28,6,.55)!important;font-style:italic}
+ul.tech{margin:6px 0 4px;padding-left:18px;font-size:13px;line-height:1.5}ul.tech li{margin:3px 0}ul.tech b{color:#f6c75a}
+.lbt.sub{margin-top:-2px}.lbt.sub button{font-size:11px;padding:3px 8px}
+#cvInfo .row2{display:flex;justify-content:space-between;font-size:12.5px;margin:3px 0}
+.authRow{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+#wxHub{margin:2px 0 6px}
+#tmV>.nums{flex:1 1 100%;width:100%;grid-template-columns:repeat(auto-fit,minmax(190px,1fr))!important}#tmV>.nums b{white-space:nowrap}
+@media (max-width:600px){#tmCur{white-space:nowrap;font-size:12px}#tm>.row{flex-wrap:wrap;row-gap:6px}#tmV>.nums{grid-template-columns:1fr 1fr!important;gap:0 12px!important}#tmV>.nums div{font-size:12px;padding:4px 0}}
+</style>
+<div id="feed" class="pn"><div class="fh" id="feedH"><span><span class="live"></span><span data-i="feedH"></span></span><span id="feedT">▾</span></div><div id="feedOne"></div><div id="feedL"></div></div>
+<div id="lbP" class="pn ph"><button class="x" id="lbX">✕</button><div id="lbB"></div></div>
+<div id="hint1" class="pn"><div class="k" id="h1K"></div><p id="h1T"></p><div class="row"><span class="dots" id="h1D"></span><button id="h1S" data-i="h1Skip"></button><button id="h1N" class="gold" data-i="h1Next"></button></div></div>
+<div id="hvLab"></div>
+<div id="shareP" class="modal hidden"><div class="pn"><button class="x" id="shX" style="position:absolute;top:10px;right:10px;padding:3px 9px">✕</button><div class="k" data-i="shK"></div><h2 data-i="shH"></h2><img id="shImg" alt=""><div class="btns"><button class="gold" id="shGo" data-i="shShare"></button><button id="shDl" data-i="shDl"></button><button id="shCp" data-i="shCopy"></button></div><p class="note" id="shNote"></p></div></div>
+<div id="authP" class="modal hidden"><div class="pn" style="position:relative"><button class="x" id="authX" style="position:absolute;top:10px;right:10px;padding:3px 9px">✕</button><div id="authB"></div></div></div>
+<div id="cv"><div id="cvTop"><div class="tt"><div class="k" id="cvK"></div><h2 id="cvH"></h2><div class="sm" id="cvS"></div></div><button id="cvX">✕</button></div><svg id="cvSvg" viewBox="-20 0 1040 620" preserveAspectRatio="xMidYMid meet"></svg><div id="cvInfo" class="pn"></div><div id="cvNote" class="pn"></div></div>
+<a id="embLogo" target="_blank" rel="noopener">ELECTRUM DECISIONS ↗</a>
 <script>
 /* =====================================================================
    ED_CONFIG — ЕДИНЫЙ БЛОК НАСТРОЕК / SHARED CONFIG (dev = /v2/, prod = /live/)
@@ -389,6 +550,34 @@ window.ED_CONFIG={
  // 3 деревянный форт, 4 обсидиановый бастион, 5 небесный храм. null/undefined = облик по умолчанию.
  // Можно задать и снаружи: window.ED_skinResolver = addr => …
  skinResolver:null,
+
+ /* ---------- ХУКИ РАУНДА 6 (для команды бэкенда) / ROUND 6 HOOKS ----------
+  Хуки подключаются к уже существующему серверу студии (его API): функция хука просто запрашивает данные у сервера и возвращает их.
+  Все хуки необязательные. null = встроенное поведение (dev: демо-данные с пометкой «демо»; prod: «4X · скоро» / «скоро», без выдуманных чисел).
+  Любой хук можно задать и снаружи до загрузки страницы: window.ED_castleProvider / ED_legionProvider / ED_authProvider. */
+
+ // A. «Внутри замка» (будущая точка входа в 4X-игру). Функция (addr) → объект или Promise объекта:
+ //   {buildings:[{id:'keep'|'walls'|'barracks'|'camp'|'mine'|'workshop'|'storage', level:число, max:число}],
+ //    army:число (необязательно), power:число (Мощь; если нет — считается из зданий и армии),
+ //    nick:строка (необязательно), showNick:true|false (игрок разрешил показывать ник на карте),
+ //    socials:{x:'https://x.com/…', tiktok:'…', youtube:'…', instagram:'…'} (все поля необязательные)}
+ //   Вернуть null = замок без данных («4X · скоро»).
+ castleProvider:null,
+
+ // B. Рои (кланы). Функция () → массив или Promise массива:
+ //   [{id:'h1', name:'Вега', color:'#8fd3ff' (необязательно), players:['0x…', …] (обычно 50–100 игроков),
+ //     power:число (суммарная Мощь, необязательно), wins:число (суммарные победы, необязательно)}]
+ //   Замки участников стягиваются в поясе ближе друг к другу, вокруг — общая аура и подпись: название · Мощь.
+ legionProvider:null,
+ // Как называть рои в интерфейсе: {ru:'Рои', en:'Hives', ru1:'Рой', en1:'Hive'} (мн. и ед. число)
+ legionTerm:{ru:'Рои',en:'Hives',ru1:'Рой',en1:'Hive'},
+
+ // C. Единый аккаунт с игрой (вход через Google / Apple / Email). null = кнопки «скоро», сайт ничего не собирает.
+ //   Объект {methods:['google','apple','email'], signIn:(method)=>Promise<профиль>, signOut:()=>void, current:()=>профиль|null}
+ //   профиль = {nick, wallet:'0x…' (внутриигровой кошелёк, создаётся автоматически через thirdweb), socials:{…}, showNick:true|false}
+ //   Внешние кошельки не привязываются. Кошелёк некастодиальный: фраза восстановления есть только у игрока,
+ //   студия и thirdweb ключей не хранят и не видят. Сайт никогда не просит ключ или фразу.
+ authProvider:null,
 
  // Аудиты и проверки смарт-контрактов — панель «Аудиты» (пасхалка: отдалите камеру до предела, появится голова-туманность с глазами).
  // По слоту на контракт. Слот — массив отчётов {auditor, url, date:'ГГГГ-ММ-ДД', scope, mechanicsSummary, checks:[]};
@@ -640,6 +829,27 @@ function card(key){
  `<p>The pink-violet nebula ring is thirdweb, our blockchain infrastructure partner: automation and smart contract deployment.</p><p>It is the skin factory: every 1–2 months a wave of new castle NFTs leaves the ring, a limited run of cosmetics (castle skin, deck design, icons). The NFTs fly to player wallets; holders own them in their own wallets and decide what to do with them.</p><p>Castle NFT is one ERC-1155 contract. Each collection is a separate token ID inside it: 0, 1, 2, 3…, each with its own fixed limit. A wave from the ring is the release of the next ID.</p>`,
  n:[[r?'Роль':'Role',r?'инфраструктура и деплой контрактов':'infrastructure and contract deployment'],[r?'Дропы NFT замков':'Castle NFT drops',r?'раз в 1–2 месяца, ограниченный тираж':'every 1–2 months, limited run'],[r?'Контракт NFT замков (ERC-1155)':'Castle NFT contract (ERC-1155)',c?`<a href="${scanAddr(c)}" target="_blank" rel="noopener">${short(c)} ↗</a>`:t('soon')],[r?'Роялти с перепродаж на внешних площадках':'Royalty on external marketplace resales',pct(M.roy)+' · POL/USDC']],
  x:`<p class="note">${r?(SET.kind==='sim'?'В симуляции дропы — пример. ':'')+'Кольцо — фон: импульсов и связей на схеме нет, кроме волн дропа.':(SET.kind==='sim'?'In the simulation the drops are an example. ':'')+'The ring is a backdrop: no pulses or links on the map apart from drop waves.'}</p>`}},
+ tech:()=>({k:r?'Как это устроено':'How it is built',h:r?'Технологии':'Technology',b:`<ul class="tech">${(r?[
+  ['Unity','игровой движок; на нём сделана карточная игра Decision Arena'],
+  ['Серверы студии','собственные серверы и кластеры Electrum Decisions: матчи, игровая логика, аккаунты'],
+  ['Единая база аккаунтов','общая для игры и сайта: один профиль везде'],
+  ['thirdweb','встроенные некастодиальные кошельки в игре и фабрика NFT замков'],
+  ['Polygon','сеть, в которой работают Amber, матчи, гномы и стейкинг'],
+  ['Chainlink Automation','автоматический запуск регулярных задач контрактов'],
+  ['Аудиты','Token Sniffer и SolidProof']]:[
+  ['Unity','the game engine; the Decision Arena card game is built on it'],
+  ['Studio servers','Electrum Decisions’ own servers and clusters: matches, game logic, accounts'],
+  ['Unified account database','shared by the game and the site: one profile everywhere'],
+  ['thirdweb','in-game non-custodial wallets and the castle NFT factory'],
+  ['Polygon','the network Amber, matches, gnomes and staking run on'],
+  ['Chainlink Automation','automatic execution of recurring contract tasks'],
+  ['Audits','Token Sniffer and SolidProof']]).map(([a,b])=>`<li><b>${a}</b> — ${b}</li>`).join('')}</ul>`,
+  x:`<p><button id="techAud">${r?'Открыть аудиты':'Open the audits'}</button></p>`}),
+ gchain:()=>({k:r?'Дорожная карта · в планах':'Roadmap · planned',h:r?'Собственная игровая сеть':'Own game chain',b:r?
+ `<p>По мере роста числа игроков студия рассматривает собственную игровую сеть на технологии Polygon. В такой сети комиссии за транзакции оплачивались бы в Amber.</p><p>Часть игровых данных может публиковаться в блокчейне. У 4X-игры будет публично просматриваемая база данных.</p>`:
+ `<p>As the player base grows, the studio is considering its own game network on Polygon technology. In such a network, transaction fees would be paid in Amber.</p><p>Some game data may be published on-chain. The 4X game will have a publicly viewable database.</p>`,
+ n:[[r?'Статус':'Status',r?'в планах':'planned'],[r?'Технология':'Technology','Polygon'],[r?'Комиссии сети':'Network fees',r?'в Amber (рассматривается)':'in Amber (under consideration)']],
+ x:`<p class="note">${r?'Это направление, которое студия рассматривает, а не объявленный запуск: без сроков и обещаний. Янтарная сетка под тканью Polygon видна только в эпохе будущего.':'This is a direction the studio is considering, not an announced launch: no dates and no promises. The amber grid under the Polygon fabric is only visible in the future era.'}</p>`}),
  shield:()=>({k:r?'Эфирный щит экосистемы':'Ether shield of the ecosystem',h:'Electrum Decisions',b:r?
  `<p>Тонкий эфирный щит — студия Electrum Decisions. Он держит всю экосистему вместе: камень Amber, боевой контракт, стейкинг, Банк Студии, гномов, шахту и кошельки игроков.</p><p>Внутри щита — всё, что создаёт и поддерживает студия. Снаружи — внешние площадки и кольцо партнёра thirdweb; кольцо Chainlink проходит через щит.</p>`:
  `<p>The thin ether shield is the Electrum Decisions studio. It holds the whole ecosystem together: the Amber stone, the battle contract, staking, the Studio Bank, the gnomes, the mine and the player wallets.</p><p>Inside the shield is everything the studio builds and runs. Outside are the external marketplaces and the thirdweb partner ring; the Chainlink ring passes through the shield.</p>`,
@@ -996,8 +1206,18 @@ function nebRing(key,ca,cb,R,W,rot,inten){const mat=new THREE.ShaderMaterial({tr
 nebRing('link',LINK_C,0x5d86ff,108,15,[.42,0,.16],.2);
 nebRing('tw',TW_C1,TW_C2,146,17,[-.3,0,-.5],.17);
 // label anchors only (clickable labels, not raycast targets)
+const GCH={obj:null,mat:null};
 {const anc=(k,obj,x,y,z)=>{const o=new THREE.Object3D();o.position.set(x,y,z);obj.add(o);NODES[k]={key:k,g:o,inner:o,pos:o.position,hit:o,lab:0,dist:60,glow:0,lines:[],neb:1}};
  anc('poly',netGroup,-70,FAB_Y+fabH(-70,-30)+1,-30);
+ // planned (roadmap) own game chain: a small amber sub-fabric tethered under the purple Polygon fabric, visible only in the Future era
+ {const cx=-128,cz=118,E2=MOBILE?30:38,N2=MOBILE?10:14,y0=FAB_Y+fabH(cx,cz)-9,pos=[],c=new THREE.Color(0xf6c75a);
+  const yy=(x,z)=>y0-2.2*Math.exp(-((x-cx)**2+(z-cz)**2)/600);
+  for(let i=0;i<=N2;i++){const u=-E2+2*E2*i/N2;for(let j=0;j<N2;j++){const a=-E2+2*E2*j/N2,b=-E2+2*E2*(j+1)/N2;pos.push(cx+u,yy(cx+u,cz+a),cz+a,cx+u,yy(cx+u,cz+b),cz+b,cx+a,yy(cx+a,cz+u),cz+u,cx+b,yy(cx+b,cz+u),cz+u)}}
+  for(const [dx,dz] of [[-1,-1],[1,-1],[-1,1],[1,1]]){const x=cx+dx*E2,z=cz+dz*E2;pos.push(x,yy(x,z),z,x,FAB_Y+fabH(x,z),z)}
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));
+  const mat=new THREE.LineBasicMaterial({color:c,transparent:true,opacity:0,depthWrite:false,blending:THREE.AdditiveBlending,fog:true});
+  const o=new THREE.LineSegments(g,mat);o.name='gameChain';o.renderOrder=-7;o.frustumCulled=false;o.visible=false;netGroup.add(o);GCH.obj=o;GCH.mat=mat;
+  anc('gchain',netGroup,cx,y0+3,cz)}
  anc('link',RINGS.link.grp,Math.cos(-.3)*108,0,Math.sin(-.3)*108);anc('tw',RINGS.tw.grp,Math.cos(-2.25)*146,0,Math.sin(-2.25)*146)}
 /* --- Electrum Decisions SHIELD: a thin ether bubble holding the whole ecosystem (between the Chainlink and thirdweb rings) --- */
 const SHIELD_R=120;
@@ -1080,27 +1300,29 @@ const TIERS=[[1,3,0xffe7a3,1.25],[4,9,0xffc93c,1.6],[10,19,0xc084fc,2.0],[20,39,
 /* wallet classes (by on-chain behaviour): 0 player · 1 trader (DEX only) · 2 trading bot · 3 router/aggregator (hidden) */
 const CLS_C={trader:0x4f8dff,link:0xff6a4d,bot:0x39ff14};
 const tierOf=n=>{if(!n)return -1;for(let i=0;i<TIERS.length;i++)if(n<=TIERS[i][1])return i;return 4};
-const wVS=`attribute vec3 o2;attribute vec3 gp;attribute float sz;attribute float hl;attribute vec3 col;attribute float rb;attribute vec4 cen;
-uniform float uS;uniform float uM;uniform float uT;uniform float uMorph;uniform float uGR;uniform float uEra;varying float vH;varying vec3 vC;varying float vSd;
-void main(){if(sz<0.){gl_Position=vec4(0.,0.,2.,1.);gl_PointSize=0.;vH=0.;vC=vec3(0.);vSd=0.;return;}float th=position.y+position.z*uT;float rr=mix(position.x,rb,uEra);vec3 p=vec3(cos(th)*rr,o2.x*(1.-uEra*.5),sin(th)*rr);vSd=fract(position.y*7.31);
+const wVS=`attribute vec3 o2;attribute vec3 gp;attribute float sz;attribute float hl;attribute vec3 col;attribute float rb;attribute vec4 cen;attribute float ag;attribute float shp;
+uniform float uS;uniform float uM;uniform float uT;uniform float uMorph;uniform float uGR;uniform float uEra;uniform float uCB;varying float vH;varying vec3 vC;varying float vSd;varying float vAg;varying float vShp;
+void main(){if(sz<0.){gl_Position=vec4(0.,0.,2.,1.);gl_PointSize=0.;vH=0.;vC=vec3(0.);vSd=0.;vAg=1.;vShp=0.;return;}float th=position.y+position.z*uT;float rr=mix(position.x,rb,uEra);vec3 p=vec3(cos(th)*rr,o2.x*(1.-uEra*.5),sin(th)*rr);vSd=fract(position.y*7.31);
  float ci=cos(o2.y),si=sin(o2.y);p=vec3(p.x,p.y*ci-p.z*si,p.y*si+p.z*ci);
  float co=cos(o2.z),so=sin(o2.z);p=vec3(p.x*co+p.z*so,p.y,-p.x*so+p.z*co);
  if(cen.w>.5){vec3 n=normalize(cen.xyz);p-=n*min(dot(p,n),0.)*.72;if(cen.w>1.5)p+=vec3(sin(uT*23.+position.y*9.),sin(uT*29.+position.y*5.),cos(uT*19.+position.y*7.))*.45;p+=cen.xyz;}
  float cg=cos(uGR),sg=sin(uGR);vec3 g=vec3(gp.x*cg+gp.z*sg,gp.y,-gp.x*sg+gp.z*cg);
  p=mix(p,g,uMorph);
- vec4 mv=modelViewMatrix*vec4(p,1.);gl_Position=projectionMatrix*mv;float sm=cen.w>1.5?2.1:cen.w>.5?1.8:1.;gl_PointSize=clamp(uS*.15*sz*sm*(1.+hl*1.8)/-mv.z,1.3*sm,uM*sz*sm*(1.+hl*1.5));vH=hl;vC=col;}`;
-const wFS=`uniform float uO;varying float vH;varying vec3 vC;varying float vSd;
+ vec4 mv=modelViewMatrix*vec4(p,1.);gl_Position=projectionMatrix*mv;float sm=(cen.w>1.5?2.1:cen.w>.5?1.8:1.)*(.78+.22*ag)*(uCB>.5?1.45:1.);gl_PointSize=clamp(uS*.15*sz*sm*(1.+hl*1.8)/-mv.z,1.3*sm*(uCB>.5?1.6:1.),uM*sz*sm*(1.+hl*1.5));vH=hl;vC=col;vAg=ag;vShp=shp;}`;
+const wFS=`uniform float uO;uniform float uCB;varying float vH;varying vec3 vC;varying float vSd;varying float vAg;varying float vShp;
 void main(){vec2 p=gl_PointCoord-.5;float d=length(p);float an=atan(p.y,p.x);
+ if(uCB>.5){float m;if(vShp<.5){m=step(abs(p.x)+abs(p.y),.46);}else if(vShp<1.5){m=step(d,.26);}else if(vShp<2.5){m=step(abs(d-.34),.09);}else{m=step(p.y,.32)*step(-.42+abs(p.x)*2.1,p.y);}
+  if(m<.5)discard;gl_FragColor=vec4(vC*(1.05+vH*.6)*(.6+.4*vAg),min(1.,uO+.35+vH*.6));return;}
  float edge=.36+.07*sin(an*5.+vSd*31.)+.04*sin(an*9.-vSd*17.);
  float rock=smoothstep(edge+.03,edge-.04,d);float glow=smoothstep(.5,.0,d)*.35;if(rock+glow<.02)discard;
  float lit=.55+.6*clamp(dot(normalize(p+1e-4),vec2(-.7,.7))*(d/edge),-.6,1.);
  vec3 rc=mix(vec3(.42,.36,.33),vC,.72)*lit;vec3 c=mix(rc,vC,glow*.9/(rock+glow));c+=vC*smoothstep(.2,.0,d)*.55;c=mix(c,vec3(1.,.85,.45),clamp(vH*.6,0.,1.));
- gl_FragColor=vec4(c*(.75+vH*1.1),min(1.,rock+glow)*min(1.,uO+.25+vH*.6));}`;
+ gl_FragColor=vec4(c*(.75+vH*1.1)*(.5+.5*vAg),min(1.,rock+glow)*min(1.,uO+.25+vH*.6)*min(1.,.4+.6*vAg));}`;
 const WG=new THREE.BufferGeometry();
-const WA={pos:new Float32Array(MAXW*3),o2:new Float32Array(MAXW*3),gp:new Float32Array(MAXW*3),sz:new Float32Array(MAXW),hl:new Float32Array(MAXW),col:new Float32Array(MAXW*3),rb:new Float32Array(MAXW),cen:new Float32Array(MAXW*4)};
+const WA={pos:new Float32Array(MAXW*3),o2:new Float32Array(MAXW*3),gp:new Float32Array(MAXW*3),sz:new Float32Array(MAXW),hl:new Float32Array(MAXW),col:new Float32Array(MAXW*3),rb:new Float32Array(MAXW),cen:new Float32Array(MAXW*4),ag:new Float32Array(MAXW).fill(1),shp:new Float32Array(MAXW)};
 const WATT={};
-for(const [k,n,dyn] of [['pos',3],['o2',3],['gp',3],['sz',1,1],['hl',1,1],['col',3,1],['rb',1,1],['cen',4,1]]){const a=new THREE.BufferAttribute(WA[k],n);if(dyn)a.setUsage(THREE.DynamicDrawUsage);WATT[k]=a;WG.setAttribute(k==='pos'?'position':k,a)}
-const WM=new THREE.ShaderMaterial({vertexShader:wVS,fragmentShader:wFS,uniforms:{uS:{value:uScale()},uM:{value:7*DPR},uT:{value:0},uMorph:{value:0},uGR:{value:0},uEra:{value:0},uO:{value:.6}},transparent:true,depthWrite:false,blending:THREE.NormalBlending});
+for(const [k,n,dyn] of [['pos',3],['o2',3],['gp',3],['sz',1,1],['hl',1,1],['col',3,1],['rb',1,1],['cen',4,1],['ag',1,1],['shp',1,1]]){const a=new THREE.BufferAttribute(WA[k],n);if(dyn)a.setUsage(THREE.DynamicDrawUsage);WATT[k]=a;WG.setAttribute(k==='pos'?'position':k,a)}
+const WM=new THREE.ShaderMaterial({vertexShader:wVS,fragmentShader:wFS,uniforms:{uS:{value:uScale()},uM:{value:7*DPR},uT:{value:0},uMorph:{value:0},uGR:{value:0},uEra:{value:0},uO:{value:.6},uCB:{value:0}},transparent:true,depthWrite:false,blending:THREE.NormalBlending});
 const WPTS=new THREE.Points(WG,WM);WPTS.frustumCulled=false;scene.add(WPTS);WG.setDrawRange(0,0);
 let NW=0;          // wallets in the current set
 let DRAWN=0;       // wallets currently drawn (time machine / players slider)
@@ -1153,8 +1375,9 @@ const PTS=new THREE.Points(PG,PM);PTS.frustumCulled=false;scene.add(PTS);
 const P=[];const FREE=[];for(let i=PN-1;i>=0;i--){FREE.push(i);P.push(null)}
 let aClock=0;
 /* endpoints: {fw|tw: wallet} {fn|tn: node key} {from|to: Vector3} */
+let PCAP=0; // quality: low keeps this many particle slots free
 function spawn(o){
- if(!FREE.length)return false;const i=FREE.pop();
+ if(FREE.length<=PCAP)return false;const i=FREE.pop();
  _c.set(o.c);PC[i*3]=_c.r;PC[i*3+1]=_c.g;PC[i*3+2]=_c.b;PS[i]=o.s||1;
  const q={t0:aClock+(o.delay||0),d:o.d||1.4,f:o.from?o.from.clone():null,fw:o.fw??-1,fn:o.fn||null,to:o.to?o.to.clone():null,tw:o.tw??-1,tn:o.tn||null,arc:o.arc??2,cb:o.cb,s:o.s||1,sp:o.tn==='burn'};
  if(q.sp){q.phi=Math.random()*Math.PI*2}
@@ -1334,9 +1557,11 @@ function beep(f=660,d=.12,v=.04,type='sine'){if(S.sound)tone(f,d,v,type)}
 
 /* ===== Toast ===== */
 const toastEl=document.createElement('div');toastEl.id='toast';toastEl.className='pn';
-toastEl.style.cssText='position:fixed;left:50%;bottom:'+(MOBILE?'150px':'176px')+';transform:translateX(-50%);z-index:11;padding:9px 14px;font-size:13px;display:none;max-width:90vw;text-align:center';
+toastEl.style.cssText='position:fixed;left:50%;bottom:'+(MOBILE?'150px':'176px')+';transform:translateX(-50%);z-index:11;padding:9px 14px;font-size:13px;display:none;max-width:90vw;text-align:center;pointer-events:none';
 document.body.appendChild(toastEl);let toastT=0;
-function toast(s,ms=2600){toastEl.style.bottom=(($('ctrl').offsetHeight||60)+44)+'px';toastEl.innerHTML=s;toastEl.style.display='block';clearTimeout(toastT);toastT=setTimeout(()=>toastEl.style.display='none',ms)}
+function toastPos(){let b=(($('ctrl').offsetHeight||60)+44);toastEl.style.top='';if(innerWidth<=820){let mt=1e9;for(const el of document.querySelectorAll('.ph.open,#tm.open,#tm[style*="block"],#lbP.open,#card.open,#stats,#ctrl')){const r=el.getBoundingClientRect();if(r.width&&r.height&&r.bottom>innerHeight*.55&&getComputedStyle(el).display!=='none'&&getComputedStyle(el).visibility!=='hidden')mt=Math.min(mt,r.top)}
+ if(mt<1e9){b=innerHeight-mt+10;if(innerHeight-b<230){toastEl.style.bottom='auto';toastEl.style.top='180px';return}}}toastEl.style.bottom=b+'px'}
+function toast(s,ms=2600){toastPos();toastEl.innerHTML=s;toastEl.style.display='block';clearTimeout(toastT);toastT=setTimeout(()=>toastEl.style.display='none',ms)}
 
 /* ===== Camera fly ===== */
 let fly=null,track=null;
@@ -1588,13 +1813,13 @@ function renderHist(full){
  html+=`<div class="sm" style="margin-top:6px">${t('hIds')}: <span class="ids">${s.ids.length?s.ids.slice(0,60).map(x=>'#'+x).join(' ')+(s.ids.length>60?' '+t('hMore',{n:s.ids.length-60}):''):t('hNone')}</span></div>`;
  if(SET.kind==='chain'&&s.ids.length)html+=`<div class="gths" id="gThumbs"></div>`;
  html+=`<p class="note">${SET.kind==='sim'?t('hNoteS'):t('hNoteC')}</p>`;
- if(!full){html+=`<button class="gold" id="hOpen">${t('wHistB')}</button>`;$('hist').innerHTML=html;$('hOpen').onclick=()=>renderHist(true);clsCardWire();if($('gThumbs'))gnomeThumbs(s.ids,$('gThumbs'));return}
+ if(!full){html+=`<button class="gold" id="hOpen">${t('wHistB')}</button>`;$('hist').innerHTML=html;if(typeof R6histExtra==='function')R6histExtra(i);$('hOpen').onclick=()=>renderHist(true);clsCardWire();if($('gThumbs'))gnomeThumbs(s.ids,$('gThumbs'));return}
  const ev=h.ev,N=ev.length,from=Math.max(0,N-150);
  html+=`<h4 style="margin:10px 0 4px">${t('hTitle')} · ${t('hFrom',{d:evWhen(s.joined)})}</h4><div class="row" style="display:flex;gap:6px;align-items:center"><button id="hPlay" class="gold">${t('hPlay')}</button><input type="range" id="hscr" min="0" max="${Math.max(0,N-1)}" value="${N-1}"></div><div id="hWhen" class="sm"></div><div class="hist" id="hList">`;
  if(from>0)html+=`<div class="sm" style="padding:4px 2px">${t('hMore',{n:fmt(from)})} …</div>`;
  for(let k=from;k<N;k++){const e=ev[k];const sg=e.info?'':['win','tPrize','stakeR','mine','in','join','mintIn','payout','dexIn','refund'].includes(e.ty)?'+':['contrib','tEntry','stake','out','burn','dexOut','bankOut'].includes(e.ty)?'−':'';
   html+=`<div class="ev" data-k="${k}"><i>${evWhen(e.t)}</i><span>${evLabel(e)}${e.md||(e.s&&(e.ty==='win'||e.ty==='loss'))?'<em class="md">'+(e.md||matchLine(e.s,'win',false))+'</em>':''}</span><b>${e.a?sg+fmtA(e.a):''}</b></div>`}
- html+='</div>';$('hist').innerHTML=html;clsCardWire();if($('gThumbs'))gnomeThumbs(s.ids,$('gThumbs'));
+ html+='</div>';$('hist').innerHTML=html;if(typeof R6histExtra==='function')R6histExtra(i);clsCardWire();if($('gThumbs'))gnomeThumbs(s.ids,$('gThumbs'));
  $('hPlay').onclick=()=>{FY.play?stopTrail(true):startTrail()};
  $('hscr').oninput=e=>{FY.play=false;$('hPlay').textContent=t('hPlay');setTrail(+e.target.value,true)};
  $('hList').querySelectorAll('.ev').forEach(d=>d.onclick=()=>{const k=+d.dataset.k;const e=ev[k];if(SET.kind==='chain'&&e.tx)window.open(scanTx(e.tx),'_blank','noopener');setTrail(k,true)});
@@ -1616,7 +1841,7 @@ function stopTrail(keep){FY.play=false;if($('hPlay'))$('hPlay').textContent=t('h
 function updFind(dt){if(FY.play&&FY.h){FY.acc+=dt;if(FY.acc>.35){FY.acc=0;if(FY.k>=FY.h.ev.length-1){stopTrail(true)}else setTrail(FY.k+1,true)}}updTrail()}
 
 /* ===== Time machine ===== */
-function tmOpen(){closePanels();$('tm').classList.add('open');S.tm={v:1000,play:false};$('tmR').value=1000;$('tm').style.bottom=(($('ctrl').offsetHeight||60)+22)+'px';tmApply(1000);updBtns()}
+function tmOpen(){closePanels();$('tm').classList.add('open');S.tm={v:1000,play:false};$('tmR').value=1000;$('tm').style.bottom=(($('ctrl').offsetHeight||60)+22+(MOBILE?56:0))+'px';tmApply(1000);updBtns();if(typeof R6tmMarks==='function')R6tmMarks()}
 function tmClose(){if(!S.tm)return;$('tm').classList.remove('open');S.tm=null;tmLive();updBtns()}
 function tmLive(){if(SET.kind==='sim'){setDrawn(PLAYERS);bhScale(S.cB);setGnomeCluster(M.gnomes-GN.hands);if(typeof applyEraAuto==='function')applyEraAuto()}else chainTmApply(null)}
 function snapAt(tt){let lo=0,hi=SNAP.length-1;while(lo<hi){const m=(lo+hi+1)>>1;if(SNAP[m].t<=tt)lo=m;else hi=m-1}return SNAP[lo]}
@@ -1626,6 +1851,7 @@ function tmApply(v){S.tm.v=v;const now=v>=1000;
   setDrawn(sn.w);bhScale(sn.b);setGnomeCluster(M.gnomes-sn.g);if(typeof applyEraAuto==='function')applyEraAuto(now?null:tt);
   $('tmV').innerHTML=`<div class="nums" style="grid-template-columns:repeat(auto-fit,minmax(130px,1fr));display:grid;gap:4px 14px">${[[t('tmDay',{d:simDay(now?S.simT:tt)}),now?t('tmNow'):''],[t('tmW'),fmt(sn.w)],[t('tmB'),big(sn.b)],[t('tmS'),big(sn.s)],[t('tmK'),big(sn.k)],[t('tmG'),fmt(sn.g)+' / '+fmt(M.gnomes)]].map(r=>`<div><span>${r[0]}</span> <b>${r[1]}</b></div>`).join('')}</div>${now?'':'<div class="sm" style="color:var(--gold)">'+t('tmPast')+'</div>'}`;
  }else chainTmApply(v);
+ if(typeof R6tmCur==='function')R6tmCur(v);
 }
 $('tmR').oninput=e=>{if(S.tm){S.tm.play=false;$('tmPlay').textContent=t('tmPlay');tmApply(+e.target.value)}};
 $('tmNow').onclick=()=>{if(!S.tm)return;S.tm.play=false;$('tmPlay').textContent=t('tmPlay');$('tmR').value=1000;tmApply(1000)};
@@ -1721,7 +1947,7 @@ function curModeKey(){return S.panel==='inv'?'mInv':S.panel==='sbx'?'mSbx':S.mod
 function renderModeMenu(){$('bMode').textContent=t('modeBtn',{m:t(curModeKey())});
  $('modeMenu').innerHTML=MODES.map(m=>`<button data-m="${m[0]}" class="${t(m[1])===t(curModeKey())?'on':''}">${t(m[1])}<small>${t(m[2])}</small></button>`).join('');
  $('modeMenu').querySelectorAll('button').forEach(b=>b.onclick=()=>{$('modeMenu').classList.remove('open');setMode(b.dataset.m)})}
-$('bMode').onclick=e=>{e.stopPropagation();renderModeMenu();$('modeMenu').classList.toggle('open')};
+$('bMode').onclick=e=>{e.stopPropagation();renderModeMenu();const mm=$('modeMenu');mm.classList.toggle('open');if(mm.classList.contains('open')){const r=$('bMode').getBoundingClientRect(),w=Math.min(250,innerWidth-16);mm.style.width=w+'px';mm.style.left=Math.max(8,Math.min(innerWidth-w-8,r.left))+'px';mm.style.bottom=(innerHeight-r.top+8)+'px';mm.style.top='auto'}};
 addEventListener('pointerdown',e=>{if(!$('modeMenu').contains(e.target)&&e.target!==$('bMode'))$('modeMenu').classList.remove('open')});
 function closePanels(keep){if(keep!=='findP'&&$('findP').classList.contains('open'))closeFind();if(keep!=='sbx')closeSbx();leaveInv();if(keep!=='tm'&&S.tm&&keep!=='keepTm')tmClose()}
 function setMode(m){
@@ -2251,14 +2477,14 @@ function skinFor(i){const a=(SET.addr[i]||'').toLowerCase();const f=window.ED_sk
  if(EDITION==='prod'&&SET.kind==='chain')return 0;return hashA(a)%SKN}
 const skinIsDefault=i=>EDITION==='prod'&&SET.kind==='chain'&&typeof(window.ED_skinResolver||CFG.skinResolver)!=='function'&&!(typeof ccSkin==='function'&&ccSkin(i)!=null);
 /* class filter: all · p players · t traders · l linked · b bots; routers (cls 3) are never drawn */
-function clsHide(i){const c=SET.cls[i];if(c===3)return true;const f=S.clsF;return f==='all'?false:f==='p'?c!==0:f==='t'?c!==1:f==='b'?c!==2:f==='l'?!SET.lk[i]:false}
+function clsHide(i){const c=SET.cls[i];if(c===3)return true;const o=S.cOff;if(o&&(SET.lk[i]?o.l:c===0?o.p:c===1?o.t:c===2?o.b:0))return true;const f=S.clsF;return f==='all'?false:f==='p'?c!==0:f==='t'?c!==1:f==='b'?c!==2:f==='l'?!SET.lk[i]:false}
 function hideMode(i){return clsHide(i)||(S.gnF&&!SET.gn[i])||(S.ccF>=0&&typeof ccHas==='function'&&!ccHas(i,S.ccF))||CAST.of.has(i)}
 function applyHide(i){const v=Math.abs(WA.sz[i])||1;WA.sz[i]=hideMode(i)?-v:v}
 function freeSlot(sl){if(sl.w>=0){CAST.of.delete(sl.w);if(sl.w<NW)applyHide(sl.w);WATT.sz.needsUpdate=true}sl.w=-1;sl.g.visible=false}
 function fillSlot(sl,i){sl.w=i;CAST.of.set(i,sl);const s=skinFor(i),h=hashA(SET.addr[i]||String(i));
  sl.cas.geometry=SKIN_G[s];sl.cas.material=SKIN_M[s];sl.rock.geometry=ROCK_G[h%4];sl.rock.material=ROCK_M[(h>>>3)%4];
  const n=Math.min(6,SET.gn[i]||0);sl.gn.count=n;for(let k=0;k<n;k++){const a=k/Math.max(1,n)*Math.PI*2+.4;_p3.set(Math.cos(a)*.62,.6,Math.sin(a)*.62);_q.setFromEuler(_e.set(0,-a,0));_m4.compose(_p3,_q,_s3.set(1,1,1));sl.gn.setMatrixAt(k,_m4)}
- sl.gn.instanceMatrix.needsUpdate=true;const tr=tierOf(SET.gn[i]);sl.glow.material.color.setHex(tr>=0?TIERS[tr][2]:0x8b5cf6);sl.glow.material.opacity=tr>=0?.55:.18;
+ sl.gn.instanceMatrix.needsUpdate=true;const tr=tierOf(SET.gn[i]);sl.glow.material.color.setHex(tr>=0?TIERS[tr][2]:0x8b5cf6);sl.glow.material.opacity=(tr>=0?.55:.18)*(typeof agGlow==='function'?agGlow(i):1);
  sl.beh.material.color.setHex(BEH_C[minerBeh(i)]);{const cc=typeof ccOf==='function'?ccOf(i):null;for(let b=0;b<4;b++){const s=sl.ban[b],e=cc&&cc[b];s.visible=!!e;if(e){s.material.color.setHex(ccCol(e[0]));const a=b*1.57+.8;s.position.set(Math.cos(a)*.42,1.75+b*.02,Math.sin(a)*.42)}}}
  sl.f=0;sl.spin=(h%628)/100;sl.g.visible=true;applyHide(i);WATT.sz.needsUpdate=true}
 function refreshCastles(){for(const sl of CAST.slots)freeSlot(sl);CAST.t=1}
@@ -2310,7 +2536,7 @@ const LINK={max:3000,seg:10,obj:null,pos:null,n:0};
 function linkGeo(){LINK.n=-1}
 function linkVis(){LINK.n=-1}
 const _la=new THREE.Vector3(),_lb=new THREE.Vector3(),_lc=new THREE.Vector3();
-function linkList(){if(!S.tok||morph>.3||S.mode!=='uni')return [];const L=[];
+function linkList(){if(!S.tok||S.arcOff||morph>.3||S.mode!=='uni')return [];const L=[];
  if(S.clsF==='l'){for(const p of SET.links)if(p[0]<DRAWN&&p[1]<DRAWN&&L.length<LINK.max)L.push(p);return L}
  const w=FY.sel>=0?FY.sel:hoverW;if(w<0||w>=DRAWN)return L;for(const o of (SET.lnk.get(w)||[]))if(o<DRAWN)L.push([w,o]);return L}
 function updLinks(){const L=linkList();const P=LINK.pos,S2=LINK.seg;let v=0;
@@ -2319,9 +2545,9 @@ function updLinks(){const L=linkList();const P=LINK.pos,S2=LINK.seg;let v=0;
    P[v++]=px;P[v++]=py;P[v++]=pz;P[v++]=x;P[v++]=y;P[v++]=z;px=x;py=y;pz=z}}
  LINK.obj.geometry.setDrawRange(0,v/3);LINK.obj.geometry.attributes.position.needsUpdate=true;LINK.obj.material.opacity=S.clsF==='l'?.3:.9;LINK.obj.visible=v>0;LINK.vis=L.length}
 /* ===== Labels ===== */
-const LBL={contract:'nContract',reserve:'nReserve',pool:'nPool',staking:'nStake',bank:'nBank',tour:'nTour',gnome:'nGnome',burn:'nBurn',dex:'nDex',link:'nLink',shield:'nShield',tw:'nTw',poly:'nPoly',ext:'nExt',fiat:'nFiat'};
+const LBL={contract:'nContract',reserve:'nReserve',pool:'nPool',staking:'nStake',bank:'nBank',tour:'nTour',gnome:'nGnome',burn:'nBurn',dex:'nDex',link:'nLink',shield:'nShield',tw:'nTw',poly:'nPoly',gchain:'nGchain',ext:'nExt',fiat:'nFiat'};
 const labEls={};
-for(const k in LBL){const e=document.createElement('div');e.className='lb'+(k==='poly'||k==='link'||k==='tw'?' neb':'')+(k==='ext'?' ext':'')+(k==='contract'?' gem':'')+(k==='shield'?' neb shield':'');e.dataset.k=k;$('labels').appendChild(e);labEls[k]=e;
+for(const k in LBL){const e=document.createElement('div');e.className='lb'+(k==='poly'||k==='link'||k==='tw'||k==='gchain'?' neb':'')+(k==='gchain'?' gch':'')+(k==='ext'?' ext':'')+(k==='contract'?' gem':'')+(k==='shield'?' neb shield':'');e.dataset.k=k;$('labels').appendChild(e);labEls[k]=e;
  e.addEventListener('click',ev=>{ev.stopPropagation();openCard(k);beep(760,.06)});
  e.addEventListener('dblclick',ev=>{ev.stopPropagation();focusNode(k)});
  e.addEventListener('mouseenter',()=>setHover(k));e.addEventListener('mouseleave',()=>setHover(null))}
@@ -2335,7 +2561,7 @@ function fiatLab(out){fiatGroup.updateMatrixWorld();let best=null,bs=1e9;
   if(sc<bs){bs=sc;best=w}}
  return best&&bs<5?out.copy(best):out.set(0,0,9999)}
 function labWorld(k,out){const n=NODES[k];if(k==='fiat')return fiatLab(out);const s=n.g.scale?n.g.scale.x:1;return out.copy(n.pos).add(_v2.set(0,n.lab*s,0))}
-function labVisible(k){if(S.kiosk&&k!=='contract'&&k!=='burn')return false;if(typeof EYE!=='undefined'&&EYE.f>.4)return false;if(morph>.5)return false;if(k==='fiat'&&!S.fiat)return false;if((k==='poly'||k==='link'||k==='tw')&&!S.net)return false;
+function labVisible(k){if(S.kiosk&&k!=='contract'&&k!=='burn')return false;if(typeof EYE!=='undefined'&&EYE.f>.4)return false;if(morph>.5)return false;if(k==='fiat'&&!S.fiat)return false;if((k==='poly'||k==='link'||k==='tw'||k==='gchain')&&!S.net)return false;if(k==='gchain'&&eraK<=.5)return false;
  if(S.panel==='inv')return false;return true}
 function updLabels(){const P=[];for(const k in labEls){const e=labEls[k];if(!labVisible(k)){e.style.display='none';continue}
   labWorld(k,_p);_p.project(camera);if(_p.z>1||_p.x<-1.2||_p.x>1.2||_p.y<-1.2||_p.y>1.2){e.style.display='none';continue}
@@ -2458,7 +2684,7 @@ $('bHelp').onclick=()=>$('intro').classList.remove('hidden');
 $('iGo').onclick=()=>{$('intro').classList.add('hidden');toast(t('hint'),3200)};
 $('iTour').onclick=()=>{$('intro').classList.add('hidden');tourStep(0)};
 $('mtoggle').onclick=()=>$('ctrl').classList.toggle('min');
-$('stats').onclick=e=>{if(MOBILE&&e.target.tagName!=='BUTTON')$('stats').classList.toggle('min')};
+$('stats').onclick=e=>{if(MOBILE&&(e.target.closest('#stHandle')||e.target.closest('.sthd')))$('stats').classList.toggle('min')};
 if(MOBILE)$('bLeg').classList.remove('hidden');
 $('bLeg').onclick=()=>$('legend').classList.toggle('show');
 if(!MOBILE){$('ctrl').classList.remove('min');$('stats').classList.remove('min')}
@@ -2472,7 +2698,7 @@ function updStats(){let r;
  if(S.src==='chain')r=chainStatRows();
  else r=[[t('chMatches'),fmt(S.cM+S.cMC)],[t('chWinG'),fmt(S.cM-S.cMD)],[t('chDrawG'),fmt(S.cMD)],[t('chCancel'),fmt(S.cMC)],[t('cBurn'),fmt(Math.round(S.cB))],[t('cMintBB'),usd(Math.round(S.cBB))],[t('cStake'),fmt(Math.round(S.cS))],[t('cBank'),fmt(Math.round(S.cK))],
   [t('cTour'),fmt(Math.round(S.cT))],[t('cMine'),fmt(Math.round(S.cN))],[t('cWallets'),fmt(DRAWN)],...clsRows(),[t('cGnHands'),fmt(GN.hands)],[t('cGnContract'),fmt(GN.inC)]];
- const h=r.map((x,j)=>`<div class="st${j>3?" x2":""}${x[2]?' '+x[2]:''}"><i>${x[0]}</i><b>${x[1]}</b></div>`).join('');if($('statRows')._h!==h){$('statRows').innerHTML=h;$('statRows')._h=h}
+ const h=r.map((x,j)=>`<div class="st${j>3?" x2":""}${x[2]?' '+x[2]:''} tb-${typeof R6tab==='function'?R6tab(x[0]):'eco'}"><i>${x[0]}</i><b>${x[1]}</b></div>`).join('');if($('statRows')._h!==h){$('statRows').innerHTML=h;$('statRows')._h=h}
  if(S.src==='chain'){$('clock').textContent=CH.state==='ok'&&CH.updAt?t('chainClock',{t:new Date(CH.updAt).toLocaleTimeString(L==='ru'?'ru-RU':'en-GB'),r:(CH.rpc||'').replace(/^https?:\/\//,'').split('/')[0]}):''}
  else $('clock').textContent=simWhen(S.simT)}
 function fitLegend(){if(MOBILE||innerWidth<=820)return;const st=$('stats'),lg=$('legend');if(!st||!lg)return;const b=st.getBoundingClientRect().bottom;const h=Math.max(70,innerHeight-108-b-14);lg.style.maxHeight=h+'px'}
@@ -2746,6 +2972,411 @@ Object.assign(T.en,{zHint:'zoom all the way out…',audK:'Easter egg · the ecos
  audFoot:'SolidProof worked with the studio on contract reviews and secure automation setup. The studio will commission detailed reports for each contract. Automated scanners and source code verification do not guarantee the absence of bugs.',
  dropT:'thirdweb drop: “{c}” · {n} castle NFTs went to wallets (example)'});
 
+/* ===== Round 6 strings (RU default, EN parity) ===== */
+Object.assign(T.ru,{techBtn:'Технологии',gchBtn:'Игровая сеть · в планах',nGchain:'Собственная игровая сеть на технологии Polygon · в планах',
+ gView:'Вид',gTime:'Время',gLay:'Слои',tabEco:'Экономика',tabMt:'Матчи',tabWal:'Кошельки',tabGn:'Гномы',
+ authBtn:'Войти',soonS:'· скоро',lbBtn:'Лидеры',layBtn:'Слои',
+ laySecCls:'Классы кошельков',laySecWorld:'Сеть и потоки',laySecCast:'Замки и связи',laySecView:'Отображение',
+ lyP:'Игроки',lyT:'Трейдеры',lyL:'Связанные',lyB:'Боты',tArc:'Дуги связей',tGlow:'Свечение активности',tCB:'Режим для дальтоников',
+ qLab:'Качество',qAuto:'авто',qHigh:'высокое',qLow:'низкое',qInfo:'Сейчас: {q} · {f} кадр/с',qToastLow:'Качество снижено автоматически: устройство не успевает. Можно выбрать вручную в «Слоях».',
+ cbP:'◆ игроки',cbT:'• трейдеры',cbL:'◯ связанные',cbB:'▲ боты',cbOn:'Режим для дальтоников: у каждого класса своя форма',
+ msLaunch:'Запуск Amber',msDex:'Первая ликвидность DEX',msStake:'Первый перевод в стейкинг',msMatch1:'Первый матч',msMatchN:'{n} матчей',msDraw1:'Первая ничья (возврат взноса)',
+ msGn1:'Первый гном',msGnN:'{n} гномов',msNow:'Сейчас',msSim:'вехи симуляции',msChain:'вехи по данным блокчейна',msStakeS:'Стейкинг начал копить',msGnS:'Первые гномы у игроков',
+ feedH:'Лента событий',feWin:'Матч #{id} завершён · победил {w}',feWinS:'Матч завершён · победил {w}',feDraw:'Ничья · возврат взноса {a} и {b}',feGn:'Гном #{id} отчеканен → {w}',
+ feBurn:'Сожжено {v} Amber',feEmpty:'Событий пока нет',feSim:'симуляция',
+ lbK:'Таблица лидеров',lbH:'Лучшие замки',lbWins:'По победам',lbPct:'По доле побед',lbHive:'Рои',lbName:'Игрок',lbW:'Побед',lbP:'Матчей',lbPc:'Доля',
+ lbNoteC:'По событиям боевого контракта (newGame, joinedGame, endedGame). Доля побед = победы / завершённые матчи; в таблице по доле — игроки от {n} завершённых матчей. Нажмите на строку — камера полетит к замку.',
+ lbNoteS:'Пример из симуляции. Доля побед = победы / сыгранные матчи; в таблице по доле — игроки от {n} матчей. Нажмите на строку — камера полетит к замку.',
+ lbHvPow:'По Мощи',lbHvWins:'По победам',lbHvName:'Рой',lbHvPower:'Мощь',lbHvMem:'Игроков',lbHvSoon:'Рои появятся вместе с 4X-игрой.',
+ hvNote:'Рои соревнуются за ресурсы в 4X-игре.',hvDemo:'Демо: 30 роёв по 50–100 игроков, Мощь — пример.',hvLay:'Рои',hvPlayers:'Игроков',hvPower:'Суммарная Мощь',hvWins:'Суммарно побед',hvTag:'рой',
+ wxShare:'Поделиться',wxCastle:'Войти в замок',wxLink:'Показать связь',wxPower:'Мощь',
+ shK:'Карточка замка',shH:'Поделиться замком',shShare:'Поделиться',shDl:'Скачать PNG',shCopy:'Копировать ссылку',shCopied:'Ссылка скопирована',shCopyFail:'Не удалось скопировать — ссылка: {u}',
+ shNote:'Картинка создаётся прямо в браузере. Ссылка открывает вселенную сразу на этом замке.',
+ scGames:'Матчей',scWins:'Побед',scPct:'Доля побед',scNet:'Итог в Amber (getPnL)',scNetS:'Итог в Amber',scSim:'симуляция · пример',scTitle:'Замок в поясе Amber',scLoading:'Читаю статистику боевого контракта…',
+ dlNF:'Кошелёк {a} не найден на карте',dlWait:'Открываю замок {a}…',
+ h1K:'Подсказка {n} / 3',h1a:'Это Amber — сердце экономики. Всё, что вы видите, вращается вокруг токена.',h1b:'Вы — среди замков: каждая точка в поясе — кошелёк игрока. Нажмите на любую.',
+ h1c:'Отдалитесь колесом мыши или щипком — увидите всю вселенную, сеть и партнёров.',h1Next:'Далее',h1Done:'Готово',h1Skip:'Пропустить',
+ cvK:'Внутри замка',cvDemo:'Демо-уровни — пример, не реальные данные',cvSoon:'4X · скоро',cvNote:'Это будущая точка входа в 4X-игру: здесь появятся постройки, армия и ресурсы вашего замка.',
+ bKeep:'Главный замок',bWalls:'Стены',bBarracks:'Казармы',bCamp:'Тренировочный лагерь',bMine:'Шахта',bWorkshop:'Мастерская',bStorage:'Склад',
+ dKeep:'Сердце замка: его уровень открывает новые постройки.',dWalls:'Защита замка от набегов.',dBarracks:'Здесь собирается армия.',dCamp:'Тренировка и улучшение отрядов.',
+ dMine:'Добыча ресурсов.',dWorkshop:'Улучшения и снаряжение.',dStorage:'Хранение ресурсов.',
+ cvLvl:'ур. {n}',cvLvlMax:'ур. {n} / {m}',cvLvlNone:'ур. —',cvPower:'Мощь',cvArmy:'Армия',cvBld:'Уровни построек',cvPick:'Нажмите на постройку, чтобы узнать о ней.',
+ cvEnter:'Приблизьтесь ещё — и вы войдёте в замок',cvPowerNote:'Мощь = уровни построек + армия.',
+ cvSoc:'Соцсети',cvSocNone:'не указаны',cvNick:'Показывать мой ник на карте',cvNickSoon:'настройка · скоро',
+ auK:'Аккаунт',auH:'Единый аккаунт с игрой',auP1:'Один аккаунт для игры и сайта: вход через Google, Apple или Email. Профиль и статистика — здесь, на сайте (в приложениях их не будет).',
+ auP2:'При регистрации для вас автоматически создаётся внутриигровой кошелёк (thirdweb). Он некастодиальный: фраза восстановления есть только у вас, студия и thirdweb ключей не хранят и не видят. По этой фразе кошелёк можно импортировать в MetaMask или другой кошелёк.',
+ auP3:'Сейчас вход отключён: сайт ничего не собирает и не хранит. Мы никогда не попросим ваш ключ или фразу восстановления.',
+ auG:'Google',auA:'Apple',auE:'Email',auPrev:'Посмотреть макет профиля',auHide:'Скрыть макет',auProfH:'Мой профиль · макет',
+ prCastle:'Мой замок',prStats:'Моя статистика',prWallet:'Мой кошелёк',prWalletT:'Внутриигровой кошелёк · создаётся автоматически',prWalletN:'Некастодиальный: фраза восстановления только у вас. Никому её не сообщайте.',
+ prAmber:'Как получить Amber',prMine:'Шахта',prSoc:'Соцсети (по желанию)',prSocN:'X, TikTok, YouTube, Instagram',prPriv:'Показывать мой ник на карте'
+});
+Object.assign(T.en,{techBtn:'Technology',gchBtn:'Game chain · planned',nGchain:'Own game chain on Polygon technology · planned',
+ gView:'View',gTime:'Time',gLay:'Layers',tabEco:'Economy',tabMt:'Matches',tabWal:'Wallets',tabGn:'Gnomes',
+ authBtn:'Sign in',soonS:'· soon',lbBtn:'Leaders',layBtn:'Layers',
+ laySecCls:'Wallet classes',laySecWorld:'Network & flows',laySecCast:'Castles & links',laySecView:'Display',
+ lyP:'Players',lyT:'Traders',lyL:'Linked',lyB:'Bots',tArc:'Link arcs',tGlow:'Activity glow',tCB:'Colour-blind mode',
+ qLab:'Quality',qAuto:'auto',qHigh:'high',qLow:'low',qInfo:'Now: {q} · {f} fps',qToastLow:'Quality lowered automatically: this device is struggling. You can pick it manually under “Layers”.',
+ cbP:'◆ players',cbT:'• traders',cbL:'◯ linked',cbB:'▲ bots',cbOn:'Colour-blind mode: each class has its own shape',
+ msLaunch:'Amber launch',msDex:'First DEX liquidity',msStake:'First transfer to staking',msMatch1:'First match',msMatchN:'{n} matches',msDraw1:'First draw (contribution refund)',
+ msGn1:'First gnome',msGnN:'{n} gnomes',msNow:'Now',msSim:'simulation milestones',msChain:'milestones from chain data',msStakeS:'Staking starts accruing',msGnS:'First gnomes with players',
+ feedH:'Event feed',feWin:'Match #{id} finished · {w} won',feWinS:'Match finished · {w} won',feDraw:'Draw · contribution refund to {a} and {b}',feGn:'Gnome #{id} minted → {w}',
+ feBurn:'{v} Amber burned',feEmpty:'No events yet',feSim:'simulation',
+ lbK:'Leaderboard',lbH:'Top castles',lbWins:'By wins',lbPct:'By win %',lbHive:'Hives',lbName:'Player',lbW:'Wins',lbP:'Matches',lbPc:'Win %',
+ lbNoteC:'From battle contract events (newGame, joinedGame, endedGame). Win % = wins / finished matches; the win % table lists players with at least {n} finished matches. Click a row to fly to the castle.',
+ lbNoteS:'Simulation example. Win % = wins / matches played; the win % table lists players with at least {n} matches. Click a row to fly to the castle.',
+ lbHvPow:'By Power',lbHvWins:'By wins',lbHvName:'Hive',lbHvPower:'Power',lbHvMem:'Players',lbHvSoon:'Hives arrive with the 4X game.',
+ hvNote:'Hives compete for resources in the 4X game.',hvDemo:'Demo: 30 hives of 50–100 players, Power is an example.',hvLay:'Hives',hvPlayers:'Players',hvPower:'Total Power',hvWins:'Total wins',hvTag:'hive',
+ wxShare:'Share',wxCastle:'Enter castle',wxLink:'Show link',wxPower:'Power',
+ shK:'Castle card',shH:'Share this castle',shShare:'Share',shDl:'Download PNG',shCopy:'Copy link',shCopied:'Link copied',shCopyFail:'Could not copy — link: {u}',
+ shNote:'The image is made right in your browser. The link opens the universe focused on this castle.',
+ scGames:'Matches',scWins:'Wins',scPct:'Win rate',scNet:'Net in Amber (getPnL)',scNetS:'Net in Amber',scSim:'simulation · example',scTitle:'A castle in the Amber belt',scLoading:'Reading battle contract stats…',
+ dlNF:'Wallet {a} is not on the map',dlWait:'Opening castle {a}…',
+ h1K:'Tip {n} / 3',h1a:'This is Amber, the heart of the economy. Everything you see orbits the token.',h1b:'You are among the castles: every dot in the belt is a player wallet. Click any of them.',
+ h1c:'Zoom out with the mouse wheel or a pinch to see the whole universe, the network and partners.',h1Next:'Next',h1Done:'Done',h1Skip:'Skip',
+ cvK:'Inside the castle',cvDemo:'Demo levels: an example, not real data',cvSoon:'4X · soon',cvNote:'This will be the entry point to the 4X game: your castle’s buildings, army and resources will live here.',
+ bKeep:'Main castle',bWalls:'Walls',bBarracks:'Barracks',bCamp:'Training camp',bMine:'Mine',bWorkshop:'Workshop',bStorage:'Storehouse',
+ dKeep:'The heart of the castle: its level unlocks new buildings.',dWalls:'Protects the castle from raids.',dBarracks:'Where the army gathers.',dCamp:'Trains and upgrades units.',
+ dMine:'Gathers resources.',dWorkshop:'Upgrades and gear.',dStorage:'Stores resources.',
+ cvLvl:'lvl {n}',cvLvlMax:'lvl {n} / {m}',cvLvlNone:'lvl —',cvPower:'Power',cvArmy:'Army',cvBld:'Building levels',cvPick:'Click a building to learn about it.',
+ cvEnter:'Zoom in a little more to enter the castle',cvPowerNote:'Power = building levels + army.',
+ cvSoc:'Social links',cvSocNone:'not set',cvNick:'Show my nickname on the map',cvNickSoon:'setting · soon',
+ auK:'Account',auH:'One account with the game',auP1:'One account for the game and the site: sign in with Google, Apple or Email. Your profile and stats live here on the site (not in the apps).',
+ auP2:'When you sign up, an in-game wallet is created for you automatically (thirdweb). It is non-custodial: only you hold the recovery phrase; the studio and thirdweb never store or see keys. With that phrase you can import the wallet into MetaMask or another wallet.',
+ auP3:'Sign-in is off for now: the site collects and stores nothing. We will never ask for your key or recovery phrase.',
+ auG:'Google',auA:'Apple',auE:'Email',auPrev:'Preview the profile',auHide:'Hide preview',auProfH:'My profile · preview',
+ prCastle:'My castle',prStats:'My stats',prWallet:'My wallet',prWalletT:'In-game wallet · created automatically',prWalletN:'Non-custodial: only you hold the recovery phrase. Never share it.',
+ prAmber:'How to get Amber',prMine:'Mine',prSoc:'Social links (optional)',prSocN:'X, TikTok, YouTube, Instagram',prPriv:'Show my nickname on the map'
+});
+
+/* ===== Round 6 · Part 1: tabs, layers, timeline, event feed, activity glow, leaderboard, share/deep link, embed, colour-blind, quality, first-visit hint ===== */
+const R6={feed:[],feedT:0,feedDirty:true,lastB:0,burnT:0,drawKey:'',hintN:0,q:'auto',qCur:'high',fpsLow:0,qT:0,agT:0,deep:null,deepT:0,lbTab:'w',ms:[],chainFeedT:0,chainAgK:0,lastAct:null,cAct:null,cActN:0,cBatN:0};
+S.cOff={p:0,t:0,l:0,b:0};S.arcOff=false;S.glowOff=false;S.cb=false;
+const R6Q=new URLSearchParams(location.search);
+const R6EMBED=R6Q.get('embed')==='1';
+/* ---------- data panel tabs ---------- */
+const R6TABK={eco:['cBurn','cMintBB','cStake','cBank','cTour','cMine','chSupply','chDead','chDex','chStakeB','chBankB','chBlock','chTx'],mt:['chMatches','chWinG','chDrawG','chCancel','chOpen'],
+ wal:['cWallets','cPl','cTr','cLk','cBot','chHolders','chAddr','chBots','chLinked','chPl','chTr'],gn:['cGnHands','cGnContract','chGMint','chGCirc','chGHands']};
+let R6tabMap=null,R6tabL='';
+function R6tab(label){if(!R6tabMap||R6tabL!==L){R6tabMap=new Map();R6tabL=L;for(const tb in R6TABK)for(const k of R6TABK[tb]){const v=T[L][k];if(typeof v==='string')R6tabMap.set(v,tb)}}
+ const v=R6tabMap.get(label);if(v)return v;if(/гном|gnome/i.test(label))return 'gn';if(/матч|match|ничь|draw/i.test(label))return 'mt';if(/кошел|wallet|игрок|player|трейдер|trader|бот|bot|связан|linked|держател|holder|адрес|address/i.test(label))return 'wal';return 'eco'}
+function R6setTab(tb){$('statRows').dataset.tab=tb;document.querySelectorAll('#stTabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===tb))}
+document.querySelectorAll('#stTabs button').forEach(b=>b.onclick=e=>{e.stopPropagation();R6setTab(b.dataset.t);beep(600,.04)});
+document.querySelector('#stats .stMin').onclick=e=>{e.stopPropagation();$('stats').classList.toggle('coll')};
+{let y0=null,dy=0;const h=$('stHandle');h.addEventListener('touchstart',e=>{y0=e.touches[0].clientY;dy=0},{passive:true});
+ h.addEventListener('touchmove',e=>{if(y0!=null)dy=e.touches[0].clientY-y0},{passive:true});
+ h.addEventListener('touchend',()=>{if(y0==null)return;if(dy>30)$('stats').classList.add('min');else if(dy<-30)$('stats').classList.remove('min');y0=null})}
+/* ---------- layers panel ---------- */
+function R6posAbove(el,btn){if(MOBILE||innerWidth<=820){el.style.left='';el.style.top='';el.style.bottom='';return}const r=btn.getBoundingClientRect(),w=el.offsetWidth||340;
+ el.style.left=Math.max(8,Math.min(innerWidth-w-8,r.right-w))+'px';el.style.bottom=(innerHeight-r.top+10)+'px';el.style.top='auto'}
+function layOpen(){const p=$('layP');p.classList.add('open');R6posAbove(p,$('bLay'));R6lay();$('bLay').classList.add('on')}
+function layClose(){$('layP').classList.remove('open');$('bLay').classList.remove('on')}
+$('bLay').onclick=e=>{e.stopPropagation();$('layP').classList.contains('open')?layClose():layOpen();beep(560,.05)};
+$('layX').onclick=layClose;
+document.querySelectorAll('#layP [data-c]').forEach(b=>b.onclick=()=>{const c=b.dataset.c;S.cOff[c]=S.cOff[c]?0:1;applyGnF();refreshCastles();if(typeof linkVis==='function')linkVis();R6lay();beep(520,.04)});
+$('tArc').onclick=()=>{S.arcOff=!S.arcOff;if(typeof linkVis==='function')linkVis();R6lay()};
+$('tGlow').onclick=()=>{S.glowOff=!S.glowOff;R6.agT=9;refreshCastles();R6lay()};
+$('tCB').onclick=()=>{S.cb=!S.cb;WM.uniforms.uCB.value=S.cb?1:0;R6.agT=9;R6lay();if(S.cb)toast(t('cbOn'),2600)};
+document.querySelectorAll('#layP [data-q]').forEach(b=>b.onclick=()=>{R6setQ(b.dataset.q,true)});
+function R6lay(){const o=S.cOff;[['lyP','p'],['lyT','t'],['lyL','l'],['lyB','b']].forEach(([id,k])=>$(id).classList.toggle('on',!o[k]));
+ $('tArc').classList.toggle('on',!S.arcOff);$('tGlow').classList.toggle('on',!S.glowOff);$('tCB').classList.toggle('on',S.cb);
+ if(typeof hvLayOn==='function')$('tLgn').classList.toggle('on',hvLayOn());
+ document.querySelectorAll('#layP [data-q]').forEach(b=>b.classList.toggle('on',b.dataset.q===R6.q));
+ $('qInfo').textContent=t('qInfo',{q:t(R6.qCur==='low'?'qLow':'qHigh')+(R6.q==='auto'?' ('+t('qAuto')+')':''),f:window.__fps||'—'});
+ $('cbKey').classList.toggle('on',S.cb);$('cbKey').innerHTML=['cbP','cbT','cbL','cbB'].map(k=>`<span>${t(k)}</span>`).join('');
+ const n=Object.values(o).filter(Boolean).length+(S.arcOff?1:0)+(S.gnF?1:0);$('bLay').innerHTML=t('layBtn')+(n?` <b>−${n}</b>`:'')}
+function R6i18n(){['lyP','lyT','lyL','lyB'].forEach(id=>$(id).textContent=t(id));if(typeof hvI18n==='function')hvI18n();R6lay();
+ if(S.tm)R6tmMarks();R6feedRender(true);if($('lbP').classList.contains('open'))lbRender();if(R6.hintN)hintShow(R6.hintN);if(typeof hubI18n==='function')hubI18n()}
+{const _ai=applyI18n;applyI18n=function(){_ai();try{R6i18n()}catch(e){}}}
+{const _ub=updBtns;updBtns=function(){_ub();try{R6lay()}catch(e){}}}
+/* ---------- quality ---------- */
+function R6applyQ(q){R6.qCur=q;const low=q==='low';bloom.enabled=!low;PCAP=low?Math.floor(PN*.55):0;for(const k in RINGS){RINGS[k].pts.visible=!low}
+ const pr=low?Math.min(DPR,1):DPR;if(renderer.getPixelRatio()!==pr){renderer.setPixelRatio(pr);if(composer.setPixelRatio)composer.setPixelRatio(pr);onResize()}R6lay()}
+function R6setQ(q,manual){R6.q=q;R6.fpsLow=0;R6.qT=0;if(manual)try{localStorage.setItem('ed_q',q)}catch(e){}R6applyQ(q==='auto'?'high':q)}
+function R6qTick(dt){if(R6.q!=='auto'||R6.qCur==='low'||document.hidden)return;R6.qT+=dt;if(R6.qT<6)return;const f=window.__fps||60;
+ if(f<28){R6.fpsLow+=dt;if(R6.fpsLow>4){R6applyQ('low');toast(t('qToastLow'),4200)}}else R6.fpsLow=Math.max(0,R6.fpsLow-dt*2)}
+/* ---------- activity glow + colour-blind shapes ---------- */
+function agOf(days){return days<1?1.45:days<3?1.25:days<7?1.1:days<30?.9:days<90?.7:.5}
+function agGlow(i){return S.glowOff?1:Math.min(1.3,.3+.65*(WA.ag[i]||1))}
+function simActInit(){const L2=new Float64Array(MAXW);for(let i=0;i<MAXW;i++){const h=((i*2654435761)>>>0)/4294967296,a=SET.act[i]||1;const d=a>1.55?h*2.5:a>1?h*12:h*140;L2[i]=-d*86400}R6.lastAct=L2}
+{const _rec=rec;rec=function(i,ev){_rec(i,ev);try{R6onRec(i,ev)}catch(e){}}}
+function R6onRec(i,ev){if(SET.kind!=='sim')return;if(R6.lastAct)R6.lastAct[i]=ev[0];const ty=ev[1];if(i>=DRAWN)return;
+ if(ty==='win')R6feedPush({k:'win',i,o:ev[3],t:ev[0]});
+ else if(ty==='refund'){const key=Math.min(i,ev[3])+':'+Math.max(i,ev[3])+':'+ev[0];if(R6.drawKey!==key){R6.drawKey=key;R6feedPush({k:'draw',i,o:ev[3],t:ev[0]})}}
+ else if(ty==='gnome')R6feedPush({k:'gn',i,id:ev[3],t:ev[0]})}
+function chainAct(){const n=CH.blk.length;if(!R6.cAct||R6.cAct.length<CH.addrs.length){const a=new Float64Array(CH.addrs.length+256);if(R6.cAct)a.set(R6.cAct);R6.cAct=a}
+ for(let q=R6.cActN;q<n;q++){const b=CH.blk[q];R6.cAct[CH.fr[q]]=Math.max(R6.cAct[CH.fr[q]],b);R6.cAct[CH.tt[q]]=Math.max(R6.cAct[CH.tt[q]],b)}R6.cActN=n;
+ const ev=CH.bat.ev;for(let q=R6.cBatN;q<ev.length;q++){const e=ev[q];for(const x of [e.a.creator,e.a.player,e.a.winner]){if(!x)continue;const k=CH.aIdx.get(lc(x));if(k!=null)R6.cAct[k]=Math.max(R6.cAct[k],e.b)}}R6.cBatN=ev.length}
+function R6agTick(dt){if((R6.agT+=dt)<1)return;R6.agT=0;const n=NW;
+ if(SET.kind==='sim'){if(!R6.lastAct)simActInit();for(let i=0;i<n;i++)WA.ag[i]=S.glowOff?1:agOf((S.simT-R6.lastAct[i])/86400)}
+ else if(CH.state==='ok'&&CH.latest){chainAct();for(let i=0;i<n;i++){const k=CHW[i];const b=R6.cAct[k]||0;WA.ag[i]=S.glowOff?1:(b?agOf((CH.latest-b)*2.1/86400):.5)}}
+ for(let i=0;i<n;i++)WA.shp[i]=SET.lk[i]?2:SET.cls[i]===0?0:SET.cls[i]===1?1:3;WATT.ag.needsUpdate=true;WATT.shp.needsUpdate=true;}
+
+/* ---------- time machine milestones ---------- */
+function R6milestones(){const o=[];
+ if(SET.kind==='sim'){const T0=-PRE,T1=S.simT,sp=T1-T0||1,vv=tt=>Math.max(0,Math.min(1000,(tt-T0)/sp*1000)),day=tt=>t('tmDay',{d:simDay(tt)});
+  const first=f=>{for(const s of SNAP)if(f(s))return s.t;return null};
+  const add=(tt,l)=>{if(tt!=null&&tt<=T1)o.push({v:vv(tt),l,d:day(tt)})};
+  add(T0,t('msLaunch'));add(first(s=>s.m>0),t('msMatch1'));add(first(s=>s.s>0),t('msStakeS'));add(first(s=>s.g>0),t('msGnS'));
+  add(first(s=>s.m>=1000),t('msMatchN',{n:fmt(1000)}));add(first(s=>s.m>=100000),t('msMatchN',{n:fmt(100000)}));
+  o.push({v:1000,l:t('msNow'),d:day(T1),now:1});o.src='sim'}
+ else{const b0=CFG.contracts.amber.fromBlock,b1=CH.latest||b0+1,vv=b=>Math.max(0,Math.min(1000,(b-b0)/(b1-b0)*1000)),day=b=>dateStr(blockTime(b));
+  const add=(b,l)=>{if(b!=null&&b>=b0&&b<=b1)o.push({v:vv(b),l,d:day(b)})};
+  add(b0,t('msLaunch'));
+  const firstTo=a=>{if(!a)return null;const k=CH.aIdx.get(a);if(k==null)return null;for(let q=0;q<CH.blk.length;q++)if(CH.tt[q]===k||CH.fr[q]===k)return CH.blk[q];return null};
+  add(firstTo(CA('dexPair')),t('msDex'));
+  {const k=CH.aIdx.get(CA('staking'));let b=null;if(k!=null)for(let q=0;q<CH.blk.length;q++)if(CH.tt[q]===k){b=CH.blk[q];break}add(b,t('msStake'))}
+  const ng=CH.bat.ev.filter(e=>e.n==='newGame').map(e=>e.b).sort((a,b)=>a-b);
+  if(ng.length)add(ng[0],t('msMatch1'));for(const n of [1000,5000,10000])if(ng.length>=n)add(ng[n-1],t('msMatchN',{n:fmt(n)}));
+  const dr=CH.bat.ev.filter(e=>e.n==='endedGame'&&lc(e.a.winner||'')===ZERO).map(e=>e.b).sort((a,b)=>a-b);if(dr.length)add(dr[0],t('msDraw1'));
+  const gm=(CH.gnm.log||[]).filter(e=>e.f===ZERO).map(e=>e.b).sort((a,b)=>a-b);if(gm.length)add(gm[0],t('msGn1'));if(gm.length>=1000)add(gm[999],t('msGnN',{n:fmt(1000)}));
+  o.push({v:1000,l:t('msNow'),d:day(b1),now:1});o.src='chain'}
+ o.sort((a,b)=>a.v-b.v);return o}
+function R6tmMarks(){const ms=R6milestones();R6.ms=ms;
+ $('tmMk').innerHTML=ms.map((m,j)=>`<button class="mk${m.now?' now':''}" data-j="${j}" style="left:${(m.v/10).toFixed(2)}%" title="${m.l} · ${m.d}"></button>`).join('');
+ $('tmMsList').innerHTML=`<span class="sm" style="font-size:10.5px;color:var(--mut);align-self:center">${t(ms.src==='sim'?'msSim':'msChain')}:</span>`+ms.map((m,j)=>`<button data-j="${j}"><b>${m.d}</b>${m.l}</button>`).join('');
+ const go=e=>{const j=+e.currentTarget.dataset.j,m=R6.ms[j];if(!m||!S.tm)return;S.tm.play=false;$('tmR').value=m.v;tmApply(m.v);beep(700,.05)};
+ document.querySelectorAll('#tmMk .mk,#tmMsList button').forEach(b=>b.onclick=go);
+ $('tmD0').textContent=ms[0]?ms[0].d:'';$('tmD1').textContent=ms[ms.length-1]?ms[ms.length-1].d:'';R6tmCur(S.tm?S.tm.v:1000)}
+function R6tmCur(v){let d;if(SET.kind==='sim'){const tt=-PRE+v/1000*(S.simT+PRE);d=t('tmDay',{d:simDay(tt)})}else{const b0=CFG.contracts.amber.fromBlock;d=dateStr(blockTime(Math.round(b0+((CH.latest||b0)-b0)*v/1000)))}
+ $('tmCur').textContent=d;document.querySelectorAll('#tmMk .mk').forEach(b=>{const m=R6.ms[+b.dataset.j];b.classList.toggle('past',m&&m.v<=v)});
+ document.querySelectorAll('#tmMsList button').forEach(b=>{const m=R6.ms[+b.dataset.j];b.classList.toggle('past',m&&m.v<=v)})}
+/* ---------- live event feed ---------- */
+function R6feedPush(e){R6.feed.unshift(e);if(R6.feed.length>14)R6.feed.length=14;R6.feedDirty=true}
+const wName=i=>SET.kind==='sim'?'@'+SET.name[i]:short(SET.addr[i]);
+const aName=a=>{const i=SET.byAddr.get(a);return i!=null&&SET.kind==='sim'?'@'+SET.name[i]:short(a)};
+function feText(e){if(e.k==='win')return e.id!=null?t('feWin',{id:e.id,w:e.a?aName(e.a):wName(e.i)}):t('feWinS',{w:wName(e.i)});
+ if(e.k==='draw')return t('feDraw',{a:e.a?aName(e.a):wName(e.i),b:e.b2?aName(e.b2):wName(e.o)});
+ if(e.k==='gn')return t('feGn',{id:e.id,w:e.a?aName(e.a):wName(e.i)});return t('feBurn',{v:fmt(e.v)})}
+const FEIC={win:'⚔',draw:'⇄',gn:'⛏',burn:'🔥'};
+function R6feedRender(force){if(!force&&!R6.feedDirty)return;R6.feedDirty=false;const L2=R6.feed.slice(0,12);
+ $('feedL').innerHTML=L2.length?L2.map((e,j)=>`<div class="fe" data-j="${j}"><span class="ic">${FEIC[e.k]}</span><span class="tx">${feText(e)}<span class="tm">${e.b!=null?evWhen(e.b):evWhen(e.t)}${SET.kind==='sim'?' · '+t('feSim'):''}</span></span></div>`).join(''):`<div class="sm" style="color:var(--mut);padding:4px">${t('feEmpty')}</div>`;
+ $('feedOne').innerHTML=L2[0]?FEIC[L2[0].k]+' '+feText(L2[0]):t('feEmpty');
+ document.querySelectorAll('#feedL .fe').forEach(el=>el.onclick=()=>R6feedClick(+el.dataset.j))}
+function R6feedClick(j){const e=R6.feed[j];if(!e)return false;beep(740,.05);
+ if(e.k==='burn'){closePanels();focusNode('burn');return 'burn'}
+ let i=e.a?SET.byAddr.get(e.a):e.i;if((i==null||i>=DRAWN)&&e.b2)i=SET.byAddr.get(e.b2);
+ if(i==null||i<0||i>=NW){toast(t('dlNF',{a:short(e.a||'')}),2600);return false}if(S.tm)tmClose();selectWallet(i,false);return i}
+$('feedH').onclick=()=>{$('feed').classList.toggle('min');$('feedT').textContent=$('feed').classList.contains('min')?'▸':'▾'};
+if(MOBILE||innerWidth<=820){$('feed').classList.add('min');$('feedT').textContent='▸'}
+function R6feedTick(dt){if(SET.kind==='sim'){if((R6.burnT+=dt)>6){R6.burnT=0;const d=S.cB-R6.lastB;if(R6.lastB&&d>=1)R6feedPush({k:'burn',v:d,t:S.simT});R6.lastB=S.cB}}
+ else if(CH.state==='ok'&&(R6.chainFeedT-=dt)<=0){R6.chainFeedT=5;R6chainFeed()}
+ if((R6.feedT+=dt)>1){R6.feedT=0;R6feedRender()}}
+function R6chainFeed(){const out=[];const G=batGames();for(const g of G.values()){if(!g.end||!g.b)continue;if(g.w===ZERO)out.push({k:'draw',id:g.id,a:g.c,b2:g.p,b:g.b});else out.push({k:'win',id:g.id,a:g.w,b:g.b})}
+ for(const e of (CH.gnm.log||[]))if(e.f===ZERO)out.push({k:'gn',id:e.id,a:lc(e.to),b:e.b});
+ const dk=CH.aIdx.get(DEAD);if(dk!=null)for(let q=CH.blk.length-1,n=0;q>=0&&n<40;q--)if(CH.tt[q]===dk&&CH.val[q]>=1){out.push({k:"burn",v:CH.val[q],b:CH.blk[q]});n++}
+ out.sort((a,b)=>b.b-a.b);const pick=new Set(),cnt={};for(const e of out){if((cnt[e.k]=(cnt[e.k]||0)+1)<=3)pick.add(e)}for(const e of out){if(pick.size>=12)break;pick.add(e)}const top=out.filter(e=>pick.has(e)).slice(0,12);const sig=top.map(e=>e.k+e.b+(e.id||'')).join();if(sig!==R6.feedSig){R6.feedSig=sig;R6.feed=top;R6.feedDirty=true}}
+/* ---------- leaderboard ---------- */
+function lbData(){const rows=[];
+ if(SET.kind==='sim'){for(let i=0;i<Math.min(DRAWN,NW);i++){if(SET.cls[i]!==0)continue;const p=WS.pl[i];if(!p)continue;rows.push({i,a:SET.addr[i],n:'@'+SET.name[i],w:WS.wn[i],p})}return {rows,min:10}}
+ const G=batGames(),m=new Map();const g1=a=>{let o=m.get(a);if(!o)m.set(a,o={a,w:0,p:0});return o};
+ for(const g of G.values()){if(!g.end||g.x)continue;if(g.c)g1(g.c).p++;if(g.p)g1(g.p).p++;if(g.w&&g.w!==ZERO)g1(g.w).w++}
+ for(const o of m.values()){o.i=SET.byAddr.get(o.a);o.n=short(o.a);rows.push(o)}return {rows,min:20}}
+function lbRender(){const tb=R6.lbTab,r=L==='ru';let h=`<h4>${t('lbK')}</h4><div class="lbt"><button data-l="w" class="${tb==='w'?'on':''}">${t('lbWins')}</button><button data-l="pc" class="${tb==='pc'?'on':''}">${t('lbPct')}</button><button data-l="hv" class="${tb==='hv'?'on':''}">${hvTerm(true)}</button></div>`;
+ if(tb==='hv')h+=typeof hvLbHTML==='function'?hvLbHTML():'';
+ else{const {rows,min}=lbData();const pc=x=>x.p?x.w/x.p*100:0;let L2=tb==='w'?rows.sort((a,b)=>b.w-a.w||pc(b)-pc(a)):rows.filter(x=>x.p>=min).sort((a,b)=>pc(b)-pc(a)||b.w-a.w);L2=L2.slice(0,20);
+  h+=`<div class="lbr hd"><span>#</span><span class="nm">${t('lbName')}</span><span>${t('lbW')}</span><span>${t('lbP')}</span><span>${t('lbPc')}</span></div>`+
+   L2.map((x,j)=>`<div class="lbr" data-a="${x.a}"><b>${j+1}</b><span class="nm">${x.n}</span><span>${fmt(x.w)}</span><span>${fmt(x.p)}</span><span>${pc(x).toFixed(1).replace('.',r?',':'.')}%</span></div>`).join('')+
+   (L2.length?'':`<p class="note">${t('feEmpty')}</p>`)+`<p class="note">${t(SET.kind==='sim'?'lbNoteS':'lbNoteC',{n:min})}</p>`}
+ if(R6.lbH===h&&$('lbB').innerHTML)return;R6.lbH=h;$('lbB').innerHTML=h;$('lbB').querySelectorAll('.lbt button').forEach(b=>b.onclick=()=>{R6.lbTab=b.dataset.l;lbRender()});
+ $('lbB').querySelectorAll('.lbr[data-a]').forEach(el=>el.onclick=()=>lbGo(el.dataset.a));
+ $('lbB').querySelectorAll('[data-hv]').forEach(el=>el.onclick=()=>typeof hvFly==='function'&&hvFly(+el.dataset.hv))}
+function lbGo(a){const i=SET.byAddr.get(a);if(i==null||i>=NW){toast(t('dlNF',{a:short(a)}),2600);return false}if(S.tm)tmClose();$('lbP').classList.remove('open');selectWallet(i,false);return i}
+function lbOpen(){closePanels('lbP');$('lbP').classList.add('open');lbRender();$('bLb').classList.add('on')}
+function lbClose(){$('lbP').classList.remove('open');$('bLb').classList.remove('on')}
+$('bLb').onclick=e=>{e.stopPropagation();$('lbP').classList.contains('open')?lbClose():lbOpen();beep(600,.05)};$('lbX').onclick=lbClose;
+/* ---------- link framing (wider zoom so the coral arc is visible) ---------- */
+function frameLinkFly(i){const o=(SET.lnk.get(i)||[])[0];if(o==null)return false;const m=()=>wPos(i).add(wPos(o)).multiplyScalar(.5);const d=wPos(i).distanceTo(wPos(o));flyTo(m(),Math.max(55,d*1.4),m);return true}
+/* ---------- wallet card extras: Share · Enter castle · Show link · Power · hive ---------- */
+function R6histExtra(i){const h=$('hist');if(!h||i==null||i<0)return;const d=document.createElement('div');d.id='wx';
+ const pl=SET.cls[i]===0;let html=`<button id="wxSh" class="gold">${t('wxShare')}</button>`;if(pl)html+=`<button id="wxCv">${t('wxCastle')}</button>`;if(SET.lk[i])html+=`<button id="wxLk">${t('wxLink')}</button>`;
+ d.innerHTML=html;const first=h.firstElementChild&&h.firstElementChild.nextElementSibling;h.insertBefore(d,first||null);
+ if(typeof hubCardExtra==='function'){const x=hubCardExtra(i);if(x){const e=document.createElement('div');e.id='wxHub';e.innerHTML=x;d.after(e)}}
+ $('wxSh').onclick=()=>shareOpen(i);if($('wxCv'))$('wxCv').onclick=()=>typeof cvOpen==='function'&&cvOpen(i);if($('wxLk'))$('wxLk').onclick=()=>frameLinkFly(i)}
+/* ---------- share card ---------- */
+function shareURL(a){const u=new URL(location.href);u.search='';u.hash='';u.searchParams.set('wallet',a);return u.toString()}
+async function shareStats(i){const a=SET.addr[i];
+ if(SET.kind==='sim'){const ev=getHistory(i).ev;let w=0,l=0,d=0,net=0;for(const e of ev){if(e.ty==='win'){w++;net+=e.a}else if(e.ty==='loss')l++;else if(e.ty==='refund'){d++;net+=e.a}else if(e.ty==='contrib')net-=e.a}
+  const p=Math.max(WS.pl[i],w+l+d),W=Math.max(WS.wn[i],w);return {p,w:W,pc:p?W/p*100:0,net,sim:1}}
+ let st=(BST.get(a)||{}).st;if(!st){st=await fetchBatStats(a);BST.set(a,{st})}const fin=st.won+st.lost+st.draws;return {p:st.played,w:st.won,pc:fin?st.won/fin*100:0,net:st.pnl,sim:0}}
+function shareDraw(i,s){const c=document.createElement('canvas');c.width=1200;c.height=630;const g=c.getContext('2d'),r=L==='ru';
+ const bg=g.createLinearGradient(0,0,1200,630);bg.addColorStop(0,'#090d26');bg.addColorStop(1,'#1b1240');g.fillStyle=bg;g.fillRect(0,0,1200,630);
+ try{composer.render();const src=renderer.domElement,sw=src.width,sh=src.height,ar=560/630;let w2=sh*ar,x0=(sw-w2)/2;if(w2>sw){w2=sw;x0=0}g.globalAlpha=.9;g.drawImage(src,x0,0,w2,sh,640,0,560,630);g.globalAlpha=1;
+  const fd=g.createLinearGradient(640,0,820,0);fd.addColorStop(0,'#0b0f2a');fd.addColorStop(1,'rgba(11,15,42,0)');g.fillStyle=fd;g.fillRect(640,0,180,630)}catch(e){}
+ g.fillStyle='#f6c75a';g.font='700 22px Inter,system-ui,sans-serif';g.fillText('ELECTRUM DECISIONS · AMBER',60,74);
+ g.fillStyle='#fff';g.font='700 46px Inter,system-ui,sans-serif';g.fillText(SET.kind==='sim'?'@'+SET.name[i]:short(SET.addr[i]),60,150);
+ g.fillStyle='#aab4d6';g.font='24px Inter,system-ui,sans-serif';g.fillText(t('scTitle')+(s.sim?' · '+t('scSim'):''),60,192);
+ const F=(x,l,v,y)=>{g.fillStyle='#9aa6cc';g.font='600 18px Inter,system-ui,sans-serif';g.fillText(l.toUpperCase(),x,y);g.fillStyle='#fff';g.font='700 44px Inter,system-ui,sans-serif';g.fillText(v,x,y+50)};
+ F(60,t('scGames'),fmt(s.p),270);F(330,t('scWins'),fmt(s.w),270);F(60,t('scPct'),s.p?s.pc.toFixed(1).replace('.',r?',':'.')+'%':'—',390);F(330,s.sim?t('scNetS'):t('scNet'),sgnA(s.net)+' Amber',390);
+ g.fillStyle='#5eead4';g.font='20px Inter,system-ui,sans-serif';const u=shareURL(SET.addr[i]).replace(/^https?:\/\//,'');g.fillText(u.length>58?u.slice(0,57)+'…':u,60,560);
+ g.strokeStyle='rgba(246,199,90,.5)';g.lineWidth=2;g.strokeRect(20,20,1160,590);return c}
+let R6share=null;
+async function shareOpen(i){$('shareP').classList.remove('hidden');$('shImg').removeAttribute('src');$('shNote').textContent=t('scLoading');R6share={i,url:shareURL(SET.addr[i])};
+ try{const s=await shareStats(i);const c=shareDraw(i,s);R6share.c=c;R6share.data=c.toDataURL('image/png');$('shImg').src=R6share.data;$('shNote').textContent=t('shNote')}
+ catch(e){$('shNote').textContent=L==='ru'?'Статистику сейчас не удалось прочитать (узел RPC).':'Could not read the stats right now (RPC node).'}return R6share}
+function shareDl(){if(!R6share||!R6share.data)return;const a=document.createElement('a');a.href=R6share.data;a.download='amber-castle-'+SET.addr[R6share.i].slice(2,8)+'.png';document.body.appendChild(a);a.click();a.remove()}
+async function shareCopy(){if(!R6share)return;try{await navigator.clipboard.writeText(R6share.url);toast(t('shCopied'),2200)}catch(e){toast(t('shCopyFail',{u:R6share.url}),6000)}}
+$('shGo').onclick=async()=>{if(!R6share||!R6share.c)return;try{const blob=await new Promise(r=>R6share.c.toBlob(r,'image/png'));const f=new File([blob],'amber-castle.png',{type:'image/png'});
+ if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Electrum Decisions · Amber',url:R6share.url});return}}catch(e){if(e&&e.name==='AbortError')return}shareDl();shareCopy()};
+$('shDl').onclick=shareDl;$('shCp').onclick=shareCopy;$('shX').onclick=()=>$('shareP').classList.add('hidden');
+/* ---------- deep link ?wallet=0x… ---------- */
+function deepTick(dt){const a=R6.deep;if(!a)return;R6.deepT+=dt;const ready=SET.kind==='sim'?S.src==='sim':(S.src==='chain'&&CH.state==='ok'&&NW>0);
+ if(ready){const i=SET.byAddr.get(a);if(i!=null&&i<NW){R6.deep=null;if(i>=DRAWN&&SET.kind==='sim')setDrawn(Math.max(DRAWN,i+1));$('intro').classList.add('hidden');hintClose(true);selectWallet(i,false);R6.deepHit=i;return}
+  if(SET.kind==='sim'||R6.deepT>20){R6.deep=null;R6.deepHit=-1;toast(t('dlNF',{a:short(a)}),4200)}}else if(R6.deepT>(SET.kind!=='sim'||CH.state==='loading'?600:90)||CH.state==='fail'){const a2=R6.deep;R6.deep=null;R6.deepHit=-1;toast(t('dlNF',{a:short(a2)}),4200)}}
+/* ---------- first-visit hint (3 steps) ---------- */
+function hintShow(n){R6.hintN=n;$('hint1').classList.add('open');$('h1K').textContent=t('h1K',{n});$('h1T').textContent=t(['h1a','h1b','h1c'][n-1]);$('h1D').textContent=['●○○','●●○','●●●'][n-1];$('h1N').textContent=t(n<3?'h1Next':'h1Done');
+ if(n===1)focusNode('contract')}
+function hintClose(save){$('hint1').classList.remove('open');R6.hintN=0;if(save)try{localStorage.setItem('ed_hint1','1')}catch(e){}}
+$('h1N').onclick=()=>{const n=R6.hintN;if(n>=3){hintClose(true);return}hintShow(n+1);if(n+1===2){let best=-1;for(let i=0;i<Math.min(DRAWN,NW);i++)if(SET.cls[i]===0&&!clsHide(i)){best=i;break}if(best>=0)flyTo(wPos(best),MOBILE?16:12,()=>wPos(best))}if(n+1===3)resetView()};
+$('h1S').onclick=()=>hintClose(true);
+function hintMaybe(){let seen=false;try{seen=!!localStorage.getItem('ed_hint1')}catch(e){}if(seen||R6EMBED||R6Q.has('nohint')||R6Q.has('kiosk')||R6.deep||R6.deepHit>=0)return;setTimeout(()=>{if(!S.kiosk&&!R6.deepHit)hintShow(1)},900)}
+/* ---------- init / tick ---------- */
+function R6init(){R6lay();R6i18n();if(MOBILE)$('ctrl').addEventListener('click',e=>{const b=e.target.closest('button');if(b&&b.id!=='mtoggle'&&b.id!=='bPause')setTimeout(()=>$('ctrl').classList.add('min'),60)});
+ const wq=R6Q.get('wallet');if(wq&&/^0x[0-9a-fA-F]{40}$/.test(wq)){R6.deep=wq.toLowerCase();toast(t('dlWait',{a:short(R6.deep)}),2600)}
+ if(R6EMBED){document.body.classList.add('embed');$('intro').classList.add('hidden');const u=new URL(location.href);u.searchParams.delete('embed');$('embLogo').href=u.toString()}
+ let q=R6Q.get('q');if(!/^(auto|high|low)$/.test(q||'')){try{q=localStorage.getItem('ed_q')}catch(e){}}R6setQ(/^(auto|high|low)$/.test(q||'')?q:'auto');
+ if($('intro').classList.contains('hidden'))hintMaybe();else $('iGo').addEventListener('click',hintMaybe,{once:true});
+ if(typeof hubInit==='function')hubInit()}
+let R6slow=0;
+function R6tick(dt){R6qTick(dt);R6agTick(dt);R6feedTick(dt);deepTick(dt);if(typeof hubTick==='function')hubTick(dt);
+ if((R6slow+=dt)>2){R6slow=0;$('stFoot').textContent=$('foot').textContent;if($('layP').classList.contains('open'))R6lay();if($('lbP').classList.contains('open')&&$('lbP').matches(':hover')===false)lbRender()}}
+const R6API={r6:{setQ:q=>R6setQ(q),q:()=>({q:R6.q,cur:R6.qCur,bloom:bloom.enabled,pcap:PCAP}),feed:()=>R6.feed.map(e=>({k:e.k,txt:feText(e)})),feedClick:j=>R6feedClick(j),
+ ms:()=>R6milestones().map(m=>({v:m.v,l:m.l,d:m.d})),lb:tb=>{R6.lbTab=tb||'w';lbOpen();return $('lbB').querySelectorAll('.lbr[data-a],[data-hv]').length},lbGo:a=>lbGo(a),
+ share:i=>shareOpen(i).then(s=>({ok:!!(s&&s.data),len:s&&s.data?s.data.length:0,url:s&&s.url})),deep:()=>R6.deepHit,ag:()=>{let n=0,lo=0,hi=0;for(let i=0;i<NW;i++){n++;if(WA.ag[i]<.8)lo++;if(WA.ag[i]>1.2)hi++}return {n,lo,hi}},
+ cb:on=>{if(on!==undefined&&!!on!==S.cb)$('tCB').click();return {cb:S.cb,u:WM.uniforms.uCB.value}},hint:()=>R6.hintN,hintShow:n=>hintShow(n),hintClose:()=>hintClose(true),
+ cOff:()=>({...S.cOff}),arcOff:()=>S.arcOff,frameLink:i=>frameLinkFly(i),tab:tb=>{R6setTab(tb);return document.querySelectorAll('#statRows .st.tb-'+tb).length}}};
+
+/* ===== Round 6 · Part 2: Hives (Рои), castle deep zoom (4X entry point), account slot, Technology card, planned game chain =====
+   All data comes through ED_CONFIG hooks (castleProvider / legionProvider / authProvider), which connect to the studio's EXISTING server.
+   null hook = built-in behaviour: DEV shows labelled demo data, PROD shows «скоро». No real sign-in, no fields, nothing collected. */
+const HUB={hv:[],hvOf:new Map(),hvOn:EDITION==='dev',hvApplied:false,orig:null,aura:[],cvI:-1,cvNear:0,cvB:null,cvSel:'keep',authPrev:false,castle:new Map()};
+const hook=n=>window['ED_'+n]||CFG[n]||null;
+function hvTerm(pl){const tm=CFG.legionTerm||{};return pl?(tm[L]||(L==='ru'?'Рои':'Hives')):(tm[L+'1']||(L==='ru'?'Рой':'Hive'))}
+const HV_NAMES=[['Вега','Vega'],['Альтаир','Altair'],['Сириус','Sirius'],['Полярис','Polaris'],['Антарес','Antares'],['Ригель','Rigel'],['Денеб','Deneb'],['Капелла','Capella'],['Арктур','Arcturus'],['Спика','Spica'],
+ ['Процион','Procyon'],['Альдебаран','Aldebaran'],['Бетельгейзе','Betelgeuse'],['Кастор','Castor'],['Поллукс','Pollux'],['Регул','Regulus'],['Фомальгаут','Fomalhaut'],['Мира','Mira'],['Электра','Electra'],['Майя','Maia'],
+ ['Альциона','Alcyone'],['Хадар','Hadar'],['Мицар','Mizar'],['Алькор','Alcor'],['Тубан','Thuban'],['Шедар','Schedar'],['Беллатрикс','Bellatrix'],['Минтака','Mintaka'],['Альнилам','Alnilam'],['Саиф','Saiph']];
+const HV_COL=[0xf6c75a,0x5eead4,0xc4b5fd,0xf472b6,0x7dd3fc,0xfb923c,0xa3e635,0xfcd34d,0x93c5fd,0xf9a8d4];
+/* ---------- castle data (castleProvider; DEV demo) ---------- */
+const BLD=['keep','walls','barracks','camp','mine','workshop','storage'];
+function castleDemo(a){const r=rng((parseInt(a.slice(2,10),16)||7)^0x5a17);const keep=1+Math.floor(r()*14);const b=BLD.map(id=>({id,level:id==='keep'?keep:Math.max(1,Math.min(keep,Math.round(keep*(.45+r()*.6)))),max:id==='keep'?20:keep}));
+ const army=Math.round(200+r()*r()*9000);const power=b.reduce((s,x)=>s+x.level*110,0)+army;const nick=SET.kind==='sim'&&SET.byAddr.has(a)?SET.name[SET.byAddr.get(a)]:null;
+ const soc={};if(r()<.6)soc.x='@'+(nick||'player'+a.slice(2,6));if(r()<.35)soc.youtube='@'+(nick||'player'+a.slice(2,6));if(r()<.25)soc.tiktok='@'+(nick||'player'+a.slice(2,6));if(r()<.2)soc.instagram='@'+(nick||'player'+a.slice(2,6));
+ return {buildings:b,army,power,nick,showNick:true,socials:soc,demo:true}}
+function castleGet(a){a=lc(a);if(HUB.castle.has(a))return HUB.castle.get(a);const h=hook('castleProvider');let v;
+ if(typeof h==='function'){v=Promise.resolve().then(()=>h(a)).catch(()=>null)}else v=Promise.resolve(EDITION==='dev'?castleDemo(a):null);
+ v=v.then(x=>{HUB.castle.set(a,Promise.resolve(x));HUB.castleV=HUB.castleV||new Map();HUB.castleV.set(a,x);return x});HUB.castle.set(a,v);return v}
+function castleNow(a){a=lc(a);if(HUB.castleV&&HUB.castleV.has(a))return HUB.castleV.get(a);if(EDITION==='dev'&&!hook('castleProvider'))return castleDemo(a);castleGet(a);return undefined}
+/* ---------- Hives ---------- */
+function hvBuildDemo(){const r=rng(4242),pool=[];const lim=Math.min(NW,PLAYERS||NW);for(let i=0;i<lim;i++)if(SET.cls[i]===0&&!SET.lk[i])pool.push(i);
+ for(let i=pool.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]]}let p=0;const out=[];
+ for(let h=0;h<30;h++){const n=50+Math.floor(r()*51);if(p+n>pool.length)break;const m=pool.slice(p,p+n).sort((a,b)=>a-b);p+=n;out.push({id:'h'+(h+1),nm:HV_NAMES[h],color:HV_COL[h%HV_COL.length],crew:m,demo:true})}return out}
+function hvLoad(){const h=hook('legionProvider');if(typeof h==='function'){return Promise.resolve().then(()=>h()).then(arr=>(arr||[]).map((x,j)=>({id:x.id||'h'+j,name:x.name,color:x.color||HV_COL[j%10],crew:(x.players||[]).map(a=>SET.byAddr.get(lc(a))).filter(i=>i!=null),power:x.power,wins:x.wins}))).catch(()=>[])}
+ return Promise.resolve(EDITION==='dev'&&SET.kind==='sim'?hvBuildDemo():[])}
+function hvName(h){return h.name||(h.nm?h.nm[L==='ru'?0:1]:h.id)}
+function hvStats(h){let w=0,p=0;for(const i of h.crew){w+=WS.pl&&SET.kind==='sim'?WS.wn[i]:0;const c=castleNow(SET.addr[i]);if(c)p+=c.power||0}return {w:h.wins!=null?h.wins:w,p:h.power!=null?h.power:p}}
+function hvClear(restore){if(HUB.orig&&restore&&SET.kind==='sim'){for(const [i,o] of HUB.orig){setWalletOrbit(i,o[0],o[1],o[2],o[3],o[4],o[5]);WA.rb[i]=o[6]}hvAttr()}
+ HUB.orig=null;HUB.hvApplied=false;HUB.hvOf.clear();for(const s of HUB.aura){scene.remove(s);s.material.dispose()}HUB.aura=[];$('hvLab').innerHTML=''}
+function hvAttr(){for(const k of ['pos','o2','rb','cen'])if(WATT[k])WATT[k].needsUpdate=true}
+function hvApply(){hvClear(true);if(!HUB.hvOn||SET.kind!=='sim')return;const kind0=SET.kind,nw=NW;
+ hvLoad().then(arr=>{if(SET.kind!==kind0||NW!==nw||!HUB.hvOn)return;HUB.hv=arr;HUB.orig=new Map();const r=rng(99);
+  arr.forEach((h,hi)=>{if(!h.crew.length)return;const a=h.crew[0];h.anchor=a;const P=WA.pos,O=WA.o2;const r0=P[a*3],a0=P[a*3+1],w0=P[a*3+2],h0=O[a*3],inc=O[a*3+1],om=O[a*3+2];
+   for(const i of h.crew){HUB.hvOf.set(i,hi);HUB.orig.set(i,[P[i*3],P[i*3+1],P[i*3+2],O[i*3],O[i*3+1],O[i*3+2],WA.rb[i]]);if(i===a)continue;
+    const rr=Math.sqrt(r())*2.6,an=r()*Math.PI*2;setWalletOrbit(i,r0+Math.cos(an)*rr,a0+Math.sin(an)*rr/Math.max(20,r0),w0,h0+(r()-.5)*2.2,inc,om)}
+   const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:DOT,color:h.color,transparent:true,opacity:.22,depthWrite:false,blending:THREE.AdditiveBlending}));sp.scale.setScalar(12);sp.renderOrder=-2;scene.add(sp);sp.userData.hv=hi;HUB.aura.push(sp)});
+  hvEraFix();hvAttr();HUB.hvApplied=true;hvLabBuild();if(typeof refreshCastles==='function')refreshCastles()})}
+function hvEraFix(){if(!HUB.orig||SET.kind!=='sim')return;HUB.hv.forEach(h=>{const a=h.anchor;if(a==null)return;const k=WA.rb[a]-WA.pos[a*3];for(const i of h.crew)if(i!==a)WA.rb[i]=WA.pos[i*3]+k});hvAttr()}
+{const _se=simEraRadii;simEraRadii=function(){_se();try{hvEraFix()}catch(e){}}}
+{const _bs=buildSimSet;buildSimSet=function(){hvClear(false);const r=_bs.apply(this,arguments);try{if(HUB.hvOn)setTimeout(hvApply,0)}catch(e){}return r}}
+function hvLabBuild(){$('hvLab').innerHTML=HUB.hv.map((h,j)=>`<div class="hl" data-hv="${j}" style="--c:#${h.color.toString(16).padStart(6,'0')}"></div>`).join('');
+ $('hvLab').querySelectorAll('.hl').forEach(el=>{el.onclick=()=>hvFly(+el.dataset.hv)});hvLabText()}
+function hvLabText(){$('hvLab').querySelectorAll('.hl').forEach(el=>{const h=HUB.hv[+el.dataset.hv];if(!h)return;const s=hvStats(h);el.innerHTML=`<b>${hvName(h)}</b> · ${h.crew.length} · ${t('wxPower')} ${fmt(s.p)}`})}
+function hvLayOn(){return HUB.hvOn}
+function hvI18n(){const lab=hvTerm(true)+(EDITION==='prod'?' '+t('soonS'):'');$('tLgn').textContent=lab;hvLabText()}
+$('tLgn').onclick=()=>{if(EDITION==='prod'&&!hook('legionProvider')){toast(t('lbHvSoon'),3200);return}HUB.hvOn=!HUB.hvOn;if(HUB.hvOn)hvApply();else hvClear(true);R6lay();beep(540,.05)};
+function hvFly(j){const h=HUB.hv[j];if(!h||h.anchor==null)return false;$('lbP').classList.remove('open');const a=h.anchor;flyTo(wPos(a),MOBILE?30:22,()=>wPos(a));toast(`${hvName(h)} · ${h.crew.length} ${t('hvPlayers').toLowerCase()}`,2400);return true}
+const _hp=new THREE.Vector3();
+function hvTick(){if(!HUB.hvApplied)return;const show=S.mode!=='world'&&morph<.5&&!S.kiosk&&S.panel!=='inv'&&!(MOBILE&&document.querySelector('.ph.open,#card.open,#tm.open'));const els=$('hvLab').children;const cand=[];const lim=MOBILE?95:135;
+ HUB.hv.forEach((h,j)=>{const sp=HUB.aura[j];const el=els[j];if(!sp)return;wPos(h.anchor,_hp);sp.position.copy(_hp);const vis=show&&h.anchor<DRAWN&&!clsHide(h.anchor);sp.visible=vis;
+  if(!el)return;el.style.display='none';if(!vis)return;const d=camera.position.distanceTo(_hp);_hp.project(camera);
+  if(_hp.z>1||d>lim||Math.abs(_hp.x)>.95||_hp.y>(MOBILE?.6:.85)||_hp.y<-.8)return;cand.push({el,d,x:(_hp.x+1)/2*innerWidth,y:(1-_hp.y)/2*innerHeight})});
+ cand.sort((a,b)=>a.d-b.d);const placed=[];for(const c of cand){if(placed.length>=(MOBILE?5:9))break;if(placed.some(q=>Math.abs(q.x-c.x)<150&&Math.abs(q.y-c.y)<22))continue;placed.push(c);
+  c.el.style.display='';c.el.style.transform=`translate(${c.x.toFixed(0)}px,${(c.y-14).toFixed(0)}px) translate(-50%,-100%)`;c.el.style.opacity=c.d>lim*.7?.6:1}}
+function hvLbHTML(){if(!HUB.hv.length||(EDITION==='prod'&&!hook('legionProvider')))return `<p class="note"><span class="soonTag">${t('cvSoon')}</span> ${t('lbHvSoon')}</p><p class="note">${t('hvNote')}</p>`;
+ const tb=HUB.lbHv||'p';const rows=HUB.hv.map((h,j)=>({j,h,...hvStats(h)})).sort((a,b)=>tb==='p'?b.p-a.p:b.w-a.w);
+ return `<div class="lbt sub"><button data-hs="p" class="${tb==='p'?'on':''}">${t('lbHvPow')}</button><button data-hs="w" class="${tb==='w'?'on':''}">${t('lbHvWins')}</button></div>`+
+  `<div class="lbr hd"><span>#</span><span class="nm">${t('lbHvName')}</span><span>${t('lbHvMem')}</span><span>${t('lbHvPower')}</span><span>${t('lbW')}</span></div>`+
+  rows.map((x,k)=>`<div class="lbr" data-hv="${x.j}"><b>${k+1}</b><span class="nm"><i style="color:#${x.h.color.toString(16).padStart(6,'0')}">⬢</i> ${hvName(x.h)}</span><span>${x.h.crew.length}</span><span>${fmt(x.p)}</span><span>${fmt(x.w)}</span></div>`).join('')+
+  `<p class="note">${HUB.hv[0].demo?'<span class="demoTag">'+t('hvDemo')+'</span> ':''}${t('hvNote')}</p>`}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-hs]');if(b){HUB.lbHv=b.dataset.hs;lbRender()}});
+/* ---------- wallet card: power + hive ---------- */
+function hubCardExtra(i){if(SET.cls[i]!==0)return '';const c=castleNow(SET.addr[i]);let h=`<div class="sm">${t('wxPower')}: `;
+ if(c===undefined){castleGet(SET.addr[i]).then(()=>{if(FY.sel===i&&$('wxHub'))$('wxHub').innerHTML=hubCardExtra(i)});h+='…'}
+ else h+=c?`<b>${fmt(c.power||0)}</b>${c.demo?' <span class="demoTag">'+t('cvDemo').split(' — ')[0]+'</span>':''}`:`<span class="soonTag">${t('cvSoon')}</span>`;h+='</div>';
+ const hj=HUB.hvOf.get(i);if(hj!=null){const hv=HUB.hv[hj];h+=`<div class="sm">${hvTerm(false)}: <a href="#" data-hvl="${hj}" style="color:#${hv.color.toString(16).padStart(6,'0')}">${hvName(hv)}</a> · ${hv.crew.length} ${t('hvPlayers').toLowerCase()}</div>`}return h}
+document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('[data-hvl]');if(a){e.preventDefault();hvFly(+a.dataset.hvl)}});
+/* ---------- castle deep zoom (isometric 4X view) ---------- */
+const BPOS={keep:[0,0,1.25],walls:[-2.3,-1.2,1],barracks:[1.6,-1.7,1],camp:[2.4,.6,1],mine:[-1.9,1.5,1],workshop:[.4,2.2,1],storage:[-2.6,.15,.9]};
+const BHUE={keep:'#f6c75a',walls:'#94a3b8',barracks:'#f472b6',camp:'#fb923c',mine:'#5eead4',workshop:'#c4b5fd',storage:'#7dd3fc'};
+function isoP(x,y,z){return [500+(x-y)*112,330+(x+y)*56-z*30]}
+function shade(hex,k){const n=parseInt(hex.slice(1),16);const f=c=>Math.max(0,Math.min(255,Math.round(c*k)));return `rgb(${f(n>>16)},${f(n>>8&255)},${f(n&255)})`}
+function cvSvg(c){const P=(a)=>a.map(p=>p.join(',')).join(' ');let s='';
+ const g=[[-4,-4],[4,-4],[4,4],[-4,4]].map(([x,y])=>isoP(x,y,0));s+=`<polygon points="${P(g)}" fill="rgba(94,234,212,.06)" stroke="rgba(94,234,212,.35)" stroke-width="1.5"/>`;
+ for(let k=-3;k<=3;k++){const a=isoP(k,-4,0),b=isoP(k,4,0),c2=isoP(-4,k,0),d=isoP(4,k,0);s+=`<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="rgba(148,163,184,.12)"/><line x1="${c2[0]}" y1="${c2[1]}" x2="${d[0]}" y2="${d[1]}" stroke="rgba(148,163,184,.12)"/>`}
+ const order=BLD.slice().sort((a,b)=>(BPOS[a][0]+BPOS[a][1])-(BPOS[b][0]+BPOS[b][1]));
+ for(const id of order){const [x,y,sz]=BPOS[id];const b=c?c.buildings.find(q=>q.id===id):null;const lv=b?b.level:0;const hgt=id==='walls'?.9:(c?.8+lv*.32:1.4)*sz;const w=.62*sz;const col=BHUE[id];
+  const v=(dx,dy,z)=>isoP(x+dx,y+dy,z);const top=[v(-w,-w,hgt),v(w,-w,hgt),v(w,w,hgt),v(-w,w,hgt)],L2=[v(-w,w,0),v(w,w,0),v(w,w,hgt),v(-w,w,hgt)],R=[v(w,-w,0),v(w,w,0),v(w,w,hgt),v(w,-w,hgt)];
+  const sel=HUB.cvSel===id;s+=`<g class="bld${sel?' on':''}${c?'':' soon'}" data-b="${id}"><polygon points="${P(L2)}" fill="${shade(col,.42)}"/><polygon points="${P(R)}" fill="${shade(col,.6)}"/><polygon points="${P(top)}" fill="${shade(col,.95)}" stroke="${sel?'#fff':'rgba(255,255,255,.35)'}" stroke-width="${sel?2.5:1}"/>`;
+  if(id==='keep'){const pk=v(0,0,hgt+1.6);s+=`<polygon points="${P([top[0],top[1],pk])}" fill="${shade(col,.8)}"/><polygon points="${P([top[1],top[2],pk])}" fill="${shade(col,.62)}"/><polygon points="${P([top[2],top[3],pk])}" fill="${shade(col,.5)}"/>`}
+  const lp=v(0,0,hgt+(id==='keep'?2.1:.5));s+=`<text class="blab" x="${lp[0]}" y="${lp[1]-8}">${t('b'+id[0].toUpperCase()+id.slice(1))}</text><text class="blv" x="${lp[0]}" y="${lp[1]+10}">${c?t('cvLvl',{n:lv}):t('cvLvlNone')}</text></g>`}
+ return s}
+function cvRender(){const i=HUB.cvI;if(i<0)return;const a=SET.addr[i];const c=castleNow(a);const bid=HUB.cvSel,Bk='b'+bid[0].toUpperCase()+bid.slice(1),Dk='d'+bid[0].toUpperCase()+bid.slice(1);
+ $('cvK').textContent=t('cvK');$('cvH').textContent=(c&&c.nick&&c.showNick!==false)?'@'+c.nick:(SET.kind==='sim'?'@'+SET.name[i]:short(a));
+ $('cvS').innerHTML=c===undefined?t('scLoading'):c?(c.demo?`<span class="demoTag">${t('cvDemo')}</span>`:''):`<span class="soonTag">${t('cvSoon')}</span>`;
+ $('cvSvg').innerHTML=cvSvg(c||null);$('cvSvg').querySelectorAll('.bld').forEach(g=>g.onclick=()=>{HUB.cvSel=g.dataset.b;cvRender();beep(620,.04)});
+ const b=c&&c.buildings.find(q=>q.id===bid);const soc=c&&c.socials||{};const sk=Object.keys(soc).filter(k=>soc[k]);const SN={x:'X',tiktok:'TikTok',youtube:'YouTube',instagram:'Instagram'};
+ const socH=sk.length?sk.map(k=>{const v=String(soc[k]);return /^https:\/\//.test(v)&&!c.demo?`<a class="soc" href="${esc(v)}" target="_blank" rel="noopener">${SN[k]||k} ↗</a>`:`<span class="soc">${SN[k]||k} ${esc(v)}</span>`}).join(''):`<span class="sm" style="color:var(--mut)">${t('cvSocNone')}</span>`;
+ $('cvInfo').innerHTML=`<div class="k">${t(Bk)}</div><b>${b?(b.max?t('cvLvlMax',{n:b.level,m:b.max}):t('cvLvl',{n:b.level})):t('cvLvlNone')}</b><p class="sm">${t(Dk)}</p>`+
+  `<div class="row2"><span>${t('cvPower')}</span><b>${c?fmt(c.power||0):t('cvSoon')}</b></div><div class="row2"><span>${t('cvArmy')}</span><b>${c?fmt(c.army||0):t('cvSoon')}</b></div><p class="note">${t('cvPowerNote')}</p>`+
+  `<div class="k" style="margin-top:6px">${t('cvSoc')}</div><div>${c?socH:`<span class="sm" style="color:var(--mut)">${t('cvSocNone')}</span>`}</div>`+
+  `<div class="tgl" title="${t('cvNickSoon')}"><i class="${c&&c.showNick!==false?'on':''}"></i>${t('cvNick')} <span class="soonTag">${t('cvNickSoon')}</span></div><p class="note">${t('cvPick')}</p>`;
+ const hj=HUB.hvOf.get(i);$('cvNote').innerHTML=t('cvNote')+(hj!=null?` · ${hvTerm(false)} <b>${hvName(HUB.hv[hj])}</b>. ${t('hvNote')}`:'')}
+function cvOpen(i){if(i==null||i<0||i>=NW)return false;HUB.cvI=i;HUB.cvNear=0;HUB.cvSel='keep';$('cv').classList.add('open');requestAnimationFrame(()=>requestAnimationFrame(()=>$('cv').classList.add('vis')));castleGet(SET.addr[i]).then(()=>{if(HUB.cvI===i)cvRender()});cvRender();beep(500,.08);return true}
+function cvClose(){if(HUB.cvI<0)return;const i=HUB.cvI;HUB.cvI=-1;$('cv').classList.remove('open','vis');HUB.cvCool=2;if(FY.sel===i)flyTo(wPos(i),MOBILE?12:9,()=>wPos(i))}
+$('cvX').onclick=cvClose;
+function cvTick(dt){if(HUB.cvCool>0){HUB.cvCool-=dt;return}if(HUB.cvI>=0||FY.sel<0||fly||S.mode==='world'||SET.cls[FY.sel]!==0){HUB.cvNear=0;return}
+ const d=camera.position.distanceTo(wPos(FY.sel));if(d<4.6){if((HUB.cvNear+=dt)>.6)cvOpen(FY.sel)}else HUB.cvNear=0}
+/* ---------- account slot (no real auth; nothing collected) ---------- */
+function authRender(){const ap=hook('authProvider');const cur=ap&&typeof ap.current==='function'?ap.current():null;
+ const btn=(m,k)=>{const on=ap&&typeof ap.signIn==='function'&&(ap.methods||[]).includes(m);return `<button class="authB" data-m="${m}" ${on?'':'disabled'}>${t(k)}${on?'':' <span class="soonTag">'+t('cvSoon').replace(/^4X · /,'')+'</span>'}</button>`};
+ let h=`<div class="k">${t('auK')}</div><h2>${t('auH')}</h2><p>${t('auP1')}</p><p>${t('auP2')}</p><div class="authRow">${btn('google','auG')}${btn('apple','auA')}${btn('email','auE')}</div><p class="note">${t('auP3')}</p>`+
+  `<button id="auPv">${t(HUB.authPrev?'auHide':'auPrev')}</button>`;
+ if(HUB.authPrev||cur)h+=profHTML(cur);$('authB').innerHTML=h;
+ $('auPv').onclick=()=>{HUB.authPrev=!HUB.authPrev;authRender()};
+ $('authB').querySelectorAll('.authB:not([disabled])').forEach(b=>b.onclick=()=>{Promise.resolve(ap.signIn(b.dataset.m)).then(()=>authRender()).catch(()=>{})})}
+function profHTML(cur){const sk=w=>`<span class="sk" style="width:${w}%"></span>`;const W=cur&&cur.wallet?short(cur.wallet):null;
+ return `<div class="prof"><div class="k">${t('auProfH')}</div>`+
+  `<div class="sec"><b>${t('prCastle')}</b>${sk(60)}${sk(40)}</div><div class="sec"><b>${t('prStats')}</b>${sk(75)}${sk(50)}</div>`+
+  `<div class="sec"><b>${t('prWallet')}</b><div class="sm">${t('prWalletT')}${W?': '+W:''}</div>${W?'':sk(55)}<p class="note">${t('prWalletN')}</p></div>`+
+  `<div class="sec"><b>${t('prAmber')}</b><div class="sm">${t('prMine')}</div></div><div class="sec"><b>${t('prSoc')}</b><div class="sm">${t('prSocN')}</div></div>`+
+  `<div class="tgl"><i></i>${t('prPriv')} <span class="soonTag">${t('cvNickSoon')}</span></div></div>`}
+function authOpen(){$('authP').classList.remove('hidden');authRender()}
+$('bAuth').onclick=e=>{e.stopPropagation();authOpen();beep(600,.05)};$('authX').onclick=()=>$('authP').classList.add('hidden');
+/* ---------- Technology card + planned game chain ---------- */
+{const _oc=openCard;openCard=function(k){_oc(k);try{
+ if(k==='shield'||k==='poly'){const p=document.createElement('p');p.innerHTML=`<button id="cTech">${t('techBtn')}</button>`+(k==='poly'?` <button id="cGch">${t('gchBtn')}</button>`:'');$('cBody').appendChild(p);
+  $('cTech').onclick=()=>{if($('findP').classList.contains('open'))closeFind();openCard('tech')};if($('cGch'))$('cGch').onclick=()=>{if(eraK<.5&&typeof setEra==='function'){S.eraAuto=false;setEra('future')}if(!S.net)$('tNet')&&$('tNet').click();closeCard();setTimeout(()=>focusNode('gchain'),300)}}
+ if(k==='tech'&&$('techAud'))$('techAud').onclick=()=>{closeCard();openAud()}}catch(e){}}}
+{const _fn=focusNode;focusNode=function(k){if(k==='gchain'&&NODES.gchain){track=null;flyTo(NODES.gchain.pos.clone(),MOBILE?150:105);return}_fn(k)}}
+function gchTick(){if(!GCH.obj)return;const k=S.net?Math.max(0,(eraK-.35)/.65):0;GCH.obj.visible=k>.01;GCH.mat.opacity=.5*k*(.85+.15*Math.sin(performance.now()/900))}
+/* ---------- init / tick / i18n ---------- */
+function hubI18n(){if($('cv').classList.contains('open'))cvRender();if(!$('authP').classList.contains('hidden'))authRender();$('bAuth').textContent=t('authBtn');if($('iTech'))$('iTech').textContent=t('techBtn')}
+function hubInit(){const b=document.createElement('button');b.id='iTech';b.textContent=t('techBtn');b.onclick=()=>{$('intro').classList.add('hidden');if($('findP').classList.contains('open'))closeFind();openCard('tech')};$('iLang').after(b);
+ $('bAuth').textContent=t('authBtn');hvI18n();if(HUB.hvOn&&SET.kind==='sim')hvApply()}
+let hubSlow=0;
+function hubTick(dt){gchTick();hvTick();cvTick(dt);if(HUB.hvApplied&&SET.kind!=='sim')hvClear(false);if((hubSlow+=dt)>3){hubSlow=0;if(HUB.hvApplied)hvLabText()}}
+Object.assign(R6API.r6,{hv:()=>({on:HUB.hvOn,applied:HUB.hvApplied,n:HUB.hv.length,sizes:HUB.hv.map(h=>h.crew.length),names:HUB.hv.map(hvName),lab:$('hvLab').children.length}),
+ hvFly:j=>hvFly(j),hvOf:i=>HUB.hvOf.get(i),cvOpen:i=>cvOpen(i),cvClose:()=>cvClose(),cvI:()=>HUB.cvI,castle:a=>castleGet(a),auth:()=>authOpen(),
+ gch:()=>({vis:GCH.obj?GCH.obj.visible:null,op:GCH.mat?GCH.mat.opacity:0,lab:labEls.gchain?labEls.gchain.style.display:null,txt:labEls.gchain?labEls.gchain.textContent:''}),firstHvCrew:()=>{const h=HUB.hv[0];return h?h.crew[1]:-1}});
+
 /* ===== Loop ===== */
 const clock=new THREE.Clock();let frame=0,fpsAcc=0,fpsN=0,statT=0;window.__fps=0;
 const NANIM=Object.keys(NODES).filter(k=>k!=='fiat'&&!NODES[k].neb).map(k=>{const n=NODES[k],sp=[];n.inner.traverse(o=>{if(/^(spin|spin2|spinr|coin|flame|lamp)$/.test(o.name))sp.push(o)});return {k,n,sp}});
@@ -2773,6 +3404,7 @@ function tick(){requestAnimationFrame(tick);
  if(mouseMoved&&frame%3===0){mouseMoved=false;const h=pick(mx,my);if(h&&h.k){setHover(h.k);hoverW=-1}else{setHover(null);hoverW=h&&h.w!=null?h.w:-1}showTip()}
  updFly();controls.update();updLabels();
  if((statT+=dt)>.25){statT=0;updStats()}
+ R6tick(dt);
  composer.render()}
 function onResize(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);composer.setSize(innerWidth,innerHeight);
  bloom.resolution.set(innerWidth*(MOBILE?.5:1),innerHeight*(MOBILE?.5:1));const u=uScale();WM.uniforms.uS.value=u;PM.uniforms.uS.value=u;BH.disk.material.uniforms.uS.value=u;if(GEM.eth)GEM.eth.uniforms.uS.value=u}
@@ -2786,9 +3418,10 @@ if(EDITION==='prod'&&!QS.has('demo'))setSource('chain',true);else if(QS.has('cha
 $('rP').value=playersToSlider(PLAYERS);applyI18n();updStats();
 window.__ed={cls:()=>({c:clsCounts(),n:typeof CLS!=='undefined'?CLS.n:null,T:typeof BOT_T!=='undefined'?BOT_T:null,codeDone:typeof CLS!=='undefined'?CLS.codeDone:null,links:SET.links.length,vis:LINK.vis||0,f:S.clsF}),
  swarm:()=>{const v=new THREE.Vector3(),D=DEX_POS.clone();const o={t:{n:0,minO:1e9,maxD:0},b:{n:0,minO:1e9,maxD:0},p:{n:0,maxO:0}};for(let i=0;i<DRAWN;i++){const c=SET.cls[i];if(c===3)continue;wPos(i,v);if(c===0){o.p.n++;o.p.maxO=Math.max(o.p.maxO,v.length());continue}const q=c===1?o.t:o.b;q.n++;q.minO=Math.min(q.minO,v.length());q.maxD=Math.max(q.maxD,v.distanceTo(D))}return o},
- setClsF:f=>setClsF(f),frameLink:i=>{const o=(SET.lnk.get(i)||[])[0];if(o==null)return false;const m=()=>wPos(i).add(wPos(o)).multiplyScalar(.5);const d=wPos(i).distanceTo(wPos(o));flyTo(m(),Math.max(30,d*.9),m);return true},desel:()=>{if(FY.sel>=0)setHL(FY.sel,0);FY.sel=-1},clsOf:i=>({c:SET.cls[i],lk:SET.lk[i],col:[WA.col[i*3],WA.col[i*3+1],WA.col[i*3+2]],partners:SET.lnk.get(i)||[]}),firstOf:k=>{for(let i=0;i<DRAWN;i++){if(k==='l'?SET.lk[i]:SET.cls[i]===k&&!SET.lk[i])return i}return -1},forceDraw:()=>visMatch(true),geo:()=>{const o={};for(const k of ['reserve','pool','gnome','staking','bank','burn','dex','ext','tour'])if(NODES[k])o[k]=+NODES[k].pos.length().toFixed(1);o.shield=SHIELD_R;let mn=1e9,mx=0;for(let i=0;i<Math.min(DRAWN,4000);i++){if(WA.cen[i*4+3]>.5||SET.cls[i]===3)continue;const r=Math.hypot(WA.pos[i*3],WA.pos[i*3+2]);if(r<mn)mn=r;if(r>mx)mx=r}o.beltMin=+mn.toFixed(1);o.beltMax=+mx.toFixed(1);return o},batCounts:()=>typeof batCounts==='function'&&S.src==='chain'?batCounts():null,get CH(){return typeof CH!=="undefined"?CH:null},chPlayers:()=>[...chainPlayers()],get SPEC(){return SPEC},CA,get SET(){return SET},get NW(){return NW},get GNM(){return typeof CH!=='undefined'?CH.gnm:null},get CC(){return CC},dropWave:(id,w)=>dropWave(id,w),ccFilter,get EYE(){return EYE},zoomTo:d=>{const v=camera.position.clone().sub(controls.target).setLength(d);camera.position.copy(controls.target).add(v);controls.update()},openAud,openCard,closeCard,nodeScreen,walletScreen:i=>{const q=wPos(i).project(camera);return {x:(q.x*.5+.5)*innerWidth,y:(-q.y*.5+.5)*innerHeight}},
+ setClsF:f=>setClsF(f),frameLink:i=>frameLinkFly(i),desel:()=>{if(FY.sel>=0)setHL(FY.sel,0);FY.sel=-1},clsOf:i=>({c:SET.cls[i],lk:SET.lk[i],col:[WA.col[i*3],WA.col[i*3+1],WA.col[i*3+2]],partners:SET.lnk.get(i)||[]}),firstOf:k=>{for(let i=0;i<DRAWN;i++){if(k==='l'?SET.lk[i]:SET.cls[i]===k&&!SET.lk[i])return i}return -1},forceDraw:()=>visMatch(true),geo:()=>{const o={};for(const k of ['reserve','pool','gnome','staking','bank','burn','dex','ext','tour'])if(NODES[k])o[k]=+NODES[k].pos.length().toFixed(1);o.shield=SHIELD_R;let mn=1e9,mx=0;for(let i=0;i<Math.min(DRAWN,4000);i++){if(WA.cen[i*4+3]>.5||SET.cls[i]===3)continue;const r=Math.hypot(WA.pos[i*3],WA.pos[i*3+2]);if(r<mn)mn=r;if(r>mx)mx=r}o.beltMin=+mn.toFixed(1);o.beltMax=+mx.toFixed(1);return o},batCounts:()=>typeof batCounts==='function'&&S.src==='chain'?batCounts():null,get CH(){return typeof CH!=="undefined"?CH:null},chPlayers:()=>[...chainPlayers()],get SPEC(){return SPEC},CA,get SET(){return SET},get NW(){return NW},get GNM(){return typeof CH!=='undefined'?CH.gnm:null},get CC(){return CC},dropWave:(id,w)=>dropWave(id,w),ccFilter,get EYE(){return EYE},zoomTo:d=>{const v=camera.position.clone().sub(controls.target).setLength(d);camera.position.copy(controls.target).add(v);controls.update()},openAud,openCard,closeCard,nodeScreen,walletScreen:i=>{const q=wPos(i).project(camera);return {x:(q.x*.5+.5)*innerWidth,y:(-q.y*.5+.5)*innerHeight}},
  pick,startFM,fmStep,endFM,launchTour,mint,tourStep,setLang,focusNode,resetView,walletClick,selectWallet,setPlayers,setSource,setEra,setMode,tmOpen,tmApply,tmClose,flyTo,wPos,
  S,M,MS,TB,CH,SET,GN,CAST,NODES,CFG,camera,controls,get FM(){return FM},get cardKey(){return cardKey},get eraK(){return eraK},get DRAWN(){return DRAWN},PLAYERS:()=>PLAYERS,live,skinFor,T,get L(){return L},ready:true};
+R6init();Object.assign(window.__ed,R6API);
 tick();
 </script>
 </body>
