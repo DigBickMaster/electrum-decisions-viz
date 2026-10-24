@@ -277,6 +277,7 @@ button.gold{background:linear-gradient(135deg,#b8862a,#f6c75a 42%,#efe9d6 60%,#d
   <button id="tEra"></button>
   <button id="tNet" class="on"></button>
   <button id="tGnF"></button>
+  <button id="tCls"></button>
   <button id="tCc" data-i="tCc"></button>
  </div>
 </div>
@@ -645,9 +646,9 @@ function card(key){
  n:[[r?'Студия':'Studio','Electrum Decisions'],[r?'Игра':'Game','Decision Arena'],[r?'Сеть':'Network','Polygon']],
  x:`<p class="note">${r?'Щит — образ студии, а не смарт-контракт. Отдалите камеру до предела — за экосистемой кто-то наблюдает.':'The shield is an image of the studio, not a smart contract. Zoom all the way out: something is watching the ecosystem.'}</p>`}),
  ext:()=>{const c=CA('castleNft');return {k:r?'Вне игры · '+(c?'контракт подключён':'скоро'):'Outside the game · '+(c?'contract connected':'coming soon'),h:t('nExt'),b:r?
- `<p>Внутриигрового рынка нет и не будет: NFT продают и покупают вне игры, на внешних площадках.</p><p>С перепродаж будущих NFT замков (косметика) студия получает роялти 1% в POL/USDC — площадки перечисляют его автоматически в Банк Студии. Это дополнительный доход в криптовалюте сверх модели, поэтому в расчётах модели он не учтён. У гномов роялти нет.</p>`:
- `<p>There is no in-game market and there never will be: NFTs are bought and sold outside the game, on external marketplaces.</p><p>On resales of the future castle NFTs (cosmetics) the studio gets a 1% royalty in POL/USDC, paid automatically by the marketplaces into the Studio Bank. It is extra crypto income on top of the model, so the model’s numbers leave it out. Gnomes carry no royalty.</p>`,
- n:[[r?'Роялти':'Royalty',pct(M.roy)+' · POL/USDC'],[r?'Получатель':'Recipient',t('nBank')],[r?'Контракт NFT замков':'Castle NFT contract',c?`<a href="${scanAddr(c)}" target="_blank" rel="noopener">${short(c)} ↗</a>`:t('soon')]]}},
+ `<p>Внутриигрового рынка нет и не будет: NFT продают и покупают вне игры, на внешних площадках.</p><p>С перепродаж будущих NFT замков (косметика) студия получает роялти 1% в POL/USDC — площадки перечисляют его автоматически в Банк Студии. Роялти зашито в контракт NFT замков: ровно 1%, изменить его нельзя. Скоро. Это дополнительный доход в криптовалюте сверх модели, поэтому в расчётах модели он не учтён. У гномов роялти нет.</p>`:
+ `<p>There is no in-game market and there never will be: NFTs are bought and sold outside the game, on external marketplaces.</p><p>On resales of the future castle NFTs (cosmetics) the studio gets a 1% royalty in POL/USDC, paid automatically by the marketplaces into the Studio Bank. The royalty is hardcoded in the castle NFT contract: fixed at 1%, it cannot be changed. Coming soon. It is extra crypto income on top of the model, so the model’s numbers leave it out. Gnomes carry no royalty.</p>`,
+ n:[[r?'Роялти':'Royalty',pct(M.roy)+' · POL/USDC'],[r?'Размер роялти в контракте':'Royalty rate in the contract',r?'1% · зашито, не меняется':'1% · hardcoded, unchangeable'],[r?'Получатель':'Recipient',t('nBank')],[r?'Контракт NFT замков':'Castle NFT contract',c?`<a href="${scanAddr(c)}" target="_blank" rel="noopener">${short(c)} ↗</a>`:t('soon')]]}},
  contract:()=>({k:r?'Камень души · токен в сети Polygon':'The Soul Stone · a token on Polygon',h:t('nContract'),b:r?
  `<p>Amber — центр всей экономики. Каждый взнос в пул матча, каждая награда, сжигание и майнинг — это движение Amber между кошельками и контрактами вокруг Камня души. Гномы добывают его, а золотой эфир внутри камня — это энергия, которую черпают игроки.</p><p>Новых Amber не выпускается: все 10 млрд уже выпущены. Дальше предложение может только уменьшаться.</p>`:
  `<p>Amber is the centre of the whole economy. Every match pool contribution, reward, burn and mining payout is Amber moving between the wallets and contracts around the Soul Stone. The gnomes mine it, and the golden ether inside the stone is the energy players draw on.</p><p>No new Amber is issued: all 10 bn already exist. From here supply can only go down.</p>`,
@@ -669,8 +670,8 @@ function card(key){
  n:[[r?'С каждого пула':'From every pool',pct(M.stake)],[r?'Из пула 20 000':'From a 20,000 pool',fmt(M.exStake)+' Amber'],...M.lock.map(l=>[(r?'Блокировка ':'Lock-up ')+l[0]+(r?' мес.':' months'),mult(l[1])]),[r?'Бонус раннего входа':'Early-entry bonus',M.early.map(e=>mult(e[1])).join(' → ')]],
  x:`<p class="note">${r?'Бонус раннего входа — предложение и допущение модели. Механика доступна только там, где это законно.':'The early-entry bonus is a proposal and a model assumption. Available only where legal.'}</p>`}),
  bank:()=>({k:r?'Доход студии в Amber':'Studio income in Amber',h:t('nBank'),b:r?
- `<p>Студия зарабатывает на обороте, а не на исходах матчей. В Банк идёт фиксированный 1% с каждого пула матча и 5% призового пула каждого турнира.</p><p>Студия не играет против игроков, и исход матча на её доход не влияет.</p><p>Сверх модели, в криптовалюте: роялти 1% с перепродаж будущих NFT замков (косметика) на внешних площадках вне игры, в POL/USDC. Площадки перечисляют его студии автоматически. Скоро.</p>`:
- `<p>The studio earns on volume, not on match outcomes. The Bank gets a fixed 1% of every match pool and 5% of every tournament prize pool.</p><p>The studio never plays against players, and the result of a match does not change its income.</p><p>On top of the model, in crypto: a 1% royalty from resales of the future castle NFTs (cosmetics) on external marketplaces outside the game, in POL/USDC. The marketplaces pay it to the studio automatically. Coming soon.</p>`,
+ `<p>Студия зарабатывает на обороте, а не на исходах матчей. В Банк идёт фиксированный 1% с каждого пула матча и 5% призового пула каждого турнира.</p><p>Студия не играет против игроков, и исход матча на её доход не влияет.</p><p>Сверх модели, в криптовалюте: роялти 1% с перепродаж будущих NFT замков (косметика) на внешних площадках вне игры, в POL/USDC. Площадки перечисляют его автоматически в Банк Студии. Роялти зашито в контракт NFT замков: ровно 1%, изменить его нельзя. Скоро.</p>`:
+ `<p>The studio earns on volume, not on match outcomes. The Bank gets a fixed 1% of every match pool and 5% of every tournament prize pool.</p><p>The studio never plays against players, and the result of a match does not change its income.</p><p>On top of the model, in crypto: a 1% royalty from resales of the future castle NFTs (cosmetics) on external marketplaces outside the game, in POL/USDC. The marketplaces pay it automatically into the Studio Bank. The royalty is hardcoded in the castle NFT contract: fixed at 1%, it cannot be changed. Coming soon.</p>`,
  n:[[r?'С пула матча':'From a match pool',pct(M.studio)],[r?'С призового пула турнира':'From a tournament prize pool',pct(M.tBank)],[r?'Пул 20 000':'A 20,000 pool',fmt(M.exStudio)+' Amber'],[r?'Турнир 1 280 000':'A 1,280,000 tournament',fmt(M.tPool*M.tBank)+' Amber'],[r?'Роялти с перепродаж NFT замков (внешние площадки)':'Royalty on castle NFT resales (external marketplaces)',pct(M.roy)+' · POL/USDC · '+(CA('castleNft')?(r?'контракт подключён':'contract connected'):(r?'скоро':'coming soon'))]]}),
   tour:()=>({k:r?'Скоро · на выбывание · примерно с '+M.tStart+'-го месяца плана':'Coming soon · single elimination · from about month '+M.tStart,h:t('nTour'),b:r?
  `<p>Турнир на выбывание: 128 игроков, 7 раундов, в каждом матче один выбывает. Взносы всех участников собираются в призовой пул в контракте турниров, а после финала контракт раздаёт его четырём лучшим и Банку студии.</p>`:
@@ -696,7 +697,7 @@ function card(key){
 }
 /* ===== Extra UI strings (RU/EN parity) ===== */
 Object.assign(T.ru,{
- wPlayed:'Матчей',lRoy:'Роялти 1% · NFT замков, внешние площадки · скоро',wWon:'Побед',
+ wPlayed:'Матчей',lRoy:'Роялти 1% (зашито в контракт NFT замков) · внешние площадки · в Банк · скоро',wWon:'Побед',
  ePayout:'Выплата из пула матча',eMLoss:'Матч #{id}: победил соперник',eMDraw:'Матч #{id}: ничья, взносы возвращены',eMNew:'Создал матч #{id}',eMJoin:'Вступил в матч #{id}',eMWin:'Победа в матче #{id}',eMCancel:'Матч #{id} отменён',
  eDexIn:'Получил Amber из пула DEX',eDexOut:'Отправил Amber в пул DEX',eBank:'Перевод в Банк Студии',eGnOut:'Передал гнома #{id}',eEvt:'Событие контракта: {n}',
  gLoad:'…',gOpen:'Вся коллекция на OpenSea ↗',
@@ -707,7 +708,17 @@ Object.assign(T.ru,{
  eraToNow:'Эпоха «Сейчас»: в центре Amber, шахта ещё формируется',eraToFut:'Эпоха «Будущее»: майнинг запущен, в центре шахта',
  eraPrevT:'Предпросмотр эпохи «Будущее»: в блокчейне шахта ещё не запущена',eraAutoT:'Эпоха снова берётся из данных',
  rgIn:'Внутреннее кольцо · держатели гномов, майнеры',rgMid:'Среднее кольцо · посредники',rgOut:'Внешнее кольцо · остальные игроки',
- tNet:'Сеть и партнёры',tGnF:'Только с гномами',gnF:'Показаны кошельки с гномами: {n}. Гномов всего максимум 9 999.',gnF0:'Сейчас ни у одного кошелька игрока нет гномов.',
+ tNet:'Сеть и партнёры',tGnF:'Только с гномами',tCls:'Кошельки',clsF_all:'все',clsF_p:'игроки',clsF_t:'трейдеры',clsF_l:'связанные',clsF_b:'боты',
+ clsT_p:'Показаны игроки: {n}.',clsT_t:'Показаны трейдеры (только DEX): {n}. Они кружат вокруг DEX, за щитом.',clsT_l:'Связанные кошельки: {n}, пар: {p}. Линии соединяют игрока и трейдера с прямым переводом Amber.',clsT_b:'Торговые боты (по поведению): {n}. Они вне экосистемы: DEX публичный.',
+ lPlayer:'Игроки',lTrader:'Трейдеры (только DEX)',lLinked:'Связанные кошельки (игра + трейдинг)',lBot:'Торговые боты (по поведению)',lLinkLine:'Связь: прямой перевод Amber',lClsH:'Кошельки по поведению',
+ lClsNote:'Классы определяются по поведению кошелька в сети: откуда кошелёк создан, по блокчейну не видно.',
+ cPl:'Игроки',cTr:'Трейдеры (только DEX)',cLk:'Связанные кошельки (игра + трейдинг)',cBot:'Торговые боты (по поведению)',cLkV:'{n} · пар {p}',hFirstAct:'Первая активность',cRt:'Агрегаторы DEX (не кошельки, не считаем)',
+ wcP:'Игрок',wcT:'Трейдер (только DEX)',wcB:'Торговый бот (по поведению)',wcR:'Агрегатор DEX',wcL:'Связанный кошелёк (игра + трейдинг)',wLinks:'Прямые переводы Amber с',
+ clsNote:'Класс определяется по поведению кошелька в сети — откуда кошелёк создан, по блокчейну не видно. Игрок — любое действие в игре: взнос в пул матча, выплата или возврат взноса, стейкинг, турнир, гномы. Трейдер — только покупка и продажа Amber через DEX или обычные переводы, без игры. Агрегаторы и роутеры DEX — инфраструктура, а не кошельки: их не показываем и не считаем.',
+ linkNote:'Связанные кошельки — игрок и трейдер, между которыми был хотя бы один прямой перевод Amber (только обычные кошельки, без контрактов; кошельки-распределители с множеством таких связей не учитываются). Это след в сети, а не вывод о владельце.',
+ botNote:'Торговые боты определяются только по поведению: очень много сделок, покупка и продажа в одном или соседнем блоке, покупки в первые блоки после добавления ликвидности, контракты, которые раз за разом торгуют с пулом. Они не часть экосистемы Decision Arena: DEX публичный, и повлиять на них мы не можем. Метка описывает только поведение.',
+ rs_swaps:'очень много сделок с DEX',rs_day:'много сделок за сутки',rs_sandwich:'покупка и продажа в одном или соседнем блоке',rs_snipe:'покупки в первые блоки после добавления ликвидности',rs_contract:'контракт, который раз за разом торгует с пулом',wcWhy:'Признаки',
+gnF:'Показаны кошельки с гномами: {n}. Гномов всего максимум 9 999.',gnF0:'Сейчас ни у одного кошелька игрока нет гномов.',
  lBeh:'Майнеры: что делают с добычей',bSell:'продаёт сразу → DEX',bHold:'держит',bLater:'продаёт позже',
  lCastle:'Кошелёк = замок на астероиде (приблизьте камеру)',lNet:'Polygon — ткань пространства; кольца Chainlink и thirdweb',
  sk0:'Каменная крепость',sk1:'Ледяной шпиль',sk2:'Янтарная цитадель',sk3:'Деревянный форт',sk4:'Обсидиановый бастион',sk5:'Небесный храм',
@@ -716,7 +727,7 @@ Object.assign(T.ru,{
  hint:'Нажмите на любое тело или кошелёк, чтобы узнать больше'
 });
 Object.assign(T.en,{
- wPlayed:'Matches',lRoy:'1% royalty · castle NFTs, external marketplaces · soon',wWon:'Wins',
+ wPlayed:'Matches',lRoy:'1% royalty (hardcoded in the castle NFT contract) · external marketplaces · to the Bank · soon',wWon:'Wins',
  ePayout:'Payout from the match pool',eMLoss:'Match #{id}: the opponent won',eMDraw:'Match #{id}: a draw, contributions returned',eMNew:'Created match #{id}',eMJoin:'Joined match #{id}',eMWin:'Won match #{id}',eMCancel:'Match #{id} cancelled',
  eDexIn:'Received Amber from the DEX pool',eDexOut:'Sent Amber to the DEX pool',eBank:'Transfer to the Studio Bank',eGnOut:'Sent gnome #{id}',eEvt:'Contract event: {n}',
  gLoad:'…',gOpen:'The whole collection on OpenSea ↗',
@@ -727,7 +738,17 @@ Object.assign(T.en,{
  eraToNow:'Era “Now”: Amber is at the centre, the mine is still forming',eraToFut:'Era “Future”: mining has started, the mine is at the centre',
  eraPrevT:'Preview of the “Future” era: on-chain, the mine has not started yet',eraAutoT:'The era follows the data again',
  rgIn:'Inner ring · gnome holders, miners',rgMid:'Middle ring · intermediaries',rgOut:'Outer ring · other players',
- tNet:'Network & partners',tGnF:'Gnome holders only',gnF:'Showing wallets with gnomes: {n}. There are 9,999 gnomes maximum in total.',gnF0:'No player wallet holds a gnome right now.',
+ tNet:'Network & partners',tGnF:'Gnome holders only',tCls:'Wallets',clsF_all:'all',clsF_p:'players',clsF_t:'traders',clsF_l:'linked',clsF_b:'bots',
+ clsT_p:'Showing players: {n}.',clsT_t:'Showing traders (DEX only): {n}. They circle the DEX, outside the shield.',clsT_l:'Linked wallets: {n}, pairs: {p}. Lines join a player and a trader with a direct Amber transfer.',clsT_b:'Trading bots (by behaviour): {n}. They are outside the ecosystem: the DEX is public.',
+ lPlayer:'Players',lTrader:'Traders (DEX only)',lLinked:'Linked wallets (play + trade)',lBot:'Trading bots (by behaviour)',lLinkLine:'Link: a direct Amber transfer',lClsH:'Wallets by behaviour',
+ lClsNote:'Classes come from each wallet’s on-chain behaviour: where a wallet was created is not visible on the blockchain.',
+ cPl:'Players',cTr:'Traders (DEX only)',cLk:'Linked wallets (play + trade)',cBot:'Trading bots (by behaviour)',cLkV:'{n} · {p} pairs',hFirstAct:'First activity',cRt:'DEX aggregators (not wallets, not counted)',
+ wcP:'Player',wcT:'Trader (DEX only)',wcB:'Trading bot (by behaviour)',wcR:'DEX aggregator',wcL:'Linked wallet (play + trade)',wLinks:'Direct Amber transfers with',
+ clsNote:'The class comes from the wallet’s on-chain behaviour: where a wallet was created is not visible on the blockchain. Player: any in-game action — a match pool contribution, a payout or contribution refund, staking, a tournament, gnomes. Trader: only buys and sells Amber via the DEX or plain transfers, never plays. DEX aggregators and routers are infrastructure, not wallets: they are neither shown nor counted.',
+ linkNote:'Linked wallets: a player and a trader with at least one direct Amber transfer between them (regular wallets only, no contracts; distribution wallets with many such links are left out). It is an on-chain trace, not a statement about who owns them.',
+ botNote:'Trading bots are identified by behaviour only: very many trades, a buy and a sell in the same or the next block, buys in the first blocks after liquidity is added, contracts that trade with the pool again and again. They are not part of the Decision Arena ecosystem: the DEX is public, and we cannot control them. The label describes behaviour only.',
+ rs_swaps:'very many DEX trades',rs_day:'many trades within a day',rs_sandwich:'a buy and a sell in the same or the next block',rs_snipe:'buys in the first blocks after liquidity is added',rs_contract:'a contract that trades with the pool again and again',wcWhy:'Signals',
+gnF:'Showing wallets with gnomes: {n}. There are 9,999 gnomes maximum in total.',gnF0:'No player wallet holds a gnome right now.',
  lBeh:'Miners: what they do with the output',bSell:'sells right away → DEX',bHold:'holds',bLater:'sells later',
  lCastle:'Wallet = a castle on an asteroid (zoom in)',lNet:'Polygon spacetime fabric; Chainlink and thirdweb rings',
  sk0:'Stone keep',sk1:'Ice spire',sk2:'Amber citadel',sk3:'Wooden fort',sk4:'Obsidian bastion',sk5:'Sky temple',
@@ -1055,35 +1076,44 @@ function addArc(A,B,c){const o=ARCS[arcI++%ARCN];const arr=o.l.geometry.attribut
 function updArcs(dt){for(const o of ARCS){if(!o.l.visible)continue;o.t-=dt*.45;o.l.material.opacity=Math.max(0,o.t)*.9;if(o.t<=0)o.l.visible=false}}
 
 /* ===== Wallets: one Points cloud, orbit computed on the GPU ===== */
-const TIERS=[[1,3,0x3b82f6,1.25],[4,9,0x22d3ee,1.6],[10,19,0xfacc15,2.0],[20,39,0xfb923c,2.5],[40,1e9,0xef4444,3.1]];
+const TIERS=[[1,3,0xffe7a3,1.25],[4,9,0xffc93c,1.6],[10,19,0xc084fc,2.0],[20,39,0xe879f9,2.5],[40,1e9,0xffffff,3.1]];
+/* wallet classes (by on-chain behaviour): 0 player · 1 trader (DEX only) · 2 trading bot · 3 router/aggregator (hidden) */
+const CLS_C={trader:0x4f8dff,link:0xff6a4d,bot:0x39ff14};
 const tierOf=n=>{if(!n)return -1;for(let i=0;i<TIERS.length;i++)if(n<=TIERS[i][1])return i;return 4};
-const wVS=`attribute vec3 o2;attribute vec3 gp;attribute float sz;attribute float hl;attribute vec3 col;attribute float rb;
+const wVS=`attribute vec3 o2;attribute vec3 gp;attribute float sz;attribute float hl;attribute vec3 col;attribute float rb;attribute vec4 cen;
 uniform float uS;uniform float uM;uniform float uT;uniform float uMorph;uniform float uGR;uniform float uEra;varying float vH;varying vec3 vC;varying float vSd;
 void main(){if(sz<0.){gl_Position=vec4(0.,0.,2.,1.);gl_PointSize=0.;vH=0.;vC=vec3(0.);vSd=0.;return;}float th=position.y+position.z*uT;float rr=mix(position.x,rb,uEra);vec3 p=vec3(cos(th)*rr,o2.x*(1.-uEra*.5),sin(th)*rr);vSd=fract(position.y*7.31);
  float ci=cos(o2.y),si=sin(o2.y);p=vec3(p.x,p.y*ci-p.z*si,p.y*si+p.z*ci);
  float co=cos(o2.z),so=sin(o2.z);p=vec3(p.x*co+p.z*so,p.y,-p.x*so+p.z*co);
+ if(cen.w>.5){vec3 n=normalize(cen.xyz);p-=n*min(dot(p,n),0.)*.72;if(cen.w>1.5)p+=vec3(sin(uT*23.+position.y*9.),sin(uT*29.+position.y*5.),cos(uT*19.+position.y*7.))*.45;p+=cen.xyz;}
  float cg=cos(uGR),sg=sin(uGR);vec3 g=vec3(gp.x*cg+gp.z*sg,gp.y,-gp.x*sg+gp.z*cg);
  p=mix(p,g,uMorph);
- vec4 mv=modelViewMatrix*vec4(p,1.);gl_Position=projectionMatrix*mv;gl_PointSize=clamp(uS*.15*sz*(1.+hl*1.8)/-mv.z,1.3,uM*sz*(1.+hl*1.5));vH=hl;vC=col;}`;
+ vec4 mv=modelViewMatrix*vec4(p,1.);gl_Position=projectionMatrix*mv;float sm=cen.w>1.5?2.1:cen.w>.5?1.8:1.;gl_PointSize=clamp(uS*.15*sz*sm*(1.+hl*1.8)/-mv.z,1.3*sm,uM*sz*sm*(1.+hl*1.5));vH=hl;vC=col;}`;
 const wFS=`uniform float uO;varying float vH;varying vec3 vC;varying float vSd;
 void main(){vec2 p=gl_PointCoord-.5;float d=length(p);float an=atan(p.y,p.x);
  float edge=.36+.07*sin(an*5.+vSd*31.)+.04*sin(an*9.-vSd*17.);
  float rock=smoothstep(edge+.03,edge-.04,d);float glow=smoothstep(.5,.0,d)*.35;if(rock+glow<.02)discard;
  float lit=.55+.6*clamp(dot(normalize(p+1e-4),vec2(-.7,.7))*(d/edge),-.6,1.);
- vec3 rc=mix(vec3(.42,.36,.33),vC,.55)*lit;vec3 c=mix(rc,vC,glow*.9/(rock+glow));c=mix(c,vec3(1.,.85,.45),clamp(vH*.6,0.,1.));
+ vec3 rc=mix(vec3(.42,.36,.33),vC,.72)*lit;vec3 c=mix(rc,vC,glow*.9/(rock+glow));c+=vC*smoothstep(.2,.0,d)*.55;c=mix(c,vec3(1.,.85,.45),clamp(vH*.6,0.,1.));
  gl_FragColor=vec4(c*(.75+vH*1.1),min(1.,rock+glow)*min(1.,uO+.25+vH*.6));}`;
 const WG=new THREE.BufferGeometry();
-const WA={pos:new Float32Array(MAXW*3),o2:new Float32Array(MAXW*3),gp:new Float32Array(MAXW*3),sz:new Float32Array(MAXW),hl:new Float32Array(MAXW),col:new Float32Array(MAXW*3),rb:new Float32Array(MAXW)};
+const WA={pos:new Float32Array(MAXW*3),o2:new Float32Array(MAXW*3),gp:new Float32Array(MAXW*3),sz:new Float32Array(MAXW),hl:new Float32Array(MAXW),col:new Float32Array(MAXW*3),rb:new Float32Array(MAXW),cen:new Float32Array(MAXW*4)};
 const WATT={};
-for(const [k,n,dyn] of [['pos',3],['o2',3],['gp',3],['sz',1,1],['hl',1,1],['col',3,1],['rb',1,1]]){const a=new THREE.BufferAttribute(WA[k],n);if(dyn)a.setUsage(THREE.DynamicDrawUsage);WATT[k]=a;WG.setAttribute(k==='pos'?'position':k,a)}
+for(const [k,n,dyn] of [['pos',3],['o2',3],['gp',3],['sz',1,1],['hl',1,1],['col',3,1],['rb',1,1],['cen',4,1]]){const a=new THREE.BufferAttribute(WA[k],n);if(dyn)a.setUsage(THREE.DynamicDrawUsage);WATT[k]=a;WG.setAttribute(k==='pos'?'position':k,a)}
 const WM=new THREE.ShaderMaterial({vertexShader:wVS,fragmentShader:wFS,uniforms:{uS:{value:uScale()},uM:{value:7*DPR},uT:{value:0},uMorph:{value:0},uGR:{value:0},uEra:{value:0},uO:{value:.6}},transparent:true,depthWrite:false,blending:THREE.NormalBlending});
 const WPTS=new THREE.Points(WG,WM);WPTS.frustumCulled=false;scene.add(WPTS);WG.setDrawRange(0,0);
 let NW=0;          // wallets in the current set
 let DRAWN=0;       // wallets currently drawn (time machine / players slider)
 let wT=0,morph=0,gRot=0;
-const BASEC=[0xa78bfa,0x8b5cf6,0x5eead4,0x7c9cff,0xc4b5fd,0x2dd4bf];
+const BASEC=[0xf2c45a,0xe9b44c,0xffd76e,0xd9a441,0xf6d58a,0xffe08a];
 const _c=new THREE.Color();
-function setWalletOrbit(i,r,a0,w,h,inc,om){WA.pos.set([r,a0,w],i*3);WA.o2.set([h,inc,om],i*3);WA.rb[i]=r}
+function setWalletOrbit(i,r,a0,w,h,inc,om){WA.pos.set([r,a0,w],i*3);WA.o2.set([h,inc,om],i*3);WA.rb[i]=r;WA.cen[i*4+3]=0}
+/* traders (1) circle the DEX in a loose swarm, bots (2) in a tight, fast, jittery one. The side facing the shield is squeezed (×0.28),
+   so every point stays well outside the shield (R 120): DEX at |r|≈140, swarm radius ≤ 30 → nearest ≈ 131 */
+function swarmOrbit(i,r,kind){const bot=kind===2;const rr=bot?9+r()*4:12+Math.sqrt(r())*13;
+ const w=(bot?.55+r()*.45:.05+r()*.08)*(r()<.5?-1:1);
+ WA.pos.set([rr,r()*Math.PI*2,w],i*3);WA.o2.set([(r()-.5)*(bot?1.5:4),(r()-.5)*2.6,r()*Math.PI*2],i*3);WA.rb[i]=rr;
+ WA.cen.set([DEX_POS.x,DEX_POS.y,DEX_POS.z,bot?2:1],i*4)}
 function setWalletGeo(i,lat,lon){ll2v(lat,lon,GLOBE_R+.25,_fp);WA.gp.set([_fp.x,_fp.y,_fp.z],i*3)}
 /* asteroid belt: a fat, scattered donut of wallets (radial ~38–96, vertical Gaussian) between the inner zone and Bank/Staking */
 function beltOrbit(i,r){const g=(r()+r()+r()+r()-2)*1.732,g2=(r()+r()+r()-1.5)*2;const rr=Math.min(101,Math.max(44,70+g*10.5+(r()-.5)*4));
@@ -1096,6 +1126,8 @@ function wPos(i,out=new THREE.Vector3()){
  const th=a0+w*wT,rr=r+(WA.rb[i]-r)*eraK;let x=Math.cos(th)*rr,y=h*(1-eraK*.5),z=Math.sin(th)*rr;
  const ci=Math.cos(inc),si=Math.sin(inc);let y2=y*ci-z*si,z2=y*si+z*ci;y=y2;z=z2;
  const co=Math.cos(om),so=Math.sin(om);let x2=x*co+z*so;z2=-x*so+z*co;x=x2;z=z2;
+ const cw=WA.cen[i*4+3];if(cw>.5){const cx=WA.cen[i*4],cy=WA.cen[i*4+1],cz=WA.cen[i*4+2],l=Math.hypot(cx,cy,cz)||1,nx=cx/l,ny=cy/l,nz=cz/l,d=Math.min(0,x*nx+y*ny+z*nz)*.72;
+  x-=nx*d;y-=ny*d;z-=nz*d;if(cw>1.5){const T=wT,a=WA.pos[i*3+1];x+=Math.sin(T*23+a*9)*.45;y+=Math.sin(T*29+a*5)*.45;z+=Math.cos(T*19+a*7)*.45}x+=cx;y+=cy;z+=cz}
  if(morph>0){const gx=WA.gp[i*3],gy=WA.gp[i*3+1],gz=WA.gp[i*3+2],cg=Math.cos(gRot),sg=Math.sin(gRot);const X=gx*cg+gz*sg,Z=-gx*sg+gz*cg;
   x+=(X-x)*morph;y+=(gy-y)*morph;z+=(Z-z)*morph}
  return out.set(x,y,z)}
@@ -1104,7 +1136,7 @@ function getHL(i){return WA.hl[i]}
 /* screen-space picking for GPU-animated points */
 const _pp=new THREE.Vector3();
 function pickWallet(x,y,maxPx=MOBILE?16:9){let best=-1,bd=maxPx*maxPx,bz=9;const W2=innerWidth/2,H2=innerHeight/2;const stepN=DRAWN;
- for(let i=0;i<stepN;i++){wPos(i,_pp);_pp.project(camera);if(_pp.z>1||_pp.z<-1)continue;const dx=(_pp.x*W2+W2)-x,dy=(-_pp.y*H2+H2)-y;const d=dx*dx+dy*dy;if(d<bd||(d<bd*1.5&&_pp.z<bz-.002&&d<maxPx*maxPx)){if(d<bd){bd=d;best=i;bz=_pp.z}}}
+ for(let i=0;i<stepN;i++){if(WA.sz[i]<0&&!(typeof CAST!=='undefined'&&CAST.of.has(i)))continue;wPos(i,_pp);_pp.project(camera);if(_pp.z>1||_pp.z<-1)continue;const dx=(_pp.x*W2+W2)-x,dy=(-_pp.y*H2+H2)-y;const d=dx*dx+dy*dy;if(d<bd||(d<bd*1.5&&_pp.z<bz-.002&&d<maxPx*maxPx)){if(d<bd){bd=d;best=i;bz=_pp.z}}}
  return best}
 
 /* ===== Particles ===== */
@@ -1168,7 +1200,7 @@ const AVG_E=M.buckets.reduce((s,[lo,hi,w])=>s+w*(hi-lo)/Math.log(hi/lo),0); // m
 
 /* ===== Wallet set (simulation or chain) ===== */
 const WS={pl:new Uint32Array(MAXW),wn:new Uint32Array(MAXW),inA:new Float64Array(MAXW),outA:new Float64Array(MAXW)};
-const SET={kind:'sim',n:0,name:[],addr:[],reg:new Uint8Array(MAXW),join:new Float64Array(MAXW),act:new Float32Array(MAXW),gn:new Uint16Array(MAXW),gids:new Map(),gAcq:new Float64Array(MAXW),bal:new Float64Array(MAXW),bal0:new Float64Array(MAXW),ho:new Uint8Array(MAXW),regList:null,byAddr:new Map()};
+const SET={kind:'sim',n:0,name:[],addr:[],reg:new Uint8Array(MAXW),join:new Float64Array(MAXW),act:new Float32Array(MAXW),gn:new Uint16Array(MAXW),gids:new Map(),gAcq:new Float64Array(MAXW),bal:new Float64Array(MAXW),bal0:new Float64Array(MAXW),ho:new Uint8Array(MAXW),cls:new Uint8Array(MAXW),lk:new Uint8Array(MAXW),links:[],lnk:new Map(),regList:null,byAddr:new Map()};
 const LIVE_EV=new Map(); // wallet -> recent live events
 function rec(i,ev){let a=LIVE_EV.get(i);if(!a){a=[];LIVE_EV.set(i,a)}a.push(ev);if(a.length>60)a.shift()}
 const ADJ=['amber','north','swift','iron','silent','neon','frost','solar','dark','crimson','quiet','wild','misty','brave','cosmic','rusty','golden','polar','storm','lunar','tiny','mad','grey','red','blue','zen','pixel','retro'];
@@ -1191,7 +1223,7 @@ function buildSimSet(){
   beltOrbit(i,r);
   setWalletLook(i,BASEC[Math.floor(r()*BASEC.length)],.6+r()*.7);
   SET.join[i]=i<N0?-PRE*(1-Math.pow((i+1)/N0,.75)):Infinity;
-  SET.act[i]=.2+Math.pow(r(),1.6)*1.8;SET.ho[i]=((i*2246822519+7)>>>0)/4294967296<.25&&i>40?1:0; // holder-only (holds Amber via DEX, never plays)
+  SET.act[i]=.2+Math.pow(r(),1.6)*1.8;SET.ho[i]=0; // set by simClasses(): 1 = trader or bot (never plays)
   SET.bal0[i]=Math.round(Math.exp(Math.log(500)+r()*Math.log(4000)));
  }
  for(let i=0;i<MAXW;i++)SET.byAddr.set(SET.addr[i],i);
@@ -1206,18 +1238,36 @@ function buildSimSet(){
   const my=ids.slice(p,p+cnt);p+=cnt;SET.gids.set(w,my);SET.gn[w]=cnt;
   const j0=SET.join[w];SET.gAcq[w]=j0+(0-j0)*r()*.8;for(let q=0;q<cnt;q++)SET.gTimes.push(SET.gAcq[w])}
  SET.gTimes.sort((a,b)=>a-b);
+ simClasses();
  SET.gPool=ids.slice(p); // still in the gnome contract
  GN.hands=G_HANDS0;setGnomeCluster(M.gnomes-G_HANDS0);
  for(let i=0;i<MAXW;i++)paintWallet(i);
  NW=MAXW;JOINED=N0;PLAYERS=N0;setDrawn(PLAYERS);wattDirty();
  buildPrehistory();if(typeof simEraRadii==='function')simEraRadii();if(typeof ccSim==='function')ccSim();if(typeof refreshCastles==='function')refreshCastles();
 }
-function paintWallet(i){const n=SET.gn[i],tr=tierOf(n);
- if(tr>=0){_c.set(TIERS[tr][2]);WA.col.set([_c.r,_c.g,_c.b],i*3);WA.sz[i]=TIERS[tr][3]}
- else if(SET.kind==='chain'){const b=SET.bal[i];WA.sz[i]=.55+Math.min(2.4,Math.max(0,Math.log10(1+b)-1)*.32)}
- else if(SET.ho[i]){_c.set(HOLD_C);WA.col.set([_c.r,_c.g,_c.b],i*3);WA.sz[i]=.42+((i*40503)%100)/260}
- else{const r=((i*2654435761)>>>0)/4294967296;_c.set(BASEC[Math.floor(r*BASEC.length)]);WA.col.set([_c.r,_c.g,_c.b],i*3);WA.sz[i]=.6+((i*40503)%100)/140}}
-const HOLD_C=0x6f84a8;
+/* colour by behaviour class: players gold (gnome tiers on top), traders blue, linked wallets coral, bots acid green */
+function paintWallet(i){const n=SET.gn[i],tr=tierOf(n),c=SET.cls[i],ch=SET.kind==='chain';const hs=((i*40503)%100)/100;
+ const bs=ch?.55+Math.min(2.4,Math.max(0,Math.log10(1+SET.bal[i])-1)*.32):0;const set=(hex,sz)=>{_c.set(hex);WA.col.set([_c.r,_c.g,_c.b],i*3);WA.sz[i]=sz};
+ if(c===3)set(0x334155,.4);
+ else if(c===2)set(CLS_C.bot,1.3+hs*.4);
+ else if(SET.lk[i])set(CLS_C.link,Math.max(1.05,ch?bs:1.05+hs*.3));
+ else if(c===1)set(CLS_C.trader,ch?Math.max(.7,bs*.85):.7+hs*.5);
+ else if(tr>=0)set(TIERS[tr][2],TIERS[tr][3]);
+ else{const r=((i*2654435761)>>>0)/4294967296;set(BASEC[Math.floor(r*BASEC.length)],ch?Math.max(.62,bs):.6+hs*.7)}
+ if(c===3||hideMode&&typeof hideMode==='function'&&hideMode(i))WA.sz[i]=-Math.abs(WA.sz[i])}
+function placeByClass(i,r){const c=SET.cls[i];if(c===1||c===2)swarmOrbit(i,r,c);else if(WA.cen[i*4+3]>.5)beltOrbit(i,r)}
+function setLinks(pairs){SET.links=pairs;SET.lnk.clear();SET.lk.fill(0);for(const [a,b] of pairs){SET.lk[a]=SET.lk[b]=1;for(const [x,y] of [[a,b],[b,a]]){let l=SET.lnk.get(x);if(!l)SET.lnk.set(x,l=[]);l.push(y)}}
+ if(typeof linkGeo==='function')linkGeo()}
+/* simulation: plausible proportions — ~25% traders (DEX only), a handful of trading bots (~0.15%), ~2% of players linked to a trader by a direct transfer */
+function simClasses(){const r=rng(4242);SET.cls.fill(0);
+ for(let i=0;i<MAXW;i++){const h=((i*2246822519+7)>>>0)/4294967296,h2=((i*3266489917+11)>>>0)/4294967296;
+  if(i>40&&!SET.gn[i]&&h2<.0016)SET.cls[i]=2;else if(i>40&&!SET.gn[i]&&h<.25)SET.cls[i]=1;SET.ho[i]=SET.cls[i]?1:0;placeByClass(i,r)}
+ const pairs=[],used=new Uint8Array(MAXW);
+ for(let i=0;i<MAXW;i++){if(SET.cls[i]||used[i])continue;const h=((i*2654435761+5)>>>0)/4294967296;if(h>=.02)continue;
+  for(let j=i+1;j<Math.min(MAXW,i+80);j++)if(SET.cls[j]===1&&!used[j]){pairs.push([i,j]);used[i]=used[j]=1;break}}
+ setLinks(pairs);SET.swI=[];for(let i=0;i<MAXW;i++)if(SET.cls[i]===2)for(let k=0;k<12;k++)SET.swI.push(i);else if(SET.cls[i]===1)SET.swI.push(i)}
+function clsCounts(lim){lim=lim==null?(DRAWN||NW):lim;const c={p:0,t:0,b:0,r:0,lw:0,lp:0};for(let i=0;i<lim;i++){const k=SET.cls[i];if(k===0)c.p++;else if(k===1)c.t++;else if(k===2)c.b++;else c.r++;if(SET.lk[i])c.lw++}
+ for(const [a,b] of SET.links)if(a<lim&&b<lim)c.lp++;return c}
 function setPlayers(n){n=Math.max(1000,Math.min(MAXW,n));if(SET.kind!=='sim')return;
  if(n>JOINED){for(let i=JOINED;i<n;i++)SET.join[i]=S.simT;JOINED=n}
  PLAYERS=n;if(!S.tm)setDrawn(PLAYERS)}
@@ -1266,7 +1316,11 @@ function visMatch(forceDraw){
 function numMatch(){const a=randW(-1),b=partner(a),e=sampleEntry();if(Math.random()<DRAW_P)bookDraw(a,b,e);else book(a,b,e,Math.random()<.5?a:b)}
 const REFUND_COL=0x94a3b8;
 let energyAcc=0;
-function energy(dt){energyAcc+=dt*(MOBILE?5:11);while(energyAcc>=1){energyAcc--;if(live()<PN*.75&&DRAWN>0){const fut=eraK>.5;let w=randW(-1);if(fut&&MS.owners.length&&Math.random()<.75){const o=MS.owners[Math.floor(Math.random()*MS.owners.length)];if(o<DRAWN)w=o}spawn({fn:fut?'reserve':'contract',tw:w,c:fut?0xffb347:0xffcf7a,s:fut?.55:.45,d:2.6+Math.random(),arc:1.2})}}}
+function energy(dt){energyAcc+=dt*(MOBILE?5:11);while(energyAcc>=1){energyAcc--;if(live()<PN*.75&&DRAWN>0){const fut=eraK>.5;let w=randW(-1);if(fut&&MS.owners.length&&Math.random()<.75){const o=MS.owners[Math.floor(Math.random()*MS.owners.length)];if(o<DRAWN)w=o}spawn({fn:fut?'reserve':'contract',tw:w,c:fut?0xffb347:0xffcf7a,s:fut?.55:.45,d:2.6+Math.random(),arc:1.2})}}
+ if(SET.kind==='sim')dexSwarm(dt)}
+/* simulation only: traders and bots swapping with the DEX (short hops, bots far more often) */
+let dexAcc=0;function dexSwarm(dt){dexAcc+=dt*(MOBILE?1.5:3);while(dexAcc>=1){dexAcc--;const L=SET.swI;if(!L||!L.length||live()>PN*.85)return;let w=-1;for(let k=0;k<6&&w<0;k++){const c=L[Math.floor(Math.random()*L.length)];if(c<DRAWN)w=c}if(w<0)return;
+ const bot=SET.cls[w]===2,o=Math.random()<.5;spawn(o?{fw:w,tn:'dex',c:bot?CLS_C.bot:0x22d3ee,s:.4,d:bot?.5:1.1,arc:.6}:{fn:'dex',tw:w,c:bot?CLS_C.bot:0x22d3ee,s:.4,d:bot?.5:1.1,arc:.6})}}
 
 /* ===== Sound (WebAudio, off by default) ===== */
 let AC=null,MG=null,sndT={m:0,b:0};
@@ -1471,9 +1525,11 @@ function simHistory(i){
  const nm=SET.ho[i]?0:Math.round(days*act*MATCH_PER_PLAYER_DAY);
  for(let k=0;k<nm;k++){const tt=j+r()*(0-j),e=Math.min(sampleEntry(r),Math.max(10,Math.round(bal*.2)));const o=Math.floor(r()*N0);ev.push({t:tt,ty:'contrib',a:e,o});
   const u=r();if(u<.006)ev.push({t:tt+60,ty:'refund',a:e,o,s:e,md:matchLine(e,'draw',false)});else if(u<.503)ev.push({t:tt+60,ty:'win',a:2*e*M.win,o,s:e});else ev.push({t:tt+60,ty:'loss',a:0,o,s:e})}
- if(r()<.35){const tt=j+r()*(0-j)*.5,a=Math.round(bal*(.1+r()*.3));ev.push({t:tt,ty:'stake',a});for(let q=tt+7*86400;q<0;q+=7*86400)ev.push({t:q,ty:'stakeR',a:Math.round(a*.004*(.5+r()))})}
+ const cl=SET.cls[i];if(cl===1||cl===2){const n=cl===2?60+Math.floor(r()*140):2+Math.floor(r()*10);for(let k=0;k<n;k++){const tt=j+r()*(0-j),a=Math.round(bal*(.05+r()*.4));ev.push({t:tt,ty:'dexIn',a});if(cl===2)ev.push({t:tt+2,ty:'dexOut',a:Math.round(a*(1.002+r()*.01))});else if(r()<.5)ev.push({t:tt+r()*86400*3,ty:'dexOut',a:Math.round(a*(.6+r()*.8))})}}
+ for(const o of (SET.lnk.get(i)||[])){const tt=Math.max(j,isFinite(SET.join[o])?SET.join[o]:j)+r()*86400*5;if(tt<0){const a=Math.round(200+r()*1800);ev.push(cl===1?{t:tt,ty:'in',a,o}:{t:tt,ty:'out',a,o})}}
+ if(!cl&&r()<.35){const tt=j+r()*(0-j)*.5,a=Math.round(bal*(.1+r()*.3));ev.push({t:tt,ty:'stake',a});for(let q=tt+7*86400;q<0;q+=7*86400)ev.push({t:q,ty:'stakeR',a:Math.round(a*.004*(.5+r()))})}
  if(SET.gn[i]&&SET.gids.has(i)){const ids=SET.gids.get(i);const t0=SET.gAcq[i];ids.forEach((id,q)=>{const tt=t0+q*600;if(tt<=0)ev.push({t:tt,ty:'gnome',a:0,id})})}
- if(r()<.08){const tt=j+r()*(0-j);ev.push({t:tt,ty:'tEntry',a:M.tEntry});if(r()<.1)ev.push({t:tt+3600,ty:'tPrize',a:M.tPool*M.tP[3],pl:4})}
+ if(!cl&&r()<.08){const tt=j+r()*(0-j);ev.push({t:tt,ty:'tEntry',a:M.tEntry});if(r()<.1)ev.push({t:tt+3600,ty:'tPrize',a:M.tPool*M.tP[3],pl:4})}
  ev.sort((a,b)=>a.t-b.t);
  for(const x of (LIVE_EV.get(i)||[]))ev.push({t:x[0],ty:x[1],a:x[2],o:x[1]==='gnome'||x[1]==='mine'||x[1]==='tPrize'?undefined:x[3],id:x[1]==='gnome'?x[3]:undefined,md:x[1]==='refund'?matchLine(x[2],'draw',false):undefined});
  return {ev,sum:sumHist(ev,i)}}
@@ -1515,22 +1571,30 @@ function selectWallet(i,showHist){
  FY.sel=i;setHL(i,2.2);closeCard();if(S.mode==='world')flyTo(wPos(i),MOBILE?60:44,()=>wPos(i));else flyTo(wPos(i),MOBILE?9:6.5,()=>wPos(i));
  if(!$('findP').classList.contains('open'))openFind();$('findRes').innerHTML='';
  FY.h=getHistory(i);renderHist(showHist);beep(740,.1)}
+function botWhy(i){if(SET.kind==='chain'){const k=CHW[i];return (typeof CLS!=='undefined'&&CLS.why.get(k))||''}const h=((i*2654435761)>>>0)%3;return ['swaps+day','sandwich','snipe'][h]}
+function clsCard(i){const c=SET.cls[i],lk=SET.lk[i];const col=clsColor(i);
+ let h=`<div id="clsCard" class="clsCard" data-cls="${lk?'l':['p','t','b','r'][c]}" style="margin:6px 0;padding:6px 8px;border-radius:8px;border:1px solid ${col}55;background:${col}14"><b style="color:${col}">● ${t(clsKey(i))}</b>`;
+ if(c===2){const w=botWhy(i).split('+').filter(Boolean);if(w.length)h+=`<div class="sm">${t('wcWhy')}: ${w.map(x=>t('rs_'+x)).join('; ')}</div>`;h+=`<p class="note" style="margin:4px 0 0">${t('botNote')}</p>`}
+ if(lk){const o=SET.lnk.get(i)||[];h+=`<div class="sm" style="margin-top:3px">${t('wLinks')}: ${o.slice(0,8).map(j=>`<a href="#" class="lnkW" data-w="${j}" style="color:${clsColor(j)}">${SET.kind==='sim'?'@'+SET.name[j]:short(SET.addr[j])}</a>`).join(', ')}</div><p class="note" style="margin:4px 0 0">${t('linkNote')}</p>`}
+ h+=`<p class="note" style="margin:4px 0 0">${t('clsNote')}</p></div>`;return h}
+function clsCardWire(){document.querySelectorAll('#hist .lnkW').forEach(a=>a.onclick=e=>{e.preventDefault();const j=+a.dataset.w;selectWallet(j,false)})}
 function renderHist(full){
  const i=FY.sel,h=FY.h,s=h.sum;if(!s){$('hist').innerHTML=`<p class="sm">${t('fNone')}</p>`;return}
  const nm=SET.kind==='sim'?'@'+SET.name[i]:(SET.name[i]&&!SET.name[i].startsWith('0x')?SET.name[i]:short(SET.addr[i]));
  let html=`<h3 style="margin:6px 0 2px">${nm}</h3><div class="sm"><a href="${scanAddr(SET.addr[i])}" target="_blank" rel="noopener">${short(SET.addr[i])}${SET.kind==='chain'?' · Polygonscan ↗':''}</a></div>`;
- html+=rows([[t('hJoined'),evWhen(s.joined)],[t('hMatches'),fmt(s.m)],[t('hWins'),fmt(s.w)],[t('hContrib'),fmt(s.c)],[t('hRewards'),fmt(s.rw)],[t('hStaked'),fmt(s.st)],[t('hTx'),fmt(s.tx)],[t('hBal'),fmtA(s.bal)],[t('hGnomes'),fmt(s.g)]]);
- html+=`<div id="batSt">${typeof batStatsHTML==='function'?batStatsHTML(i,h):''}</div>`;
+ html+=clsCard(i);const pl=SET.cls[i]===0;
+ html+=rows(pl?[[t('hJoined'),evWhen(s.joined)],[t('hMatches'),fmt(s.m)],[t('hWins'),fmt(s.w)],[t('hContrib'),fmt(s.c)],[t('hRewards'),fmt(s.rw)],[t('hStaked'),fmt(s.st)],[t('hTx'),fmt(s.tx)],[t('hBal'),fmtA(s.bal)],[t('hGnomes'),fmt(s.g)]]:[[t('hFirstAct'),evWhen(s.joined)],[t('hTx'),fmt(s.tx)],[t('hBal'),fmtA(s.bal)]]);
+ html+=`<div id="batSt">${pl&&typeof batStatsHTML==='function'?batStatsHTML(i,h):''}</div>`;
  html+=`<div class="sm" style="margin-top:6px">${t('hIds')}: <span class="ids">${s.ids.length?s.ids.slice(0,60).map(x=>'#'+x).join(' ')+(s.ids.length>60?' '+t('hMore',{n:s.ids.length-60}):''):t('hNone')}</span></div>`;
  if(SET.kind==='chain'&&s.ids.length)html+=`<div class="gths" id="gThumbs"></div>`;
  html+=`<p class="note">${SET.kind==='sim'?t('hNoteS'):t('hNoteC')}</p>`;
- if(!full){html+=`<button class="gold" id="hOpen">${t('wHistB')}</button>`;$('hist').innerHTML=html;$('hOpen').onclick=()=>renderHist(true);if($('gThumbs'))gnomeThumbs(s.ids,$('gThumbs'));return}
+ if(!full){html+=`<button class="gold" id="hOpen">${t('wHistB')}</button>`;$('hist').innerHTML=html;$('hOpen').onclick=()=>renderHist(true);clsCardWire();if($('gThumbs'))gnomeThumbs(s.ids,$('gThumbs'));return}
  const ev=h.ev,N=ev.length,from=Math.max(0,N-150);
  html+=`<h4 style="margin:10px 0 4px">${t('hTitle')} · ${t('hFrom',{d:evWhen(s.joined)})}</h4><div class="row" style="display:flex;gap:6px;align-items:center"><button id="hPlay" class="gold">${t('hPlay')}</button><input type="range" id="hscr" min="0" max="${Math.max(0,N-1)}" value="${N-1}"></div><div id="hWhen" class="sm"></div><div class="hist" id="hList">`;
  if(from>0)html+=`<div class="sm" style="padding:4px 2px">${t('hMore',{n:fmt(from)})} …</div>`;
  for(let k=from;k<N;k++){const e=ev[k];const sg=e.info?'':['win','tPrize','stakeR','mine','in','join','mintIn','payout','dexIn','refund'].includes(e.ty)?'+':['contrib','tEntry','stake','out','burn','dexOut','bankOut'].includes(e.ty)?'−':'';
   html+=`<div class="ev" data-k="${k}"><i>${evWhen(e.t)}</i><span>${evLabel(e)}${e.md||(e.s&&(e.ty==='win'||e.ty==='loss'))?'<em class="md">'+(e.md||matchLine(e.s,'win',false))+'</em>':''}</span><b>${e.a?sg+fmtA(e.a):''}</b></div>`}
- html+='</div>';$('hist').innerHTML=html;if($('gThumbs'))gnomeThumbs(s.ids,$('gThumbs'));
+ html+='</div>';$('hist').innerHTML=html;clsCardWire();if($('gThumbs'))gnomeThumbs(s.ids,$('gThumbs'));
  $('hPlay').onclick=()=>{FY.play?stopTrail(true):startTrail()};
  $('hscr').oninput=e=>{FY.play=false;$('hPlay').textContent=t('hPlay');setTrail(+e.target.value,true)};
  $('hList').querySelectorAll('.ev').forEach(d=>d.onclick=()=>{const k=+d.dataset.k;const e=ev[k];if(SET.kind==='chain'&&e.tx)window.open(scanTx(e.tx),'_blank','noopener');setTrail(k,true)});
@@ -1543,7 +1607,7 @@ function setTrail(k,anim){if(!FY.h)return;const ev=FY.h.ev;if(!ev.length)return;
  if($('hscr'))$('hscr').value=k;if($('hWhen'))$('hWhen').textContent=evWhen(ev[k].t)+' · '+evLabel(ev[k]);
  const L2=$('hList');if(L2){L2.querySelectorAll('.ev.cur').forEach(d=>d.classList.remove('cur'));const d=L2.querySelector(`.ev[data-k="${k}"]`);if(d){d.classList.add('cur');if(FY.play)d.scrollIntoView({block:'nearest'})}}
  if(anim){const [a,b,c]=evEnds(ev[k],FY.sel);spawn({fw:a.w??-1,fn:a.n,tw:b.w??-1,tn:b.n,c,s:2.2,d:b.n==='burn'?2.4:1.4,arc:2.5});beep(500+(k%7)*70,.08)}}
-function updTrail(){if(!TRL.visible||FY.sel<0||!FY.h)return;const ev=FY.h.ev,k=FY.k,from=Math.max(0,k-TRN+1);const pa=TRG.attributes.position.array,ca=TRG.attributes.color.array;let n=0;
+function updTrail(){if(!TRL.visible||FY.sel<0||!FY.h)return;const ev=FY.h.ev;if(!ev.length){TRG.setDrawRange(0,0);return}if(FY.k>ev.length-1)FY.k=ev.length-1;const k=FY.k,from=Math.max(0,k-TRN+1);const pa=TRG.attributes.position.array,ca=TRG.attributes.color.array;let n=0;
  for(let q=from;q<=k;q++){const [a,b,c]=evEnds(ev[q],FY.sel);if(a.w!=null)wPos(a.w,_ta);else _ta.copy(NODES[a.n].pos);if(b.w!=null)wPos(b.w,_tb);else _tb.copy(NODES[b.n].pos);
   const fade=.25+.75*(q-from+1)/(k-from+1);_tc.set(c).multiplyScalar(fade);pa.set([_ta.x,_ta.y,_ta.z,_tb.x,_tb.y,_tb.z],n*6);ca.set([_tc.r,_tc.g,_tc.b,_tc.r,_tc.g,_tc.b],n*6);n++}
  TRG.setDrawRange(0,n*2);TRG.attributes.position.needsUpdate=TRG.attributes.color.needsUpdate=true}
@@ -1871,7 +1935,7 @@ function buildChainSet(){SPEC=SPECIAL();SET.kind='chain';SET.name.length=0;SET.a
  CHW.forEach((k,i)=>{W_OF[k]=i;const a=CH.addrs[k];SET.addr.push(a);SET.name.push(a);SET.byAddr.set(a,i);SET.bal[i]=Math.max(0,CH.balA[k]);
   SET.join[i]=CH.first[k]>=0?CH.blk[CH.first[k]]:CH.latest;SET.act[i]=1;SET.reg[i]=parseInt(a.slice(-2),16)%REG.length;chainWalletOrbit(i,a)});
  for(const [id,o] of CH.gnm.own){const i=SET.byAddr.get(o);if(i==null)continue;SET.gn[i]++;let l=SET.gids.get(i);if(!l){l=[];SET.gids.set(i,l)}l.push(id)}
- NW=CHW.length;chainHolderOnly();for(let i=0;i<NW;i++){paintWallet(i);chainTint(i)}
+ NW=CHW.length;SET.cls.fill(0);SET.lk.fill(0);SET.links=[];SET.lnk.clear();for(let i=0;i<NW;i++)paintWallet(i);chainReclass();if(!CLS.codeBusy&&!CLS.codeDone)loadCodeAndMints()
  chainEraRadii();setDrawn(NW);wattDirty();
  GN.hands=CH.gnm.hands||0;setGnomeCluster(CH.gnm.left!=null?CH.gnm.left+CH.gnm.inC:9999);
  bhScale(CH.dead||CH.deadCum[CH.deadCum.length-1]||0);MS.mineOn=false;
@@ -1881,11 +1945,11 @@ function extendChainSet(){let add=0;for(let k=0;k<CH.addrs.length;k++){if(W_OF[k
   const i=NW++;CHW.push(k);const a=CH.addrs[k];SET.addr.push(a);SET.name.push(a);SET.byAddr.set(a,i);SET.join[i]=CH.blk[CH.first[k]]||CH.latest;chainWalletOrbit(i,a);paintWallet(i);add++}
  if(W_OF.length<CH.addrs.length){const n=new Int32Array(CH.addrs.length).fill(-1);n.set(W_OF);W_OF=n;CHW.forEach((k,i)=>W_OF[k]=i)}
  for(let i=0;i<NW;i++){SET.bal[i]=Math.max(0,CH.balA[CHW[i]])}
- chainHolderOnly();for(let i=0;i<NW;i++)if(!SET.gn[i]){paintWallet(i);chainTint(i)}
+ chainReclass();
  chainEraRadii();if(!S.tm)setDrawn(NW);wattDirty();bhScale(CH.dead||0)}
 // era layout radii for chain wallets: gnome holders inner, DEX traders middle, everyone else outer belt
 function chainEraRadii(){const dex=CH.aIdx.get(CA('dexPair'));const cnt=new Map();if(dex!=null)for(let q=0;q<CH.blk.length;q++){if(CH.fr[q]===dex)cnt.set(CH.tt[q],(cnt.get(CH.tt[q])||0)+1);else if(CH.tt[q]===dex)cnt.set(CH.fr[q],(cnt.get(CH.fr[q])||0)+1)}
- for(let i=0;i<NW;i++){const h=((i*2654435761)>>>0)/4294967296;WA.rb[i]=SET.gn[i]?46+h*10:(cnt.get(CHW[i])||0)>=3?58+h*16:76+h*24}WATT.rb.needsUpdate=true}
+ for(let i=0;i<NW;i++){if(WA.cen[i*4+3]>.5){WA.rb[i]=WA.pos[i*3];continue}const h=((i*2654435761)>>>0)/4294967296;WA.rb[i]=SET.gn[i]?46+h*10:(cnt.get(CHW[i])||0)>=3?58+h*16:76+h*24}WATT.rb.needsUpdate=true}
 
 /* --- replay of transfers as particles --- */
 function endOf(k){const a=CH.addrs[k],s=SPEC[a];if(s)return {n:s};const w=W_OF[k];return w>=0&&w<DRAWN?{w}:{n:'contract'}}
@@ -1936,10 +2000,12 @@ function chainInvData(){const r=L==='ru',now=Date.now();let tx30=0;for(let q=CH.
 function chainChart(){const x=[],y=[];const n=CH.blk.length;if(!n)return {x:[0,1],y:[0,0]};for(let s=0;s<=60;s++){const q=Math.min(n-1,Math.floor((n-1)*s/60));x.push(CH.blk[q]);y.push(CH.deadCum[q])}return {x,y}}
 
 /* --- stats rows + node card rows --- */
+function chainClsRows(){const n=CLS.n;if(!n)return [[t('cPl'),'…']];const pend=CLS.codeDone?'':' …';
+ return [[t('cPl'),fmt(n.p)],[t('cTr'),fmt(n.t)+pend],[t('cLk'),t('cLkV',{n:fmt(n.lw),p:fmt(n.lp)})],[t('cBot'),fmt(n.b)+pend],[t('cRt'),fmt(n.r)]]}
 function chainStatRows(){const g=GN.known;let holders=0;for(let k=0;k<CH.addrs.length;k++)if(CH.balA[k]>1e-9&&!SPEC[CH.addrs[k]])holders++;
  const v=x=>x==null?'—':fmt(Math.round(x));
  return [[t('chSupply'),v(CH.supply)],[t('chDead'),v(CH.dead)],[t('chDex'),v(CH.bals.dexPair)],[t('chStakeB'),v(CH.bals.staking)],[t('chBankB'),v(CH.bals.bank)],[t('chHolders'),fmt(holders)],[t('chAddr'),fmt(CH.addrs.length)],[t('chTx'),fmt(CH.blk.length)],
-  ...batRows(),[t('chGMint'),g?fmt(CH.gnm.minted):'—'],[t('chGCirc'),g?fmt(CH.gnm.circ)+' / '+fmt(GN_CIRC_MAX):'—'],[t('chGHands'),g?fmt(CH.gnm.hands):'—'],[t('chBlock'),CH.latest?fmt(CH.latest):'—']]}
+  ...chainClsRows(),...batRows(),[t('chGMint'),g?fmt(CH.gnm.minted):'—'],[t('chGCirc'),g?fmt(CH.gnm.circ)+' / '+fmt(GN_CIRC_MAX):'—'],[t('chGHands'),g?fmt(CH.gnm.hands):'—'],[t('chBlock'),CH.latest?fmt(CH.latest):'—']]}
 function chainNodeRows(key){if(S.src!=='chain'||CH.state!=='ok')return [];const v=x=>x==null?'—':fmt(Math.round(x))+' Amber';const r=L==='ru';
  const m={dex:[[r?'Баланс Amber сейчас':'Amber balance now',v(CH.bals.dexPair)]],staking:[[r?'Баланс Amber сейчас':'Amber balance now',v(CH.bals.staking)]],bank:[[r?'Баланс Amber сейчас':'Amber balance now',v(CH.bals.bank)]],
   burn:[[r?'На мёртвом адресе сейчас':'At the dead address now',v(CH.dead)],[t('chGDead'),GN.known?fmt(CH.gnm.dead):'—']],
@@ -2011,9 +2077,9 @@ function batStatsBlock(st,net,chain){const r=L==='ru';const fin=st.won+st.lost+s
  const rr=[[r?'Сыграно матчей':'Matches played',fmt(st.played)],[r?'Побед':'Wins',fmt(st.won)],[r?'Поражений':'Losses',fmt(st.lost)],[r?'Ничьих (возврат взноса)':'Draws (refund)',fmt(st.draws)]];
  if(st.cancel)rr.push([r?'Отменено / не начато':'Cancelled / not started',fmt(st.cancel)]);
  rr.push([r?'Доля побед':'Win rate',fin?(pc.toFixed(1).replace('.',r?',':'.')+'%'):'—']);
- if(net!=null)rr.push([r?'Итог за всё время':'Lifetime net',sgnA(net)+' Amber']);
- if(chain)rr.push([r?'getPnL контракта':'Contract getPnL',sgnA(st.pnl)+' Amber']);
- const note=chain?(r?`Данные — view-функции боевого контракта (totalStats, getAllDrawnOf; исходник проверен на Sourcify), прочитано сейчас. Доля побед = победы / завершённые (победы + поражения + ничьи). «Итог за всё время» — по переводам Amber: выплаты и возвраты из пула минус взносы в пул. getPnL контракта считает иначе: сумма взносов выигранных матчей минус проигранных, без учёта 10% пула. Ничьи и отмены дают 0. Все суммы в Amber.`:`Data: view functions of the battle contract (totalStats, getAllDrawnOf; source verified on Sourcify), read just now. Win rate = wins / finished (wins + losses + draws). “Lifetime net” is from Amber transfers: payouts and refunds from the pool minus contributions into it. The contract’s getPnL counts differently: contributions of won matches minus lost ones, before the 10% pool share. Draws and cancellations count as 0. All amounts in Amber.`)
+ if(chain)rr.push([r?'Итог в Amber (getPnL контракта)':'Net result in Amber (contract getPnL)',sgnA(st.pnl)+' Amber']);
+ else if(net!=null)rr.push([r?'Итог за всё время':'Lifetime net',sgnA(net)+' Amber']);
+ const note=chain?(r?`Данные — view-функции боевого контракта (totalStats, getAllDrawnOf; исходник проверен на Sourcify), прочитано сейчас. Доля побед = победы / завершённые (победы + поражения + ничьи). Итог — результат кошелька в Amber по функции getPnL контракта. Ничьи и отмены дают 0. Все суммы в Amber.`:`Data: view functions of the battle contract (totalStats, getAllDrawnOf; source verified on Sourcify), read just now. Win rate = wins / finished (wins + losses + draws). Net result is the wallet’s result in Amber from the contract’s getPnL function. Draws and cancellations count as 0. All amounts in Amber.`)
   :(r?'Пример из симуляции. Доля побед = победы / завершённые матчи; ничья — возврат взноса обоим. Все суммы в Amber.':'Simulation example. Win rate = wins / finished matches; a draw refunds both contributions. All amounts in Amber.');
  return `<h4 style="margin:10px 0 2px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut)">${r?'Боевой контракт · статистика':'Battle contract · stats'}</h4>`+rows(rr)+`<p class="note">${note}</p>`}
 function batStatsHTML(i,h){const r=L==='ru';
@@ -2029,12 +2095,79 @@ function decodeGameId(hex){return parseInt(String(hex).replace(/^0x/,'').slice(-
 /* players vs holder-only: an address that appears in battle events (creator / joiner) is a player;
    a non-player with an Amber balance and no gnome is a holder-only wallet (bought on the DEX, never played) */
 function chainPlayers(){if(CH.bat._ps&&CH.bat._pn===CH.bat.ev.length)return CH.bat._ps;const P=new Set();for(const g of batGames().values()){if(g.c)P.add(g.c);if(g.p)P.add(g.p)}CH.bat._ps=P;CH.bat._pn=CH.bat.ev.length;return P}
-function chainHolderOnly(){const P=chainPlayers();for(let i=0;i<NW;i++){SET.ho[i]=(!SET.gn[i]&&SET.bal[i]>0&&!P.has(lc(SET.addr[i])))?1:0}}
-function chainTint(i){if(SET.gn[i])return;if(SET.ho[i]){_c.set(HOLD_C);WA.col.set([_c.r,_c.g,_c.b],i*3);WA.sz[i]*=.78;return}_c.set(SET.bal[i]>0?0x9f8cff:0x5b5f7a);WA.col.set([_c.r,_c.g,_c.b],i*3)}
+/* ===== Wallet classes by on-chain behaviour (live) =====
+   Origin of a wallet cannot be seen on-chain, so wallets are classed only by what they did:
+   player  — any game activity: battle contract (match pool contribution, payout, refund), staking, tournament, mining, gnome NFT transfers
+   trader  — no game activity; only buys/sells via the DEX pair (directly or through an aggregator) or plain Amber transfers
+   bot     — trading bot by behaviour (thresholds in BOT_T); never overrides game activity, except contracts that trade the pair
+   router  — aggregator/router contracts (Amber passes through them inside one tx): infrastructure, hidden and not counted
+   linked  — a player and a trader with ≥1 direct Amber transfer between them (both EOAs; hubs with > hubDeg such partners are skipped) */
+const BOT_T={swaps:150,day:40,dayBlocks:43200,sand:3,snipeBlocks:2,snipes:2,contractHits:3,passRatio:.6,passMin:3,hubDeg:5};
+const CLS={code:new Map(),codeDone:false,codeBusy:false,mints:null,mintsTo:0,ready:false,n:null,why:new Map(),ver:0};
+const MINT_TOPIC='0x4c209b5fc8ad50758f13e2e1088ba56a560dff690a1c6fef26394f4c03821c4f';
+const isContractCode=a=>CLS.code.get(a)===2; // 0 EOA · 1 EIP-7702 delegated EOA · 2 contract
+function chainClassify(){const A=CH.addrs,N=CH.blk.length,na=A.length;const S2=SPEC;
+ const isS=k=>!!S2[A[k]];const dex=CH.aIdx.get(CA('dexPair'));
+ // players: game activity
+ const P=new Uint8Array(na);for(const a of chainPlayers()){const k=CH.aIdx.get(a);if(k!=null)P[k]=1}
+ for(const e of CH.gnm.log){for(const a of [e.f,e.to]){const k=CH.aIdx.get(a);if(k!=null&&a!==ZERO)P[k]=1}}
+ const game=new Set(['pool','staking','tour','reserve']);
+ for(let q=0;q<N;q++){const f=CH.fr[q],t2=CH.tt[q];if(game.has(S2[A[f]]))P[t2]=1;if(game.has(S2[A[t2]]))P[f]=1}
+ // pass-through (router) detection: share of an address's txs where Amber both enters and leaves it
+ const txN=new Uint32Array(na),both=new Uint32Array(na);
+ for(let q=0;q<N;){let e=q;const tx=CH.tx[q];while(e<N&&CH.tx[e]===tx)e++;const ins=new Set(),outs=new Set();for(let k=q;k<e;k++){outs.add(CH.fr[k]);ins.add(CH.tt[k])}
+  const all=new Set([...ins,...outs]);for(const k of all){txN[k]++;if(ins.has(k)&&outs.has(k))both[k]++}q=e}
+ const cls=new Int8Array(na).fill(-1);
+ for(let k=0;k<na;k++){if(isS(k))continue;const cs=CLS.code.get(A[k]);if((cs===2||(cs==null&&!CLS.codeDone))&&txN[k]>=BOT_T.passMin&&both[k]/txN[k]>=BOT_T.passRatio)cls[k]=3}
+ const dexLike=k=>k===dex||cls[k]===3;
+ // per-address DEX buys/sells (blocks)
+ const buys=new Map(),sells=new Map();const push=(m,k,b)=>{let l=m.get(k);if(!l)m.set(k,l=[]);l.push(b)};
+ for(let q=0;q<N;q++){const f=CH.fr[q],t2=CH.tt[q];if(dexLike(f)&&!dexLike(t2)&&!isS(t2))push(buys,t2,CH.blk[q]);else if(dexLike(t2)&&!dexLike(f)&&!isS(f))push(sells,f,CH.blk[q])}
+ const mints=CLS.mints||[],mintB=mints.map(m=>m.b).sort((a,b)=>a-b),first=mintB[0];const mintTx=new Set(mints.map(m=>m.tx)),lps=new Set();
+ if(mintTx.size)for(let q=0;q<N;q++)if(mintTx.has(CH.tx[q]))lps.add(CH.fr[q]);
+ const why=new Map();const cnt={p:0,t:0,b:0,r:0};
+ for(let k=0;k<na;k++){if(isS(k))continue;if(cls[k]===3){cnt.r++;continue}
+  const bu=buys.get(k)||[],se=sells.get(k)||[],n=bu.length+se.length;
+  if(isContractCode(A[k])&&n>=BOT_T.contractHits){cls[k]=2;why.set(k,'contract');cnt.b++;continue}
+  if(P[k]){cls[k]=0;cnt.p++;continue}
+  const w=[];if(n>=BOT_T.swaps)w.push('swaps');
+  if(n>=BOT_T.day){const all=bu.concat(se).sort((a,b)=>a-b);let j=0,mx=0;for(let i=0;i<all.length;i++){while(all[i]-all[j]>BOT_T.dayBlocks)j++;mx=Math.max(mx,i-j+1)}if(mx>=BOT_T.day)w.push('day')}
+  if(bu.length&&se.length){const sb=new Set(bu);let sw=0;for(const b of se)if(sb.has(b)||sb.has(b-1)||sb.has(b+1))sw++;if(sw>=BOT_T.sand)w.push('sandwich')}
+  if(mintB.length&&bu.length&&!lps.has(k)){let sn=0,f1=false;for(const b of bu){let lo=0,hi=mintB.length-1,m=-1;while(lo<=hi){const md=(lo+hi)>>1;if(mintB[md]<=b){m=md;lo=md+1}else hi=md-1}
+    if(m>=0&&b-mintB[m]<=BOT_T.snipeBlocks){sn++;if(mintB[m]===first)f1=true}}if(sn>=BOT_T.snipes||f1)w.push('snipe')}
+  if(w.length){cls[k]=2;why.set(k,w.join('+'));cnt.b++}else{cls[k]=1;cnt.t++}}
+ // linked pairs: direct transfer player ↔ trader, both EOAs
+ const pairs=new Set(),deg=new Map();
+ for(let q=0;q<N;q++){const f=CH.fr[q],t2=CH.tt[q];const cf=cls[f],ct=cls[t2];if(!((cf===0&&ct===1)||(cf===1&&ct===0)))continue;if(isContractCode(A[f])||isContractCode(A[t2]))continue;
+  const key=f<t2?f*1e6+t2:t2*1e6+f;if(!pairs.has(key)){pairs.add(key);deg.set(f,(deg.get(f)||0)+1);deg.set(t2,(deg.get(t2)||0)+1)}}
+ const lp=[];for(const key of pairs){const a=Math.floor(key/1e6),b=key%1e6;if(deg.get(a)>BOT_T.hubDeg||deg.get(b)>BOT_T.hubDeg)continue;lp.push([a,b])}
+ CH.cls=cls;CLS.why=why;CLS.pairsA=lp;CLS.n=Object.assign(cnt,{lp:lp.length,lw:new Set(lp.flat()).size,code:CLS.codeDone,mints:mintB.length});CLS.ready=true;CLS.ver++;return cls}
+function applyChainClasses(){if(SET.kind!=='chain'||!CH.cls)return;let moved=0;const r=rng(99);
+ for(let i=0;i<NW;i++){const k=CHW[i],c=CH.cls[k]<0?0:CH.cls[k];if(SET.cls[i]!==c||(c===1||c===2)!==(WA.cen[i*4+3]>.5)){SET.cls[i]=c;const rr=rng(parseInt(SET.addr[i].slice(2,10),16)||i+1);if(c===1||c===2)swarmOrbit(i,rr,c);else{beltOrbit(i,rr)}moved++}SET.ho[i]=c?1:0}
+ const pr=[];for(const [a,b] of CLS.pairsA){const x=W_OF[a],y=W_OF[b];if(x>=0&&y>=0)pr.push([x,y])}setLinks(pr);
+ for(let i=0;i<NW;i++)paintWallet(i);chainEraRadii();wattDirty();if(typeof refreshCastles==='function')refreshCastles();updStatsSoon();return moved}
+function chainReclass(){if(!CH.blk.length)return;chainClassify();applyChainClasses()}
+// batched eth_getCode (20 per request, all nodes in parallel, cached in IndexedDB) and pair Mint (liquidity add) logs
+async function loadCodeAndMints(){if(CLS.codeBusy)return;CLS.codeBusy=true;
+ try{const c=await idbGet('ed-cls-v1');if(c){if(c.code)for(const [a,v] of c.code)CLS.code.set(a,v);if(c.mints){CLS.mints=c.mints;CLS.mintsTo=c.mintsTo||0}}}catch(e){}
+ try{const pair=CA('dexPair');if(pair&&CH.latest>CLS.mintsTo){const from=CLS.mintsTo?CLS.mintsTo+1:CFG.contracts.amber.fromBlock;const add=[];
+   await scanLogs({address:pair,topics:[MINT_TOPIC]},from,CH.latest,l=>{for(const x of l)add.push({b:parseInt(x.blockNumber,16),tx:x.transactionHash})});CLS.mints=(CLS.mints||[]).concat(add);CLS.mintsTo=CH.latest}}catch(e){console.warn('mint logs',e)}
+ chainReclass();
+ const todo=[];for(const a of CH.addrs)if(!SPEC[a]&&!CLS.code.has(a))todo.push(a);
+ const B=20;let qi=0,fails=0;const batches=[];for(let i=0;i<todo.length;i+=B)batches.push(todo.slice(i,i+B));
+ const worker=async r=>{let errs=0;while(qi<batches.length&&errs<4){const bt=batches[qi++];
+   try{const ac=new AbortController();const tm=setTimeout(()=>ac.abort(),20000);const res=await fetch(r.url,{method:'POST',headers:{'content-type':'application/json'},signal:ac.signal,body:JSON.stringify(bt.map((a,j)=>({jsonrpc:'2.0',id:j,method:'eth_getCode',params:[a,'latest']})))});clearTimeout(tm);
+    const js=await res.json();if(!Array.isArray(js))throw new Error('batch');let miss=[];for(const x of js){const a=bt[x.id];if(a==null)continue;if(typeof x.result!=='string'){miss.push(a);continue}const h=x.result.toLowerCase();CLS.code.set(a,h==='0x'?0:h.startsWith('0xef0100')?1:2)}
+    for(const a of bt)if(!CLS.code.has(a)&&!miss.includes(a))miss.push(a);if(miss.length){batches.push(miss);errs++;await sleep(1500)}else errs=0;await sleep(350)}
+   catch(e){batches.push(bt);errs++;fails++;await sleep(2000)}}};
+ await Promise.all(RPCS.map(worker));
+ CLS.codeDone=todo.every(a=>CLS.code.has(a));
+ try{await idbPut('ed-cls-v1',{code:[...CLS.code],mints:CLS.mints,mintsTo:CLS.mintsTo})}catch(e){}
+ CLS.codeBusy=false;chainReclass()}
 /* =====================================================================
    Eras · castles on asteroids · network layer · gnome-holder filter
    ===================================================================== */
-S.era='now';S.eraAuto=true;S.net=true;S.gnF=false;S.mineAt=null;let eraTo=0;
+S.era='now';S.eraAuto=true;S.net=true;S.gnF=false;S.clsF='all';S.mineAt=null;let eraTo=0;
 const miningLive=()=>{const c=CFG.contracts.mining||{};return !!(c.address&&c.active)};
 const eraReal=()=>SET.kind==='chain'?miningLive():MS.mineOn;
 const eraPreview=()=>S.era==='future'&&!eraReal();
@@ -2048,7 +2181,7 @@ function applyEraAuto(tt){if(!S.eraAuto){updEraUI();return}setEra(autoEra(tt))}
 $('tEra').onclick=()=>{const to=S.era==='future'?'now':'future';S.eraAuto=to===autoEra();setEra(to);
  toast(eraPreview()?t('eraPrevT'):t(to==='future'?'eraToFut':'eraToNow'),3200);beep(to==='future'?520:440,.2)};
 // era-B layout for simulated wallets: gnome holders → inner ring, very active players → middle ring, the rest → outer ring
-function simEraRadii(){if(SET.kind!=='sim')return;for(let i=0;i<NW;i++){const h=((i*2654435761)>>>0)/4294967296;
+function simEraRadii(){if(SET.kind!=='sim')return;for(let i=0;i<NW;i++){if(WA.cen[i*4+3]>.5){WA.rb[i]=WA.pos[i*3];continue}const h=((i*2654435761)>>>0)/4294967296;
   WA.rb[i]=SET.gn[i]?46+h*10:SET.act[i]>1.55?58+h*16:76+h*24}WATT.rb.needsUpdate=true}
 /* era visuals: the mine grows into the centre, the Soul Stone stays large and orbits it */
 const RP={};['core','form','spin','hot','hotw','cor'].forEach(n=>RP[n]=NODES.reserve.inner.getObjectByName(n));
@@ -2117,7 +2250,9 @@ function skinFor(i){const a=(SET.addr[i]||'').toLowerCase();const f=window.ED_sk
  if(typeof ccSkin==='function'){const v=ccSkin(i);if(v!=null)return ((v|0)%SKN+SKN)%SKN}
  if(EDITION==='prod'&&SET.kind==='chain')return 0;return hashA(a)%SKN}
 const skinIsDefault=i=>EDITION==='prod'&&SET.kind==='chain'&&typeof(window.ED_skinResolver||CFG.skinResolver)!=='function'&&!(typeof ccSkin==='function'&&ccSkin(i)!=null);
-function hideMode(i){return (S.gnF&&!SET.gn[i])||(S.ccF>=0&&typeof ccHas==='function'&&!ccHas(i,S.ccF))||CAST.of.has(i)}
+/* class filter: all · p players · t traders · l linked · b bots; routers (cls 3) are never drawn */
+function clsHide(i){const c=SET.cls[i];if(c===3)return true;const f=S.clsF;return f==='all'?false:f==='p'?c!==0:f==='t'?c!==1:f==='b'?c!==2:f==='l'?!SET.lk[i]:false}
+function hideMode(i){return clsHide(i)||(S.gnF&&!SET.gn[i])||(S.ccF>=0&&typeof ccHas==='function'&&!ccHas(i,S.ccF))||CAST.of.has(i)}
 function applyHide(i){const v=Math.abs(WA.sz[i])||1;WA.sz[i]=hideMode(i)?-v:v}
 function freeSlot(sl){if(sl.w>=0){CAST.of.delete(sl.w);if(sl.w<NW)applyHide(sl.w);WATT.sz.needsUpdate=true}sl.w=-1;sl.g.visible=false}
 function fillSlot(sl,i){sl.w=i;CAST.of.set(i,sl);const s=skinFor(i),h=hashA(SET.addr[i]||String(i));
@@ -2130,8 +2265,8 @@ function refreshCastles(){for(const sl of CAST.slots)freeSlot(sl);CAST.t=1}
 const _cp=new THREE.Vector3();
 function lodPick(){const cam=camera.position,D2=CAST.D*CAST.D;const best=[];const push=(i,d)=>{if(best.length<CAST.K){best.push([d,i]);best.sort((a,b)=>a[0]-b[0])}else if(d<best[best.length-1][0]){best[best.length-1]=[d,i];best.sort((a,b)=>a[0]-b[0])}};
  const forced=new Set();if(FY.sel>=0)forced.add(FY.sel);if(FM){forced.add(FM.a);forced.add(FM.b)}
- for(const i of forced){if(i<DRAWN){wPos(i,_cp);const d=_cp.distanceToSquared(cam);if(d<60*60)push(i,-1+d*1e-9)}}
- if(cam.length()-34<CAST.D){for(let i=0;i<DRAWN;i++){if(forced.has(i))continue;if(S.gnF&&!SET.gn[i])continue;if(S.ccF>=0&&typeof ccHas==='function'&&!ccHas(i,S.ccF))continue;wPos(i,_cp);const d=_cp.distanceToSquared(cam);if(d<D2)push(i,d)}}
+ for(const i of forced){if(i<DRAWN&&SET.cls[i]===0){wPos(i,_cp);const d=_cp.distanceToSquared(cam);if(d<60*60)push(i,-1+d*1e-9)}}
+ if(cam.length()-34<CAST.D){for(let i=0;i<DRAWN;i++){if(forced.has(i))continue;if(SET.cls[i]!==0||clsHide(i))continue;if(S.gnF&&!SET.gn[i])continue;if(S.ccF>=0&&typeof ccHas==='function'&&!ccHas(i,S.ccF))continue;wPos(i,_cp);const d=_cp.distanceToSquared(cam);if(d<D2)push(i,d)}}
  return best.map(b=>b[1])}
 function updCastles(dt){const off=morph>.3||S.panel==='inv';
  CAST.t-=dt;if(CAST.t<=0){CAST.t=MOBILE?.45:.3;
@@ -2145,7 +2280,11 @@ function updCastles(dt){const off=morph>.3||S.panel==='inv';
 
 /* ===== Gnome-holder filter ===== */
 function holderCount(){let n=0;for(let i=0;i<DRAWN;i++)if(SET.gn[i])n++;return n}
-function applyGnF(){for(let i=0;i<NW;i++)applyHide(i);WATT.sz.needsUpdate=true;$('tGnF').classList.toggle('on',S.gnF)}
+function applyGnF(){for(let i=0;i<NW;i++)applyHide(i);WATT.sz.needsUpdate=true;$('tGnF').classList.toggle('on',S.gnF);updClsBtn()}
+const CLS_F=['all','p','t','l','b'];
+function updClsBtn(){const b=$('tCls');if(!b)return;b.textContent=t('tCls')+': '+t('clsF_'+S.clsF);b.classList.toggle('on',S.clsF!=='all');b.dataset.f=S.clsF;if(typeof linkVis==='function')linkVis()}
+function setClsF(f){S.clsF=f;applyGnF();refreshCastles();if(f!=='all'){const c=clsCounts();const n=f==='p'?c.p:f==='t'?c.t:f==='b'?c.b:c.lw;toast(t('clsT_'+f,{n:fmt(n),p:fmt(c.lp)}),3600)}}
+$('tCls').onclick=()=>setClsF(CLS_F[(CLS_F.indexOf(S.clsF)+1)%CLS_F.length]);
 $('tGnF').onclick=()=>{S.gnF=!S.gnF;applyGnF();if(S.gnF){const n=holderCount();toast(n?t('gnF',{n:fmt(n)}):t('gnF0'),3600)}refreshCastles()};
 let gnFT=0;function updGnF(dt){if(!S.gnF)return;gnFT+=dt;if(gnFT>1.2){gnFT=0;applyGnF()}}
 
@@ -2159,9 +2298,26 @@ let royT=2;function updRoy(dt){if(S.paused||morph>.3||!S.tok)return;royT-=dt*S.s
 
 /* history panel: show the castle look */
 const _renderHist=renderHist;
-renderHist=function(full){_renderHist(full);const i=FY.sel;if(i<0||!FY.h||!FY.h.sum)return;const h=$('hist').querySelector('h3');if(!h)return;
+renderHist=function(full){_renderHist(full);const i=FY.sel;if(i<0||!FY.h||!FY.h.sum||SET.cls[i]!==0)return;const h=$('hist').querySelector('h3');if(!h)return;
  const d=document.createElement('div');d.className='sm';d.style.margin='2px 0 4px';d.textContent=t('hCastle')+': '+t('sk'+skinFor(i))+(skinIsDefault(i)?' · '+t('skDef'):'');h.after(d);};
 updEraUI();setNet(true);
+
+/* ===== Linked wallets: thin coral arcs between a player and a trader that sent Amber to each other directly =====
+   shown for every pair when the “Linked” filter is on, otherwise only for the selected / hovered wallet */
+const LINK={max:3000,seg:10,obj:null,pos:null,n:0};
+(function(){const g=new THREE.BufferGeometry();LINK.pos=new Float32Array(LINK.max*LINK.seg*6);const a=new THREE.BufferAttribute(LINK.pos,3);a.setUsage(THREE.DynamicDrawUsage);g.setAttribute('position',a);g.setDrawRange(0,0);
+ LINK.obj=new THREE.LineSegments(g,new THREE.LineBasicMaterial({color:CLS_C.link,transparent:true,opacity:.62,depthWrite:false,blending:THREE.AdditiveBlending}));LINK.obj.frustumCulled=false;LINK.obj.renderOrder=3;scene.add(LINK.obj)})();
+function linkGeo(){LINK.n=-1}
+function linkVis(){LINK.n=-1}
+const _la=new THREE.Vector3(),_lb=new THREE.Vector3(),_lc=new THREE.Vector3();
+function linkList(){if(!S.tok||morph>.3||S.mode!=='uni')return [];const L=[];
+ if(S.clsF==='l'){for(const p of SET.links)if(p[0]<DRAWN&&p[1]<DRAWN&&L.length<LINK.max)L.push(p);return L}
+ const w=FY.sel>=0?FY.sel:hoverW;if(w<0||w>=DRAWN)return L;for(const o of (SET.lnk.get(w)||[]))if(o<DRAWN)L.push([w,o]);return L}
+function updLinks(){const L=linkList();const P=LINK.pos,S2=LINK.seg;let v=0;
+ for(const [a,b] of L){wPos(a,_la);wPos(b,_lb);const d=_la.distanceTo(_lb);_lc.addVectors(_la,_lb).multiplyScalar(.5);_lc.y+=d*.18+.8;
+  let px=_la.x,py=_la.y,pz=_la.z;for(let s=1;s<=S2;s++){const t=s/S2,u=1-t;const x=u*u*_la.x+2*u*t*_lc.x+t*t*_lb.x,y=u*u*_la.y+2*u*t*_lc.y+t*t*_lb.y,z=u*u*_la.z+2*u*t*_lc.z+t*t*_lb.z;
+   P[v++]=px;P[v++]=py;P[v++]=pz;P[v++]=x;P[v++]=y;P[v++]=z;px=x;py=y;pz=z}}
+ LINK.obj.geometry.setDrawRange(0,v/3);LINK.obj.geometry.attributes.position.needsUpdate=true;LINK.obj.material.opacity=S.clsF==='l'?.3:.9;LINK.obj.visible=v>0;LINK.vis=L.length}
 /* ===== Labels ===== */
 const LBL={contract:'nContract',reserve:'nReserve',pool:'nPool',staking:'nStake',bank:'nBank',tour:'nTour',gnome:'nGnome',burn:'nBurn',dex:'nDex',link:'nLink',shield:'nShield',tw:'nTw',poly:'nPoly',ext:'nExt',fiat:'nFiat'};
 const labEls={};
@@ -2202,9 +2358,11 @@ function pick(x,y){if(morph>.5){const w=S.tok?pickWallet(x,y):-1;return w>=0?{w}
  const w=S.tok?pickWallet(x,y):-1;const weak=!node||['fiat','poly'].includes(node.object.userData.key);
  if(w>=0&&weak)return {w};if(node)return {k:node.object.userData.key};return null}
 const tip=$('tip');
-function walletTip(i){const nm=wid(i);const g=SET.gn[i];let s=`<b>${nm}</b> · ${t(SET.kind==='sim'?'simWallet':'chainWallet')}<br>`;
+const clsKey=i=>SET.lk[i]?'wcL':['wcP','wcT','wcB','wcR'][SET.cls[i]]||'wcP';
+const clsColor=i=>SET.lk[i]?hexC(CLS_C.link):SET.cls[i]===1?hexC(CLS_C.trader):SET.cls[i]===2?hexC(CLS_C.bot):'#f2c45a';
+function walletTip(i){const nm=wid(i);const g=SET.gn[i];let s=`<b>${nm}</b> · ${t(SET.kind==='sim'?'simWallet':'chainWallet')}<br><span style="color:${clsColor(i)}">${t(clsKey(i))}</span><br>`;
  if(SET.kind==='sim')s+=`${t('wPlayed')}: ${fmt(WS.pl[i])} · ${t('wWon')}: ${fmt(WS.wn[i])}`;else s+=`${fmtA(SET.bal[i])} Amber`;
- if(g)s+=`<br>🜨 ${fmt(g)} · ${t('hCastle')}: ${t('sk'+skinFor(i))}`;return s+`<br><span style="color:#8f9cc4">${t('tipClick')}</span>`}
+ if(g&&SET.cls[i]===0)s+=`<br>🜨 ${fmt(g)} · ${t('hCastle')}: ${t('sk'+skinFor(i))}`;return s+`<br><span style="color:#8f9cc4">${t('tipClick')}</span>`}
 function showTip(){
  if(hoverK){const c=card(hoverK);tip.innerHTML=`<b>${labText(hoverK)}</b><br>${c.k}<br><span style="color:#8f9cc4">${t('tipClick')}</span>`}
  else if(hoverW>=0&&hoverW<DRAWN){tip.innerHTML=walletTip(hoverW)}
@@ -2234,17 +2392,20 @@ $('cX').onclick=closeCard;
 function walletClick(i){selectWallet(i,true)}
 
 /* ===== i18n ===== */
-const LEG=[['lWallet','#a78bfa'],['lHold','#6f84a8'],['lEnergy','#ffcf7a'],['lEntry','#8b5cf6'],['lWin','#f6c75a'],['lRefund','#94a3b8'],['lBurn','#ff7a3d'],['lStake','#2dd4bf'],['lBank','#f6c75a'],['lTour','#f472b6'],['lMine','#ffb347'],['lMint','#7dd3fc'],['lRoy','#c4b5fd'],['lFiat','#60a5fa']];
+const LEG=[['lEnergy','#ffcf7a'],['lEntry','#8b5cf6'],['lWin','#f6c75a'],['lRefund','#94a3b8'],['lBurn','#ff7a3d'],['lStake','#2dd4bf'],['lBank','#f6c75a'],['lTour','#f472b6'],['lMine','#ffb347'],['lMint','#7dd3fc'],['lRoy','#c4b5fd'],['lFiat','#60a5fa']];
 const hexC=c=>'#'+c.toString(16).padStart(6,'0');
+function clsLegend(){const d=(c,k)=>`<div class="lc" data-c="${k}"><span class="dot" style="color:${c};background:${c}"></span>${t(k)}</div>`;
+ return `<div class="sm" style="margin-bottom:2px">${t('lClsH')}</div>`+d('#f2c45a','lPlayer')+d(hexC(CLS_C.trader),'lTrader')+d(hexC(CLS_C.link),'lLinked')+d(hexC(CLS_C.bot),'lBot')+
+  `<div><span class="leg2" style="background:${hexC(CLS_C.link)}"></span>${t('lLinkLine')}</div><div class="sm" id="lClsNote" style="margin:3px 0 6px;opacity:.85">${t('lClsNote')}</div>`}
 function renderLegend(){const tiers=TIERS.map((x,j)=>`<div><span class="dot" style="color:${hexC(x[2])};background:${hexC(x[2])}"></span>${t('gt'+(j+1))}</div>`).join('');
  const beh=[['bSell',BEH_C[0]],['bHold',BEH_C[1]],['bLater',BEH_C[2]]].map(x=>`<div><span class="dot" style="color:${hexC(x[1])};background:${hexC(x[1])}"></span>${t(x[0])}</div>`).join('');
- $('legI').innerHTML=LEG.map(x=>`<div><span class="dot" style="color:${x[1]};background:${x[1]}"></span>${t(x[0])}</div>`).join('')+
+ $('legI').innerHTML=clsLegend()+LEG.map(x=>`<div><span class="dot" style="color:${x[1]};background:${x[1]}"></span>${t(x[0])}</div>`).join('')+
   `<div class="sm" style="margin-top:6px">${t('lGn')}</div>`+tiers+(eraK>.3||S.era==='future'?`<div class="sm" style="margin-top:6px">${t('lBeh')}</div>`+beh+`<div><span class="leg2" style="background:#ffb347"></span>${t('lMineStream')}</div>`:'')+
   `<div style="margin-top:6px">🏰 ${t('lCastle')}</div>`+(S.net?`<div><span class="leg2" style="background:#8247E5"></span><span class="leg2" style="background:#375BD2"></span><span class="leg2" style="background:#e0489c"></span>${t('lNet')}</div>`:'')}
 function applyI18n(){document.documentElement.lang=L;
  document.querySelectorAll('[data-i]').forEach(e=>{e.textContent=t(e.dataset.i)});
  $('srcSim').textContent=EDITION==='prod'?t('srcDemo'):t('srcSim');
- $('tNet').textContent=t('tNet');$('tGnF').textContent=t('tGnF');
+ $('tNet').textContent=t('tNet');$('tGnF').textContent=t('tGnF');updClsBtn();
  $('edTag').textContent=EDITION==='prod'?t('edProd'):t('edDev');
  $('intro4').textContent=S.src==='chain'?t('intro4c'):t('intro4s');
  for(const k in labEls){labEls[k].textContent=labText(k);labEls[k]._t=null}
@@ -2306,11 +2467,12 @@ $('tEra').onclick=()=>{_tE();renderLegend()};$('tNet').onclick=()=>{_tN();render
 window.__play=()=>{closeCard();openPlay()};window.__tour=()=>{closeCard();launchTour()};window.__mint=()=>{closeCard();$('bMint').onclick()};
 
 /* ===== Stats ===== */
+function clsRows(){const c=clsCounts();return [[t('cPl'),fmt(c.p)],[t('cTr'),fmt(c.t)],[t('cLk'),t('cLkV',{n:fmt(c.lw),p:fmt(c.lp)})],[t('cBot'),fmt(c.b)]]}
 function updStats(){let r;
  if(S.src==='chain')r=chainStatRows();
  else r=[[t('chMatches'),fmt(S.cM+S.cMC)],[t('chWinG'),fmt(S.cM-S.cMD)],[t('chDrawG'),fmt(S.cMD)],[t('chCancel'),fmt(S.cMC)],[t('cBurn'),fmt(Math.round(S.cB))],[t('cMintBB'),usd(Math.round(S.cBB))],[t('cStake'),fmt(Math.round(S.cS))],[t('cBank'),fmt(Math.round(S.cK))],
-  [t('cTour'),fmt(Math.round(S.cT))],[t('cMine'),fmt(Math.round(S.cN))],[t('cWallets'),fmt(DRAWN)],[t('cGnHands'),fmt(GN.hands)],[t('cGnContract'),fmt(GN.inC)]];
- const h=r.map((x,j)=>`<div class="st${j>3?" x2":""}"><i>${x[0]}</i><b>${x[1]}</b></div>`).join('');if($('statRows')._h!==h){$('statRows').innerHTML=h;$('statRows')._h=h}
+  [t('cTour'),fmt(Math.round(S.cT))],[t('cMine'),fmt(Math.round(S.cN))],[t('cWallets'),fmt(DRAWN)],...clsRows(),[t('cGnHands'),fmt(GN.hands)],[t('cGnContract'),fmt(GN.inC)]];
+ const h=r.map((x,j)=>`<div class="st${j>3?" x2":""}${x[2]?' '+x[2]:''}"><i>${x[0]}</i><b>${x[1]}</b></div>`).join('');if($('statRows')._h!==h){$('statRows').innerHTML=h;$('statRows')._h=h}
  if(S.src==='chain'){$('clock').textContent=CH.state==='ok'&&CH.updAt?t('chainClock',{t:new Date(CH.updAt).toLocaleTimeString(L==='ru'?'ru-RU':'en-GB'),r:(CH.rpc||'').replace(/^https?:\/\//,'').split('/')[0]}):''}
  else $('clock').textContent=simWhen(S.simT)}
 function fitLegend(){if(MOBILE||innerWidth<=820)return;const st=$('stats'),lg=$('legend');if(!st||!lg)return;const b=st.getBoundingClientRect().bottom;const h=Math.max(70,innerHeight-108-b-14);lg.style.maxHeight=h+'px'}
@@ -2384,7 +2546,7 @@ function closeCc(){$('ccP').classList.remove('open');ccRender()}
 $('tCc').onclick=()=>{$('ccP').classList.contains('open')?closeCc():openCc();beep(520,.06)};$('ccX').onclick=closeCc;
 {const _cp=closePanels;closePanels=function(keep){if(keep!=='ccP'&&$('ccP').classList.contains('open'))closeCc();return _cp(keep)}}
 /* wallet card: castle collections held */
-{const _rh=renderHist;renderHist=function(full){_rh(full);const i=FY.sel;if(i<0||!FY.h||!FY.h.sum)return;const h=$('hist').querySelector('h3');if(!h)return;const a=ccOf(i);
+{const _rh=renderHist;renderHist=function(full){_rh(full);const i=FY.sel;if(i<0||!FY.h||!FY.h.sum)return;const h=$('hist').querySelector('h3');if(!h)return;const a=ccOf(i);if(SET.cls[i]!==0&&!(a&&a.length))return;
  const d=document.createElement('div');d.className='sm';d.style.margin='0 0 4px';
  if(a&&a.length)d.innerHTML=t('hCastleNft')+': '+a.map(([id,c])=>{const cc=CC.list.find(x=>x.id===id);return `<span style="color:${ccHex(id)}">■</span> ${cc?ccName(cc):'#'+id}${c>1?' ×'+c:''}`}).join(' · ')+(CC.src==='sim'?` <span class="ccex">${t('ccEx')}</span>`:'');
  else d.textContent=t('hCastleNft')+': '+(CC.src==='soon'||CC.src==='none'?t('soon').toLowerCase():'—');
@@ -2394,13 +2556,13 @@ Object.assign(T.ru,{tCc:'Коллекции замков',ccH:'Коллекци�
  ccNoteSim:'Пример: коллекции сгенерированы для симуляции, каждая ≈10% от числа игроков. Настоящих данных о NFT замков пока нет.',
  ccNoteSoon:'Контракт NFT замков (ERC-1155, thirdweb) ещё не подключён. Каждый tokenId будет отдельной коллекцией с фиксированным лимитом.',
  ccNoteChain:'Из блокчейна: контракт NFT замков (ERC-1155)',ccIss:'выпущено {a} из {b}',ccHold:'держателей {n}',ccShow:'Держатели',ccAll:'Все',
- ccFoot:'Только косметика: облик замка, дизайн колоды, иконки. Роялти 1% с каждой перепродажи на внешних площадках идёт в Банк Студии. Цены назначают держатели вне игры, поэтому здесь их нет.',
+ ccFoot:'Только косметика: облик замка, дизайн колоды, иконки. Роялти 1% в POL/USDC с каждой перепродажи на внешних площадках идёт в Банк Студии; оно зашито в контракт NFT замков и не меняется (скоро). Цены назначают держатели вне игры, поэтому здесь их нет.',
  ccFT:'Показаны держатели «{c}»: {n}'});
 Object.assign(T.en,{tCc:'Castle collections',ccH:'Castle collections',ccEx:'example',
  ccNoteSim:'Example: the collections are generated for the simulation, each ≈10% of the player count. There is no real castle NFT data yet.',
  ccNoteSoon:'The castle NFT contract (ERC-1155, thirdweb) is not connected yet. Each token id will be a separate collection with a fixed limit.',
  ccNoteChain:'On-chain: the castle NFT contract (ERC-1155)',ccIss:'{a} of {b} issued',ccHold:'{n} holders',ccShow:'Holders',ccAll:'All',
- ccFoot:'Cosmetic only: castle skin, deck design, icons. A 1% royalty on every resale on external marketplaces goes to the Studio Bank. Holders set prices outside the game, so none are shown here.',
+ ccFoot:'Cosmetic only: castle skin, deck design, icons. A 1% royalty in POL/USDC on every resale on external marketplaces goes to the Studio Bank; it is hardcoded in the castle NFT contract and cannot change (soon). Holders set prices outside the game, so none are shown here.',
  ccFT:'Showing holders of “{c}”: {n}'});
 if(SET.kind==='sim'&&!CC.list.length)ccSim();else if(SET.kind==='chain')ccChainMap();
 /* ===== Electrum Decisions shield · thirdweb skin-factory drops · far zoom-out «watchers» easter egg + audits panel ===== */
@@ -2606,7 +2768,7 @@ function tick(){requestAnimationFrame(tick);
   for(const o of a.sp){if(o.name==='spin'){o.rotation.y+=dt*.3;o.rotation.x+=dt*.1}else if(o.name==='spin2')o.rotation.y-=dt*.15;else if(o.name==='spinr'){o.rotation.z+=dt*.8;o.rotation.y+=dt*.3}else if(o.name==='coin')o.rotation.z+=dt*1.5;else if(o.name==='flame')o.scale.y=1+Math.sin(tm*9)*.15+n.glow*.4}}
  if(run)pulse*=.94;const pz=NODES.pool.inner.getObjectByName('pulse');if(pz){pz.material.opacity=.1+Math.min(.6,pulse*.35);pz.scale.setScalar(1+pulse*.03)}
  for(const o of flowLines){const mineLine=o.a==='reserve';const want=o.hov?.85:(mineLine&&!(MS.mineOn||eraK>.5)?.05:o.base);o.ln.material.opacity+=(want-o.ln.material.opacity)*.15;o.ln.visible=morph<.5}
- updEra(dt);updNet(dt);updRoy(dt);updWatch(dt);updGnF(dt);updCastles(dt);
+ updEra(dt);updNet(dt);updRoy(dt);updWatch(dt);updGnF(dt);updCastles(dt);updLinks();
  updParticles();updArcs(dt);updFind(dt);updTrail();updTM(dt);updMorph(dt);updInv(dt);updRegions(dt);
  if(mouseMoved&&frame%3===0){mouseMoved=false;const h=pick(mx,my);if(h&&h.k){setHover(h.k);hoverW=-1}else{setHover(null);hoverW=h&&h.w!=null?h.w:-1}showTip()}
  updFly();controls.update();updLabels();
@@ -2622,7 +2784,9 @@ if(QS.has('nointro'))$('intro').classList.add('hidden');
 if(SET.kind!=='sim'&&S.src!=='chain')buildSimSet();else if(S.src==='sim')buildSimSet();
 if(EDITION==='prod'&&!QS.has('demo'))setSource('chain',true);else if(QS.has('chain'))setSource('chain',true);else if(EDITION==='prod')setSource('demo',true);
 $('rP').value=playersToSlider(PLAYERS);applyI18n();updStats();
-window.__ed={forceDraw:()=>visMatch(true),geo:()=>{const o={};for(const k of ['reserve','pool','gnome','staking','bank','burn','dex','ext','tour'])if(NODES[k])o[k]=+NODES[k].pos.length().toFixed(1);o.shield=SHIELD_R;let mn=1e9,mx=0;for(let i=0;i<Math.min(DRAWN,4000);i++){const r=Math.hypot(WA.pos[i*3],WA.pos[i*3+2]);if(r<mn)mn=r;if(r>mx)mx=r}o.beltMin=+mn.toFixed(1);o.beltMax=+mx.toFixed(1);return o},batCounts:()=>typeof batCounts==='function'&&S.src==='chain'?batCounts():null,get GNM(){return typeof CH!=='undefined'?CH.gnm:null},get CC(){return CC},dropWave:(id,w)=>dropWave(id,w),ccFilter,get EYE(){return EYE},zoomTo:d=>{const v=camera.position.clone().sub(controls.target).setLength(d);camera.position.copy(controls.target).add(v);controls.update()},openAud,openCard,closeCard,nodeScreen,walletScreen:i=>{const q=wPos(i).project(camera);return {x:(q.x*.5+.5)*innerWidth,y:(-q.y*.5+.5)*innerHeight}},
+window.__ed={cls:()=>({c:clsCounts(),n:typeof CLS!=='undefined'?CLS.n:null,T:typeof BOT_T!=='undefined'?BOT_T:null,codeDone:typeof CLS!=='undefined'?CLS.codeDone:null,links:SET.links.length,vis:LINK.vis||0,f:S.clsF}),
+ swarm:()=>{const v=new THREE.Vector3(),D=DEX_POS.clone();const o={t:{n:0,minO:1e9,maxD:0},b:{n:0,minO:1e9,maxD:0},p:{n:0,maxO:0}};for(let i=0;i<DRAWN;i++){const c=SET.cls[i];if(c===3)continue;wPos(i,v);if(c===0){o.p.n++;o.p.maxO=Math.max(o.p.maxO,v.length());continue}const q=c===1?o.t:o.b;q.n++;q.minO=Math.min(q.minO,v.length());q.maxD=Math.max(q.maxD,v.distanceTo(D))}return o},
+ setClsF:f=>setClsF(f),frameLink:i=>{const o=(SET.lnk.get(i)||[])[0];if(o==null)return false;const m=()=>wPos(i).add(wPos(o)).multiplyScalar(.5);const d=wPos(i).distanceTo(wPos(o));flyTo(m(),Math.max(30,d*.9),m);return true},desel:()=>{if(FY.sel>=0)setHL(FY.sel,0);FY.sel=-1},clsOf:i=>({c:SET.cls[i],lk:SET.lk[i],col:[WA.col[i*3],WA.col[i*3+1],WA.col[i*3+2]],partners:SET.lnk.get(i)||[]}),firstOf:k=>{for(let i=0;i<DRAWN;i++){if(k==='l'?SET.lk[i]:SET.cls[i]===k&&!SET.lk[i])return i}return -1},forceDraw:()=>visMatch(true),geo:()=>{const o={};for(const k of ['reserve','pool','gnome','staking','bank','burn','dex','ext','tour'])if(NODES[k])o[k]=+NODES[k].pos.length().toFixed(1);o.shield=SHIELD_R;let mn=1e9,mx=0;for(let i=0;i<Math.min(DRAWN,4000);i++){if(WA.cen[i*4+3]>.5||SET.cls[i]===3)continue;const r=Math.hypot(WA.pos[i*3],WA.pos[i*3+2]);if(r<mn)mn=r;if(r>mx)mx=r}o.beltMin=+mn.toFixed(1);o.beltMax=+mx.toFixed(1);return o},batCounts:()=>typeof batCounts==='function'&&S.src==='chain'?batCounts():null,get CH(){return typeof CH!=="undefined"?CH:null},chPlayers:()=>[...chainPlayers()],get SPEC(){return SPEC},CA,get SET(){return SET},get NW(){return NW},get GNM(){return typeof CH!=='undefined'?CH.gnm:null},get CC(){return CC},dropWave:(id,w)=>dropWave(id,w),ccFilter,get EYE(){return EYE},zoomTo:d=>{const v=camera.position.clone().sub(controls.target).setLength(d);camera.position.copy(controls.target).add(v);controls.update()},openAud,openCard,closeCard,nodeScreen,walletScreen:i=>{const q=wPos(i).project(camera);return {x:(q.x*.5+.5)*innerWidth,y:(-q.y*.5+.5)*innerHeight}},
  pick,startFM,fmStep,endFM,launchTour,mint,tourStep,setLang,focusNode,resetView,walletClick,selectWallet,setPlayers,setSource,setEra,setMode,tmOpen,tmApply,tmClose,flyTo,wPos,
  S,M,MS,TB,CH,SET,GN,CAST,NODES,CFG,camera,controls,get FM(){return FM},get cardKey(){return cardKey},get eraK(){return eraK},get DRAWN(){return DRAWN},PLAYERS:()=>PLAYERS,live,skinFor,T,get L(){return L},ready:true};
 tick();
