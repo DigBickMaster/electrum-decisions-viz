@@ -419,12 +419,16 @@ button.ck i.sw{display:inline-block;width:9px;height:9px;border-radius:50%;margi
 #cv.open{display:block}#cv.vis{opacity:1}
 #cvTop{position:absolute;top:14px;left:16px;right:16px;display:flex;align-items:flex-start;gap:10px;z-index:2}
 #cvTop .tt{flex:1}#cvTop h2{margin:2px 0;font-size:22px}#cvTop .sm{color:var(--mut);font-size:12px}
-#cvSvg{position:absolute;left:0;right:0;top:70px;bottom:120px;width:calc(100% - 320px);height:calc(100% - 190px)}
+#cvC{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}#cvC:active{cursor:grabbing}
+#cvLab{position:absolute;inset:0;pointer-events:none;overflow:hidden}#cvLab.off{display:none}
+#cvLab .bl{position:absolute;left:0;top:0;white-space:nowrap;font:600 11.5px Inter,system-ui,sans-serif;color:#f3e9d2;text-shadow:0 1px 3px #000,0 0 6px #000;transform-origin:50% 100%;opacity:.92}
+#cvLab .bl i{font-style:normal;color:#f6c75a;margin-left:5px}
+#cvTip{position:absolute;left:0;top:0;z-index:3;pointer-events:none;display:none;padding:7px 10px;border-radius:9px;background:rgba(12,14,30,.92);border:1px solid rgba(246,199,90,.45);font:12.5px Inter,system-ui,sans-serif;color:#eef1fb;white-space:nowrap;box-shadow:0 6px 18px rgba(0,0,0,.45)}
+#cvTip b{display:block;font-size:13.5px;color:#f6c75a;margin-bottom:2px}
+#cvLb{font-size:12px}#cvLb.on{border-color:var(--gold);color:var(--gold)}
+#cvInfo,#cvNote,#cvTop{z-index:2}
 #cvInfo{position:absolute;right:16px;top:90px;width:300px;padding:12px 14px;font-size:12.5px}
 #cvNote{position:absolute;left:50%;transform:translateX(-50%);bottom:18px;width:min(760px,94vw);padding:10px 14px;font-size:12px;color:#c9d2ee;text-align:center}
-.bld{cursor:pointer}.bld:hover .top{filter:brightness(1.25)}
-.blab{font:600 15px Inter,system-ui,sans-serif;text-anchor:middle;fill:#fff;paint-order:stroke;stroke:#050816;stroke-width:3px}
-.blv{font:600 13px Inter,system-ui,sans-serif;text-anchor:middle;fill:#f6c75a;paint-order:stroke;stroke:#050816;stroke-width:3px}
 /* embed */
 #embLogo{display:none;position:fixed;right:12px;bottom:10px;z-index:9;font-size:10.5px;letter-spacing:.22em;font-weight:700;color:rgba(246,199,90,.75);text-decoration:none;padding:4px 8px;border-radius:8px;background:rgba(5,8,22,.35)}
 body.embed #embLogo{display:block}
@@ -447,9 +451,8 @@ body.kiosk #feed,body.kiosk #hint1,body.kiosk #layP,body.kiosk #hvLab,body.inv #
  #feed #feedOne{display:block}
  #lbP{top:auto;bottom:0;left:0;right:0;width:auto;max-height:64%;border-radius:16px 16px 0 0}
  #hint1{bottom:auto;top:176px}
- #cvInfo{left:8px;right:8px;width:auto;top:auto;bottom:96px;max-height:30vh;overflow:auto}
- #cvSvg{top:70px;width:100%;height:calc(100% - 300px)}
- #cvSvg .blab{font-size:30px;stroke-width:6px}#cvSvg .blv{font-size:26px;stroke-width:6px}
+ #cvInfo{left:8px;right:8px;width:auto;top:auto;bottom:74px;max-height:19vh;overflow:auto;padding:8px 10px;font-size:11.5px}
+ #cvLab .bl{font-size:10.5px}
  #cvNote{bottom:8px;font-size:11px}
  .prof{grid-template-columns:1fr}
  #tm{bottom:86px!important}
@@ -479,7 +482,7 @@ ul.tech{margin:6px 0 4px;padding-left:18px;font-size:13px;line-height:1.5}ul.tec
 <div id="hvLab"></div>
 <div id="shareP" class="modal hidden"><div class="pn"><button class="x" id="shX" style="position:absolute;top:10px;right:10px;padding:3px 9px">✕</button><div class="k" data-i="shK"></div><h2 data-i="shH"></h2><img id="shImg" alt=""><div class="btns"><button class="gold" id="shGo" data-i="shShare"></button><button id="shDl" data-i="shDl"></button><button id="shCp" data-i="shCopy"></button></div><p class="note" id="shNote"></p></div></div>
 <div id="authP" class="modal hidden"><div class="pn" style="position:relative"><button class="x" id="authX" style="position:absolute;top:10px;right:10px;padding:3px 9px">✕</button><div id="authB"></div></div></div>
-<div id="cv"><div id="cvTop"><div class="tt"><div class="k" id="cvK"></div><h2 id="cvH"></h2><div class="sm" id="cvS"></div></div><button id="cvX">✕</button></div><svg id="cvSvg" viewBox="-20 0 1040 620" preserveAspectRatio="xMidYMid meet"></svg><div id="cvInfo" class="pn"></div><div id="cvNote" class="pn"></div></div>
+<div id="cv"><div id="cvTop"><div class="tt"><div class="k" id="cvK"></div><h2 id="cvH"></h2><div class="sm" id="cvS"></div></div><button id="cvLb" class="on"></button><button id="cvX">✕</button></div><canvas id="cvC"></canvas><div id="cvLab"></div><div id="cvTip"></div><div id="cvInfo" class="pn"></div><div id="cvNote" class="pn"></div></div>
 <a id="embLogo" target="_blank" rel="noopener">ELECTRUM DECISIONS ↗</a>
 <script>
 /* =====================================================================
@@ -557,20 +560,22 @@ window.ED_CONFIG={
   Любой хук можно задать и снаружи до загрузки страницы: window.ED_castleProvider / ED_legionProvider / ED_authProvider. */
 
  // A. «Внутри замка» (будущая точка входа в 4X-игру). Функция (addr) → объект или Promise объекта:
- //   {buildings:[{id:'keep'|'walls'|'barracks'|'camp'|'mine'|'workshop'|'storage', level:число, max:число}],
+ //   {buildings:[{id:'castle'|'infantry'|'pikemen'|'archers'|'infirmary'|'university'|'tavern'|'heroes'|'wall', level:1…30, max:30, start:1}],
+ //    (9 построек: Замок, Казармы пехоты, Казармы копейщиков, Казармы лучников, Лечебница, Университет, Таверна, Зал героев,
+ //     Стена = энергетический щит вокруг острова; яркость щита растёт с уровнем Стены. start — уровень, с которого начинал)
  //    army:число (необязательно), power:число (Мощь; если нет — считается из зданий и армии),
  //    nick:строка (необязательно), showNick:true|false (игрок разрешил показывать ник на карте),
  //    socials:{x:'https://x.com/…', tiktok:'…', youtube:'…', instagram:'…'} (все поля необязательные)}
  //   Вернуть null = замок без данных («4X · скоро»).
  castleProvider:null,
 
- // B. Рои (кланы). Функция () → массив или Promise массива:
+ // B. Ульи (кланы). Функция () → массив или Promise массива:
  //   [{id:'h1', name:'Вега', color:'#8fd3ff' (необязательно), players:['0x…', …] (обычно 50–100 игроков),
  //     power:число (суммарная Мощь, необязательно), wins:число (суммарные победы, необязательно)}]
  //   Замки участников стягиваются в поясе ближе друг к другу, вокруг — общая аура и подпись: название · Мощь.
  legionProvider:null,
- // Как называть рои в интерфейсе: {ru:'Рои', en:'Hives', ru1:'Рой', en1:'Hive'} (мн. и ед. число)
- legionTerm:{ru:'Рои',en:'Hives',ru1:'Рой',en1:'Hive'},
+ // Как называть ульи в интерфейсе: {ru:'Ульи', en:'Hives', ru1:'Улей', en1:'Hive'} (мн. и ед. число)
+ legionTerm:{ru:'Ульи',en:'Hives',ru1:'Улей',en1:'Hive'},
 
  // C. Единый аккаунт с игрой (вход через Google / Apple / Email). null = кнопки «скоро», сайт ничего не собирает.
  //   Объект {methods:['google','apple','email'], signIn:(method)=>Promise<профиль>, signOut:()=>void, current:()=>профиль|null}
@@ -2984,11 +2989,11 @@ Object.assign(T.ru,{techBtn:'Технологии',gchBtn:'Игровая сет
  msGn1:'Первый гном',msGnN:'{n} гномов',msNow:'Сейчас',msSim:'вехи симуляции',msChain:'вехи по данным блокчейна',msStakeS:'Стейкинг начал копить',msGnS:'Первые гномы у игроков',
  feedH:'Лента событий',feWin:'Матч #{id} завершён · победил {w}',feWinS:'Матч завершён · победил {w}',feDraw:'Ничья · возврат взноса {a} и {b}',feGn:'Гном #{id} отчеканен → {w}',
  feBurn:'Сожжено {v} Amber',feEmpty:'Событий пока нет',feSim:'симуляция',
- lbK:'Таблица лидеров',lbH:'Лучшие замки',lbWins:'По победам',lbPct:'По доле побед',lbHive:'Рои',lbName:'Игрок',lbW:'Побед',lbP:'Матчей',lbPc:'Доля',
+ lbK:'Таблица лидеров',lbH:'Лучшие замки',lbWins:'По победам',lbPct:'По доле побед',lbHive:'Ульи',lbName:'Игрок',lbW:'Побед',lbP:'Матчей',lbPc:'Доля',
  lbNoteC:'По событиям боевого контракта (newGame, joinedGame, endedGame). Доля побед = победы / завершённые матчи; в таблице по доле — игроки от {n} завершённых матчей. Нажмите на строку — камера полетит к замку.',
  lbNoteS:'Пример из симуляции. Доля побед = победы / сыгранные матчи; в таблице по доле — игроки от {n} матчей. Нажмите на строку — камера полетит к замку.',
- lbHvPow:'По Мощи',lbHvWins:'По победам',lbHvName:'Рой',lbHvPower:'Мощь',lbHvMem:'Игроков',lbHvSoon:'Рои появятся вместе с 4X-игрой.',
- hvNote:'Рои соревнуются за ресурсы в 4X-игре.',hvDemo:'Демо: 30 роёв по 50–100 игроков, Мощь — пример.',hvLay:'Рои',hvPlayers:'Игроков',hvPower:'Суммарная Мощь',hvWins:'Суммарно побед',hvTag:'рой',
+ lbHvPow:'По Мощи',lbHvWins:'По победам',lbHvName:'Улей',lbHvPower:'Мощь',lbHvMem:'Игроков',lbHvSoon:'Ульи появятся вместе с 4X-игрой.',
+ hvNote:'Ульи соревнуются за ресурсы в 4X-игре.',hvDemo:'Демо: 30 ульев по 50–100 игроков, Мощь — пример.',hvLay:'Ульи',hvPlayers:'Игроков',hvPower:'Суммарная Мощь',hvWins:'Суммарно побед',hvTag:'рой',
  wxShare:'Поделиться',wxCastle:'Войти в замок',wxLink:'Показать связь',wxPower:'Мощь',
  shK:'Карточка замка',shH:'Поделиться замком',shShare:'Поделиться',shDl:'Скачать PNG',shCopy:'Копировать ссылку',shCopied:'Ссылка скопирована',shCopyFail:'Не удалось скопировать — ссылка: {u}',
  shNote:'Картинка создаётся прямо в браузере. Ссылка открывает вселенную сразу на этом замке.',
@@ -2996,11 +3001,10 @@ Object.assign(T.ru,{techBtn:'Технологии',gchBtn:'Игровая сет
  dlNF:'Кошелёк {a} не найден на карте',dlWait:'Открываю замок {a}…',
  h1K:'Подсказка {n} / 3',h1a:'Это Amber — сердце экономики. Всё, что вы видите, вращается вокруг токена.',h1b:'Вы — среди замков: каждая точка в поясе — кошелёк игрока. Нажмите на любую.',
  h1c:'Отдалитесь колесом мыши или щипком — увидите всю вселенную, сеть и партнёров.',h1Next:'Далее',h1Done:'Готово',h1Skip:'Пропустить',
- cvK:'Внутри замка',cvDemo:'Демо-уровни — пример, не реальные данные',cvSoon:'4X · скоро',cvNote:'Это будущая точка входа в 4X-игру: здесь появятся постройки, армия и ресурсы вашего замка.',
- bKeep:'Главный замок',bWalls:'Стены',bBarracks:'Казармы',bCamp:'Тренировочный лагерь',bMine:'Шахта',bWorkshop:'Мастерская',bStorage:'Склад',
- dKeep:'Сердце замка: его уровень открывает новые постройки.',dWalls:'Защита замка от набегов.',dBarracks:'Здесь собирается армия.',dCamp:'Тренировка и улучшение отрядов.',
- dMine:'Добыча ресурсов.',dWorkshop:'Улучшения и снаряжение.',dStorage:'Хранение ресурсов.',
- cvLvl:'ур. {n}',cvLvlMax:'ур. {n} / {m}',cvLvlNone:'ур. —',cvPower:'Мощь',cvArmy:'Армия',cvBld:'Уровни построек',cvPick:'Нажмите на постройку, чтобы узнать о ней.',
+ cvK:'Внутри замка',cvDemo:'Демо-уровни — пример, не реальные данные',cvSoon:'4X · скоро',cvNote:'Это будущая точка входа в 4X-игру: постройки, армия и ресурсы вашего замка. Названия рабочие, стиль ещё выбирается.',
+ bCastle:'Замок',bInfantry:'Казармы пехоты',bPikemen:'Казармы копейщиков',bArchers:'Казармы лучников',bInfirmary:'Лечебница',bUniversity:'Университет',bTavern:'Таверна',bHeroes:'Зал героев',bWall:'Стена',
+ cvTipLv:'Уровень {n} из {m} · начинал с {s}',cvTipSoon:'Уровень — · 4X · скоро',cvLabs:'Подписи',
+ cvLvl:'ур. {n}',cvLvlMax:'ур. {n} / {m}',cvLvlNone:'ур. —',cvPower:'Мощь',cvArmy:'Армия',cvBld:'Уровни построек',cvPick:'Крутите и приближайте базу со всех сторон; наведите на здание — увидите его уровень. Стена — энергетический щит вокруг острова.',
  cvEnter:'Приблизьтесь ещё — и вы войдёте в замок',cvPowerNote:'Мощь = уровни построек + армия.',
  cvSoc:'Соцсети',cvSocNone:'не указаны',cvNick:'Показывать мой ник на карте',cvNickSoon:'настройка · скоро',
  auK:'Аккаунт',auH:'Единый аккаунт с игрой',auP1:'Один аккаунт для игры и сайта: вход через Google, Apple или Email. Профиль и статистика — здесь, на сайте (в приложениях их не будет).',
@@ -3033,11 +3037,10 @@ Object.assign(T.en,{techBtn:'Technology',gchBtn:'Game chain · planned',nGchain:
  dlNF:'Wallet {a} is not on the map',dlWait:'Opening castle {a}…',
  h1K:'Tip {n} / 3',h1a:'This is Amber, the heart of the economy. Everything you see orbits the token.',h1b:'You are among the castles: every dot in the belt is a player wallet. Click any of them.',
  h1c:'Zoom out with the mouse wheel or a pinch to see the whole universe, the network and partners.',h1Next:'Next',h1Done:'Done',h1Skip:'Skip',
- cvK:'Inside the castle',cvDemo:'Demo levels: an example, not real data',cvSoon:'4X · soon',cvNote:'This will be the entry point to the 4X game: your castle’s buildings, army and resources will live here.',
- bKeep:'Main castle',bWalls:'Walls',bBarracks:'Barracks',bCamp:'Training camp',bMine:'Mine',bWorkshop:'Workshop',bStorage:'Storehouse',
- dKeep:'The heart of the castle: its level unlocks new buildings.',dWalls:'Protects the castle from raids.',dBarracks:'Where the army gathers.',dCamp:'Trains and upgrades units.',
- dMine:'Gathers resources.',dWorkshop:'Upgrades and gear.',dStorage:'Stores resources.',
- cvLvl:'lvl {n}',cvLvlMax:'lvl {n} / {m}',cvLvlNone:'lvl —',cvPower:'Power',cvArmy:'Army',cvBld:'Building levels',cvPick:'Click a building to learn about it.',
+ cvK:'Inside the castle',cvDemo:'Demo levels: an example, not real data',cvSoon:'4X · soon',cvNote:'This will be the entry point to the 4X game: your castle’s buildings, army and resources. Names are working titles; the art style is still being chosen.',
+ bCastle:'Castle',bInfantry:'Infantry Barracks',bPikemen:'Pikemen Barracks',bArchers:'Archer Barracks',bInfirmary:'Infirmary',bUniversity:'University',bTavern:'Tavern',bHeroes:'Hero Hall',bWall:'Wall',
+ cvTipLv:'Level {n} of {m} · started at {s}',cvTipSoon:'Level — · 4X · soon',cvLabs:'Labels',
+ cvLvl:'lvl {n}',cvLvlMax:'lvl {n} / {m}',cvLvlNone:'lvl —',cvPower:'Power',cvArmy:'Army',cvBld:'Building levels',cvPick:'Orbit and zoom the base from any side; hover over a building to see its level. The Wall is the energy shield around the island.',
  cvEnter:'Zoom in a little more to enter the castle',cvPowerNote:'Power = building levels + army.',
  cvSoc:'Social links',cvSocNone:'not set',cvNick:'Show my nickname on the map',cvNickSoon:'setting · soon',
  auK:'Account',auH:'One account with the game',auP1:'One account for the game and the site: sign in with Google, Apple or Email. Your profile and stats live here on the site (not in the apps).',
@@ -3185,7 +3188,7 @@ function lbOpen(){closePanels('lbP');$('lbP').classList.add('open');lbRender();$
 function lbClose(){$('lbP').classList.remove('open');$('bLb').classList.remove('on')}
 $('bLb').onclick=e=>{e.stopPropagation();$('lbP').classList.contains('open')?lbClose():lbOpen();beep(600,.05)};$('lbX').onclick=lbClose;
 /* ---------- link framing (wider zoom so the coral arc is visible) ---------- */
-function frameLinkFly(i){const o=(SET.lnk.get(i)||[])[0];if(o==null)return false;const m=()=>wPos(i).add(wPos(o)).multiplyScalar(.5);const d=wPos(i).distanceTo(wPos(o));flyTo(m(),Math.max(55,d*1.4),m);return true}
+function frameLinkFly(i){const o=(SET.lnk.get(i)||[])[0];if(o==null)return false;const m=()=>wPos(i).add(wPos(o)).multiplyScalar(.5);const d=wPos(i).distanceTo(wPos(o));flyTo(m(),Math.max(70,d*1.9),m);return true}
 /* ---------- wallet card extras: Share · Enter castle · Show link · Power · hive ---------- */
 function R6histExtra(i){const h=$('hist');if(!h||i==null||i<0)return;const d=document.createElement('div');d.id='wx';
  const pl=SET.cls[i]===0;let html=`<button id="wxSh" class="gold">${t('wxShare')}</button>`;if(pl)html+=`<button id="wxCv">${t('wxCastle')}</button>`;if(SET.lk[i])html+=`<button id="wxLk">${t('wxLink')}</button>`;
@@ -3245,22 +3248,28 @@ const R6API={r6:{setQ:q=>R6setQ(q),q:()=>({q:R6.q,cur:R6.qCur,bloom:bloom.enable
  cb:on=>{if(on!==undefined&&!!on!==S.cb)$('tCB').click();return {cb:S.cb,u:WM.uniforms.uCB.value}},hint:()=>R6.hintN,hintShow:n=>hintShow(n),hintClose:()=>hintClose(true),
  cOff:()=>({...S.cOff}),arcOff:()=>S.arcOff,frameLink:i=>frameLinkFly(i),tab:tb=>{R6setTab(tb);return document.querySelectorAll('#statRows .st.tb-'+tb).length}}};
 
-/* ===== Round 6 · Part 2: Hives (Рои), castle deep zoom (4X entry point), account slot, Technology card, planned game chain =====
+/* ===== Round 6 · Part 2: Hives (Ульи), castle deep zoom (4X entry point), account slot, Technology card, planned game chain =====
    All data comes through ED_CONFIG hooks (castleProvider / legionProvider / authProvider), which connect to the studio's EXISTING server.
    null hook = built-in behaviour: DEV shows labelled demo data, PROD shows «скоро». No real sign-in, no fields, nothing collected. */
 const HUB={hv:[],hvOf:new Map(),hvOn:EDITION==='dev',hvApplied:false,orig:null,aura:[],cvI:-1,cvNear:0,cvB:null,cvSel:'keep',authPrev:false,castle:new Map()};
 const hook=n=>window['ED_'+n]||CFG[n]||null;
-function hvTerm(pl){const tm=CFG.legionTerm||{};return pl?(tm[L]||(L==='ru'?'Рои':'Hives')):(tm[L+'1']||(L==='ru'?'Рой':'Hive'))}
+function hvTerm(pl){const tm=CFG.legionTerm||{};return pl?(tm[L]||(L==='ru'?'Ульи':'Hives')):(tm[L+'1']||(L==='ru'?'Улей':'Hive'))}
 const HV_NAMES=[['Вега','Vega'],['Альтаир','Altair'],['Сириус','Sirius'],['Полярис','Polaris'],['Антарес','Antares'],['Ригель','Rigel'],['Денеб','Deneb'],['Капелла','Capella'],['Арктур','Arcturus'],['Спика','Spica'],
  ['Процион','Procyon'],['Альдебаран','Aldebaran'],['Бетельгейзе','Betelgeuse'],['Кастор','Castor'],['Поллукс','Pollux'],['Регул','Regulus'],['Фомальгаут','Fomalhaut'],['Мира','Mira'],['Электра','Electra'],['Майя','Maia'],
  ['Альциона','Alcyone'],['Хадар','Hadar'],['Мицар','Mizar'],['Алькор','Alcor'],['Тубан','Thuban'],['Шедар','Schedar'],['Беллатрикс','Bellatrix'],['Минтака','Mintaka'],['Альнилам','Alnilam'],['Саиф','Saiph']];
 const HV_COL=[0xf6c75a,0x5eead4,0xc4b5fd,0xf472b6,0x7dd3fc,0xfb923c,0xa3e635,0xfcd34d,0x93c5fd,0xf9a8d4];
 /* ---------- castle data (castleProvider; DEV demo) ---------- */
-const BLD=['keep','walls','barracks','camp','mine','workshop','storage'];
-function castleDemo(a){const r=rng((parseInt(a.slice(2,10),16)||7)^0x5a17);const keep=1+Math.floor(r()*14);const b=BLD.map(id=>({id,level:id==='keep'?keep:Math.max(1,Math.min(keep,Math.round(keep*(.45+r()*.6)))),max:id==='keep'?20:keep}));
+const BLD=['castle','infantry','pikemen','archers','infirmary','university','tavern','heroes','wall'],BMAX=30;
+/* demo levels 1–30, deterministic per address: ~18% fully maxed (all 30), ~32% young (5–15), the rest mixed (castle 16–30, others below it) */
+function castleLevels(r){const lv={};const p=r();let prof;
+ if(p<.18){prof='max';for(const id of BLD)lv[id]=BMAX}
+ else if(p<.5){prof='low';const c=8+Math.floor(r()*8);lv.castle=c;for(const id of BLD)if(id!=='castle')lv[id]=Math.max(5,Math.min(c,c-Math.floor(r()*7)))}
+ else{prof='mixed';const c=16+Math.floor(r()*15);lv.castle=c;for(const id of BLD)if(id!=='castle')lv[id]=Math.max(1,Math.min(c,c-Math.floor(r()*r()*16)-(r()<.35?1:0)))}
+ return {prof,lv}}
+function castleDemo(a){const r=rng((parseInt(a.slice(2,10),16)||7)^0x5a17);const L0=castleLevels(r);const b=BLD.map(id=>({id,level:L0.lv[id],max:BMAX,start:1}));
  const army=Math.round(200+r()*r()*9000);const power=b.reduce((s,x)=>s+x.level*110,0)+army;const nick=SET.kind==='sim'&&SET.byAddr.has(a)?SET.name[SET.byAddr.get(a)]:null;
  const soc={};if(r()<.6)soc.x='@'+(nick||'player'+a.slice(2,6));if(r()<.35)soc.youtube='@'+(nick||'player'+a.slice(2,6));if(r()<.25)soc.tiktok='@'+(nick||'player'+a.slice(2,6));if(r()<.2)soc.instagram='@'+(nick||'player'+a.slice(2,6));
- return {buildings:b,army,power,nick,showNick:true,socials:soc,demo:true}}
+ return {buildings:b,army,power,nick,showNick:true,socials:soc,demo:true,prof:L0.prof}}
 function castleGet(a){a=lc(a);if(HUB.castle.has(a))return HUB.castle.get(a);const h=hook('castleProvider');let v;
  if(typeof h==='function'){v=Promise.resolve().then(()=>h(a)).catch(()=>null)}else v=Promise.resolve(EDITION==='dev'?castleDemo(a):null);
  v=v.then(x=>{HUB.castle.set(a,Promise.resolve(x));HUB.castleV=HUB.castleV||new Map();HUB.castleV.set(a,x);return x});HUB.castle.set(a,v);return v}
@@ -3313,37 +3322,7 @@ function hubCardExtra(i){if(SET.cls[i]!==0)return '';const c=castleNow(SET.addr[
  else h+=c?`<b>${fmt(c.power||0)}</b>${c.demo?' <span class="demoTag">'+t('cvDemo').split(' — ')[0]+'</span>':''}`:`<span class="soonTag">${t('cvSoon')}</span>`;h+='</div>';
  const hj=HUB.hvOf.get(i);if(hj!=null){const hv=HUB.hv[hj];h+=`<div class="sm">${hvTerm(false)}: <a href="#" data-hvl="${hj}" style="color:#${hv.color.toString(16).padStart(6,'0')}">${hvName(hv)}</a> · ${hv.crew.length} ${t('hvPlayers').toLowerCase()}</div>`}return h}
 document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('[data-hvl]');if(a){e.preventDefault();hvFly(+a.dataset.hvl)}});
-/* ---------- castle deep zoom (isometric 4X view) ---------- */
-const BPOS={keep:[0,0,1.25],walls:[-2.3,-1.2,1],barracks:[1.6,-1.7,1],camp:[2.4,.6,1],mine:[-1.9,1.5,1],workshop:[.4,2.2,1],storage:[-2.6,.15,.9]};
-const BHUE={keep:'#f6c75a',walls:'#94a3b8',barracks:'#f472b6',camp:'#fb923c',mine:'#5eead4',workshop:'#c4b5fd',storage:'#7dd3fc'};
-function isoP(x,y,z){return [500+(x-y)*112,330+(x+y)*56-z*30]}
-function shade(hex,k){const n=parseInt(hex.slice(1),16);const f=c=>Math.max(0,Math.min(255,Math.round(c*k)));return `rgb(${f(n>>16)},${f(n>>8&255)},${f(n&255)})`}
-function cvSvg(c){const P=(a)=>a.map(p=>p.join(',')).join(' ');let s='';
- const g=[[-4,-4],[4,-4],[4,4],[-4,4]].map(([x,y])=>isoP(x,y,0));s+=`<polygon points="${P(g)}" fill="rgba(94,234,212,.06)" stroke="rgba(94,234,212,.35)" stroke-width="1.5"/>`;
- for(let k=-3;k<=3;k++){const a=isoP(k,-4,0),b=isoP(k,4,0),c2=isoP(-4,k,0),d=isoP(4,k,0);s+=`<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="rgba(148,163,184,.12)"/><line x1="${c2[0]}" y1="${c2[1]}" x2="${d[0]}" y2="${d[1]}" stroke="rgba(148,163,184,.12)"/>`}
- const order=BLD.slice().sort((a,b)=>(BPOS[a][0]+BPOS[a][1])-(BPOS[b][0]+BPOS[b][1]));
- for(const id of order){const [x,y,sz]=BPOS[id];const b=c?c.buildings.find(q=>q.id===id):null;const lv=b?b.level:0;const hgt=id==='walls'?.9:(c?.8+lv*.32:1.4)*sz;const w=.62*sz;const col=BHUE[id];
-  const v=(dx,dy,z)=>isoP(x+dx,y+dy,z);const top=[v(-w,-w,hgt),v(w,-w,hgt),v(w,w,hgt),v(-w,w,hgt)],L2=[v(-w,w,0),v(w,w,0),v(w,w,hgt),v(-w,w,hgt)],R=[v(w,-w,0),v(w,w,0),v(w,w,hgt),v(w,-w,hgt)];
-  const sel=HUB.cvSel===id;s+=`<g class="bld${sel?' on':''}${c?'':' soon'}" data-b="${id}"><polygon points="${P(L2)}" fill="${shade(col,.42)}"/><polygon points="${P(R)}" fill="${shade(col,.6)}"/><polygon points="${P(top)}" fill="${shade(col,.95)}" stroke="${sel?'#fff':'rgba(255,255,255,.35)'}" stroke-width="${sel?2.5:1}"/>`;
-  if(id==='keep'){const pk=v(0,0,hgt+1.6);s+=`<polygon points="${P([top[0],top[1],pk])}" fill="${shade(col,.8)}"/><polygon points="${P([top[1],top[2],pk])}" fill="${shade(col,.62)}"/><polygon points="${P([top[2],top[3],pk])}" fill="${shade(col,.5)}"/>`}
-  const lp=v(0,0,hgt+(id==='keep'?2.1:.5));s+=`<text class="blab" x="${lp[0]}" y="${lp[1]-8}">${t('b'+id[0].toUpperCase()+id.slice(1))}</text><text class="blv" x="${lp[0]}" y="${lp[1]+10}">${c?t('cvLvl',{n:lv}):t('cvLvlNone')}</text></g>`}
- return s}
-function cvRender(){const i=HUB.cvI;if(i<0)return;const a=SET.addr[i];const c=castleNow(a);const bid=HUB.cvSel,Bk='b'+bid[0].toUpperCase()+bid.slice(1),Dk='d'+bid[0].toUpperCase()+bid.slice(1);
- $('cvK').textContent=t('cvK');$('cvH').textContent=(c&&c.nick&&c.showNick!==false)?'@'+c.nick:(SET.kind==='sim'?'@'+SET.name[i]:short(a));
- $('cvS').innerHTML=c===undefined?t('scLoading'):c?(c.demo?`<span class="demoTag">${t('cvDemo')}</span>`:''):`<span class="soonTag">${t('cvSoon')}</span>`;
- $('cvSvg').innerHTML=cvSvg(c||null);$('cvSvg').querySelectorAll('.bld').forEach(g=>g.onclick=()=>{HUB.cvSel=g.dataset.b;cvRender();beep(620,.04)});
- const b=c&&c.buildings.find(q=>q.id===bid);const soc=c&&c.socials||{};const sk=Object.keys(soc).filter(k=>soc[k]);const SN={x:'X',tiktok:'TikTok',youtube:'YouTube',instagram:'Instagram'};
- const socH=sk.length?sk.map(k=>{const v=String(soc[k]);return /^https:\/\//.test(v)&&!c.demo?`<a class="soc" href="${esc(v)}" target="_blank" rel="noopener">${SN[k]||k} ↗</a>`:`<span class="soc">${SN[k]||k} ${esc(v)}</span>`}).join(''):`<span class="sm" style="color:var(--mut)">${t('cvSocNone')}</span>`;
- $('cvInfo').innerHTML=`<div class="k">${t(Bk)}</div><b>${b?(b.max?t('cvLvlMax',{n:b.level,m:b.max}):t('cvLvl',{n:b.level})):t('cvLvlNone')}</b><p class="sm">${t(Dk)}</p>`+
-  `<div class="row2"><span>${t('cvPower')}</span><b>${c?fmt(c.power||0):t('cvSoon')}</b></div><div class="row2"><span>${t('cvArmy')}</span><b>${c?fmt(c.army||0):t('cvSoon')}</b></div><p class="note">${t('cvPowerNote')}</p>`+
-  `<div class="k" style="margin-top:6px">${t('cvSoc')}</div><div>${c?socH:`<span class="sm" style="color:var(--mut)">${t('cvSocNone')}</span>`}</div>`+
-  `<div class="tgl" title="${t('cvNickSoon')}"><i class="${c&&c.showNick!==false?'on':''}"></i>${t('cvNick')} <span class="soonTag">${t('cvNickSoon')}</span></div><p class="note">${t('cvPick')}</p>`;
- const hj=HUB.hvOf.get(i);$('cvNote').innerHTML=t('cvNote')+(hj!=null?` · ${hvTerm(false)} <b>${hvName(HUB.hv[hj])}</b>. ${t('hvNote')}`:'')}
-function cvOpen(i){if(i==null||i<0||i>=NW)return false;HUB.cvI=i;HUB.cvNear=0;HUB.cvSel='keep';$('cv').classList.add('open');requestAnimationFrame(()=>requestAnimationFrame(()=>$('cv').classList.add('vis')));castleGet(SET.addr[i]).then(()=>{if(HUB.cvI===i)cvRender()});cvRender();beep(500,.08);return true}
-function cvClose(){if(HUB.cvI<0)return;const i=HUB.cvI;HUB.cvI=-1;$('cv').classList.remove('open','vis');HUB.cvCool=2;if(FY.sel===i)flyTo(wPos(i),MOBILE?12:9,()=>wPos(i))}
-$('cvX').onclick=cvClose;
-function cvTick(dt){if(HUB.cvCool>0){HUB.cvCool-=dt;return}if(HUB.cvI>=0||FY.sel<0||fly||S.mode==='world'||SET.cls[FY.sel]!==0){HUB.cvNear=0;return}
- const d=camera.position.distanceTo(wPos(FY.sel));if(d<4.6){if((HUB.cvNear+=dt)>.6)cvOpen(FY.sel)}else HUB.cvNear=0}
+/* ---------- castle deep zoom: real 3D base (see h_base.js) ---------- */
 /* ---------- account slot (no real auth; nothing collected) ---------- */
 function authRender(){const ap=hook('authProvider');const cur=ap&&typeof ap.current==='function'?ap.current():null;
  const btn=(m,k)=>{const on=ap&&typeof ap.signIn==='function'&&(ap.methods||[]).includes(m);return `<button class="authB" data-m="${m}" ${on?'':'disabled'}>${t(k)}${on?'':' <span class="soonTag">'+t('cvSoon').replace(/^4X · /,'')+'</span>'}</button>`};
@@ -3377,6 +3356,216 @@ Object.assign(R6API.r6,{hv:()=>({on:HUB.hvOn,applied:HUB.hvApplied,n:HUB.hv.leng
  hvFly:j=>hvFly(j),hvOf:i=>HUB.hvOf.get(i),cvOpen:i=>cvOpen(i),cvClose:()=>cvClose(),cvI:()=>HUB.cvI,castle:a=>castleGet(a),auth:()=>authOpen(),
  gch:()=>({vis:GCH.obj?GCH.obj.visible:null,op:GCH.mat?GCH.mat.opacity:0,lab:labEls.gchain?labEls.gchain.style.display:null,txt:labEls.gchain?labEls.gchain.textContent:''}),firstHvCrew:()=>{const h=HUB.hv[0];return h?h.crew[1]:-1}});
 
+/* ===== Castle base: real 3D interior (Round 7) =====
+   Clicking «В замок» / zooming into a castle island flies the camera in, then a separate lightweight WebGL view shows the castle's base on its
+   floating island: 9 buildings with levels 1–30 (castleProvider; DEV demo levels), static low-poly geometry merged per material (≈12 draw calls),
+   rendered only when the camera moves. Hover (tap on touch) shows name + level. Working names; the art style is not final.
+   Wall = energy shield: a bubble around the WHOLE floating island, same look as the ecosystem shield; brightness grows with the Wall level
+   (L1 barely visible → L30 = 1.5× the ecosystem shield). In the universe view bubbles are drawn only for the few revealed island slots
+   (CAST LOD) plus the selected island: one InstancedMesh, one draw call, distance fade. */
+const BB={r:null,sc:null,cam:null,ctl:null,root:null,hits:[],dome:null,domeR:19,domeY:-2,dirty:true,intro:null,lab:[],hov:null,full:false,c:null,i:-1,
+ ray:new THREE.Raycaster(),ndc:new THREE.Vector2(),info:[],down:null,labOn:true,ids:[],frames:0};
+const BCOL={stone:0xbba786,stoneD:0x7f6d58,plaster:0xe6d8bc,wood:0x7a4e2d,woodD:0x4a3020,roof:0xa5482a,roofD:0x6b3426,slate:0x56606d,copper:0x5f907d,
+ gold:0xd8a43e,red:0x8f2f2a,green:0x3f6a45,ground:0x8d7b57,path:0xc4ad82,rock:0x5f554a,rockD:0x463e37,pine:0x4b5a33,straw:0xd8c07a,dark:0x2b211b,bronze:0x9b773a};
+let BMAT=null;
+function bMats(){if(BMAT)return BMAT;BMAT={};for(const k in BCOL){const met=k==='gold'||k==='bronze';BMAT[k]=new THREE.MeshStandardMaterial({color:BCOL[k],flatShading:true,roughness:met?.45:.92,metalness:met?.55:0})}return BMAT}
+/* ---- static wall shader (the ecosystem shield's look, frozen in time) ---- */
+function wallMat(inst,gain){return new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide,fog:false,
+ uniforms:{uOp:{value:1},uG:{value:gain}},
+ vertexShader:`${inst?'attribute float aOp;':''}varying vec3 vN;varying vec3 vV;varying vec3 vP;varying float vO;
+ void main(){vP=position;${inst?'mat4 m=modelMatrix*instanceMatrix;vO=aOp;':'mat4 m=modelMatrix;vO=1.;'}vec4 w=m*vec4(position,1.);vN=normalize(mat3(m)*normal);vV=normalize(cameraPosition-w.xyz);gl_Position=projectionMatrix*viewMatrix*w;}`,
+ fragmentShader:`uniform float uOp,uG;varying vec3 vN;varying vec3 vV;varying vec3 vP;varying float vO;
+ float hexE(vec2 p){p.x*=1.1547;p.y+=mod(floor(p.x),2.)*.5;vec2 f=abs(fract(p)-.5);return max(f.x*1.5+f.y,f.y*2.);}
+ void main(){vec3 n=normalize(vP);float fr=pow(1.-abs(dot(normalize(vN),vV)),2.6);
+  vec2 sp=vec2(atan(n.z,n.x)*4.,asin(clamp(n.y,-1.,1.))*4.);float e=hexE(sp*1.6);float edge=smoothstep(.86,.99,e);
+  float flow=.5+.5*sin(n.y*7.+.6+sin(n.x*4.+.35)*1.6)*sin(n.z*5.-.45);
+  vec3 gold=vec3(1.,.78,.38),silver=vec3(.78,.84,.96);vec3 col=mix(silver,gold,smoothstep(.2,.8,flow*.6+fr*.5));
+  float rim=smoothstep(.2,.95,fr);float a=fr*.16+edge*(.02+.2*rim)*(.4+flow)+flow*fr*.08;
+  gl_FragColor=vec4(col*a*uOp*vO*uG,1.);}`})}
+const wallOp=lv=>lv>0?.1+1.4*(Math.max(1,Math.min(BMAX,lv))-1)/(BMAX-1):0;   // L1 0.10 … L30 1.50 (× ecosystem shield)
+/* ---- universe view: bubbles on revealed islands only ---- */
+const WB={n:MOBILE?14:28,mesh:null,op:null};
+{const g=new THREE.SphereGeometry(1,MOBILE?22:30,MOBILE?14:20);WB.op=new THREE.InstancedBufferAttribute(new Float32Array(WB.n),1);g.setAttribute('aOp',WB.op);
+ WB.mesh=new THREE.InstancedMesh(g,wallMat(true,1),WB.n);WB.mesh.count=0;WB.mesh.frustumCulled=false;WB.mesh.renderOrder=3;WB.mesh.raycast=()=>{};scene.add(WB.mesh)}
+const _wq=new THREE.Vector3(),_wm=new THREE.Matrix4(),_ws=new THREE.Vector3(),_wo=new THREE.Quaternion();
+function wallLevelOf(i){const c=castleNow(SET.addr[i]);if(!c)return 0;const b=(c.buildings||[]).find(x=>x.id==='wall');return b?b.level|0:0}
+function wallTick(){let n=0;const D=CAST.D;
+ if(!BB.full&&morph<.3)for(const sl of CAST.slots){if(n>=WB.n)break;if(sl.w<0||!sl.g.visible)continue;const i=sl.w;const lv=wallLevelOf(i);if(!lv)continue;
+  const R=sl.g.scale.x;_wq.set(0,.32,0).applyQuaternion(sl.g.quaternion).multiplyScalar(R).add(sl.g.position);const d=_wq.distanceTo(camera.position);
+  const sel=WA.hl[i]>0||i===FY.sel;const fade=sel?1:1-Math.min(1,Math.max(0,(d-D*.6)/(D*.4)));if(fade<=.01)continue;
+  _wm.compose(_wq,_wo,_ws.setScalar(R*1.62));WB.mesh.setMatrixAt(n,_wm);WB.op.array[n]=wallOp(lv)*fade*sl.f;n++}
+ WB.mesh.count=n;if(n){WB.mesh.instanceMatrix.needsUpdate=true;WB.op.needsUpdate=true}}
+/* ---- geometry kit ---- */
+const _bE=new THREE.Euler(),_bQ=new THREE.Quaternion(),_bV=new THREE.Vector3(),_b1=new THREE.Vector3(1,1,1),_bM=new THREE.Matrix4();
+function gableG(w,h,d){const x=w/2,z=d/2;const P=[-x,0,z, x,0,z, 0,h,z,  x,0,-z, -x,0,-z, 0,h,-z,
+ -x,0,z, 0,h,z, 0,h,-z, -x,0,z, 0,h,-z, -x,0,-z,  x,0,z, x,0,-z, 0,h,-z, x,0,z, 0,h,-z, 0,h,z,  -x,0,z, -x,0,-z, x,0,-z, -x,0,z, x,0,-z, x,0,z];
+ const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(P,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(new Array(P.length/3*2).fill(0),2));g.computeVertexNormals();return g}
+function bKit(){const M=bMats();const parts=new Map();const T=new THREE.Matrix4();let box=null,cur=null;
+ const put=(g,m,x,y,z,ry=0,rx=0,rz=0)=>{let h=g.index?g.toNonIndexed():g;if(h!==g)g.dispose();_bM.compose(_bV.set(x,y,z),_bQ.setFromEuler(_bE.set(rx,ry,rz)),_b1);h.applyMatrix4(_bM).applyMatrix4(T);
+  if(box){h.computeBoundingBox();box.union(h.boundingBox);cur.push(h)}const mm=M[m];if(!parts.has(mm))parts.set(mm,[]);parts.get(mm).push(h)};
+ const K={T,parts,M,
+  box:(w,h,d,m,x,y,z,ry)=>put(new THREE.BoxGeometry(w,h,d),m,x,y+h/2,z,ry),
+  cyl:(rt,rb,h,s,m,x,y,z,rx=0,rz=0)=>put(new THREE.CylinderGeometry(rt,rb,h,s),m,x,y+h/2,z,0,rx,rz),
+  cone:(r,h,s,m,x,y,z,ry=0)=>put(new THREE.ConeGeometry(r,h,s),m,x,y+h/2,z,ry),
+  gable:(w,h,d,m,x,y,z,ry)=>put(gableG(w,h,d),m,x,y,z,ry),
+  dome:(r,m,x,y,z,s=12)=>put(new THREE.SphereGeometry(r,s,Math.max(4,s/2|0),0,Math.PI*2,0,Math.PI/2),m,x,y,z),
+  ball:(r,m,x,y,z)=>put(new THREE.IcosahedronGeometry(r,0),m,x,y,z),
+  disc:(r,t,m,x,y,z,ry=0)=>put(new THREE.CylinderGeometry(r,r,t,14),m,x,y,z,ry,Math.PI/2),
+  begin:(x,z,ry,s)=>{T.compose(_bV.set(x,0,z),_bQ.setFromEuler(_bE.set(0,ry,0)),new THREE.Vector3(s,s,s));box=new THREE.Box3();cur=[]},
+  end:()=>{const b=box;box=null;T.identity();const hg=mergeGeometries(cur.map(g=>{const q=new THREE.BufferGeometry();q.setAttribute('position',g.attributes.position.clone());return q}),false);cur=null;return [b,hg]}};
+ K.crenels=(w,d,y,m,step=.7,sz=.32)=>{for(let x=-w/2+sz/2;x<=w/2-sz/2+1e-3;x+=step){K.box(sz,sz,sz,m,x,y,d/2-sz/2);K.box(sz,sz,sz,m,x,y,-d/2+sz/2)}
+  for(let z=-d/2+sz/2+step;z<=d/2-sz/2-step+1e-3;z+=step){K.box(sz,sz,sz,m,w/2-sz/2,y,z);K.box(sz,sz,sz,m,-w/2+sz/2,y,z)}};
+ K.banner=(x,y,z,h,m='red')=>{K.cyl(.05,.05,h,5,'woodD',x,y,z);K.box(.05,h*.42,.6,m,x+.02,y+h*.5,z+.32)};
+ return K}
+/* ---- the 9 buildings (local +z faces the castle; k = (level-1)/29) ---- */
+const BDEF={
+ castle(K,k,lv){K.box(7.2,.6,7.2,'stoneD',0,0,0);const kh=3+3*k;K.box(3.4,kh,3.4,'stone',0,.6,0);K.crenels(3.4,3.4,.6+kh,'stone',.68,.34);
+  const towers=lv>=10?[[-1,-1],[1,-1],[-1,1],[1,1]]:[[-1,1],[1,1]];const th=2.6+3.2*k;
+  for(const [a,b] of towers){K.cyl(.72,.84,th,10,'stone',a*2.9,.6,b*2.9);K.cone(1.04,1.5+.7*k,10,'roof',a*2.9,.6+th,b*2.9)}
+  if(lv>=10){const wh=1.3+.9*k;K.box(5,wh,.5,'stone',0,.6,2.9);K.box(5,wh,.5,'stone',0,.6,-2.9);K.box(.5,wh,5,'stone',2.9,.6,0);K.box(.5,wh,5,'stone',-2.9,.6,0)}
+  K.box(1.2,1.5,.35,'dark',0,.6,lv>=10?3.2:1.85);
+  if(lv>=20){const sh=2.2+1.6*k;K.cyl(.9,1,sh,10,'stone',0,.6+kh,0);K.cone(1.25,2.2,10,'roofD',0,.6+kh+sh,0);if(lv>=30){K.ball(.28,'gold',0,.6+kh+sh+2.35,0);K.banner(0,.6+kh+sh+2.4,0,1.6)}}
+  else K.cone(2.3,1.4+k*2,4,'roofD',0,.6+kh+.34,0,Math.PI/4);
+  if(lv>=15){K.box(.7,1.8,.06,'red',-.9,.6+kh-2.1,1.72);K.box(.7,1.8,.06,'red',.9,.6+kh-2.1,1.72)}},
+ infantry(K,k,lv){const h=1.5+.8*k;K.box(4.4,h,2.2,'plaster',0,0,-.4);for(const x of [-2.1,-.7,.7,2.1])K.box(.14,h,.08,'woodD',x,0,.71);K.box(4.4,.14,.08,'woodD',0,h-.14,.71);
+  K.gable(2.6,1.2+.4*k,4.8,'roof',0,h,-.4,Math.PI/2);K.disc(.42,.1,'red',0,h*.55,.76);K.ball(.14,'gold',0,h*.55,.84);
+  K.box(4.4,.06,2,'path',0,0,1.9);for(const [x,z] of [[-2.1,1],[2.1,1],[-2.1,2.8],[2.1,2.8]])K.cyl(.07,.07,.7,5,'wood',x,0,z);
+  if(lv>=10)for(const x of [-.9,.9]){K.cyl(.07,.07,1.2,5,'wood',x,0,2.1);K.box(.8,.1,.1,'wood',x,.95,2.1);K.ball(.16,'straw',x,1.25,2.1)}
+  if(lv>=20){K.box(3,h*.85,1.6,'plaster',0,0,-2.6);K.gable(1.9,1,3.4,'roof',0,h*.85,-2.6,Math.PI/2)}
+  if(lv>=30)K.banner(2.4,0,-.4,h+2.2)},
+ pikemen(K,k,lv){const h=2+1.2*k;K.box(3,h,3,'stoneD',-.6,0,-.6);K.box(3.2,.2,3.2,'stone',-.6,h,-.6);if(lv>=10)K.crenels(3.2,3.2,h+.2,'stone',.64,.3);
+  K.box(.8,1.1,.1,'dark',-.6,0,.92);const n=4+Math.floor(lv/5),ph=3+.8*k;K.box(.12,.12,n*.32+.3,'wood',1.5,ph*.55,-.6);K.box(.12,.12,n*.32+.3,'wood',1.5,.3,-.6);
+  for(let j=0;j<n;j++){const z=-.6-(n-1)*.16+j*.32;K.cyl(.045,.045,ph,5,'wood',1.62,0,z);K.cone(.09,.3,4,'gold',1.62,ph,z)}
+  if(lv>=20)K.banner(-2.2,0,.9,h+1.8)},
+ archers(K,k,lv){const h=2.2+2*k;K.cyl(1.25,1.45,h*.45,12,'stone',0,0,-.5);K.cyl(1.15,1.2,h*.55,12,'wood',0,h*.45,-.5);K.cyl(1.7,1.7,.18,12,'woodD',0,h,-.5);
+  K.cone(1.95,1.5+.4*k,12,'slate',0,h+.18,-.5);K.box(.7,1,.12,'dark',0,0,.92);const n=1+Math.floor(lv/10);
+  for(let j=0;j<n;j++){const x=(j-(n-1)/2)*1.25;K.cyl(.05,.05,1,5,'wood',x-.25,0,2.1);K.cyl(.05,.05,1,5,'wood',x+.25,0,2.1);K.disc(.5,.12,'straw',x,1.05,2.1);K.disc(.3,.14,'red',x,1.05,2.11);K.disc(.12,.16,'straw',x,1.05,2.12)}},
+ infirmary(K,k,lv){const h=1.8+1.1*k;K.cyl(1.8,1.9,h,8,'plaster',0,0,-.3);K.dome(1.78,'copper',0,h,-.3,12);K.box(.8,1.2,.12,'dark',0,0,1.5);
+  K.box(2,1.3,1.5,'plaster',2.1,0,-.3);K.gable(1.7,.8,2.2,'roofD',2.1,1.3,-.3,0);
+  if(lv>=10){K.box(1.6,1.1,1.3,'plaster',-2,0,-.5);K.gable(1.5,.7,1.8,'roofD',-2,1.1,-.5,0)}
+  if(lv>=20){K.cyl(.32,.36,.7,8,'plaster',0,h+1.55,-.3);K.cone(.45,.6,8,'gold',0,h+2.25,-.3)}
+  K.banner(1.2,0,1.4,h+.6,'green')},
+ university(K,k,lv){const h=2+1*k;K.box(4,h,2.6,'plaster',0,0,-.6);K.box(4.3,.22,2.9,'slate',0,h,-.6);const n=4+Math.floor(lv/10),ch=h-.25;
+  K.box(4.2,.2,1.4,'stone',0,0,1.25);for(let j=0;j<n;j++){const x=-1.75+j*3.5/(n-1);K.cyl(.15,.17,ch,8,'stone',x,.2,1.6)}
+  K.box(4.2,.25,1.2,'stone',0,ch+.2,1.2);K.gable(4.2,.75,.3,'stone',0,ch+.45,1.7,0);
+  if(lv>=10){K.cyl(.9,.95,.7,12,'stone',0,h+.22,-.9);K.dome(.9,'copper',0,h+.92,-.9,12)}
+  if(lv>=20)K.cyl(.09,.13,1.4,6,'bronze',.35,h+1.3,-.9,0,-.9);
+  if(lv>=30)K.banner(-2.3,0,1.6,h+1.6,'red')},
+ tavern(K,k,lv){K.box(5.2,1.6,3.6,'stone',0,0,0);const uh=1.4+.6*k;K.box(5.6,uh,4,'plaster',0,1.6,0);
+  for(const x of [-2.75,-1.4,0,1.4,2.75])K.box(.16,uh,.1,'woodD',x,1.6,2.02);K.box(5.6,.14,.1,'woodD',0,1.6,2.02);K.box(5.6,.14,.1,'woodD',0,1.6+uh-.14,2.02);
+  K.gable(4.6,2.4+.8*k,6.2,'roof',0,1.6+uh,0,Math.PI/2);K.box(.6,2.8+k,.6,'stoneD',1.8,1.6+uh,-1);K.box(1.1,1.3,.12,'dark',0,0,1.82);
+  K.cyl(.06,.06,2.6,5,'woodD',-2.9,0,2.3);K.box(.9,.08,.08,'woodD',-2.5,2.5,2.3);K.box(.75,.55,.08,'gold',-2.3,1.85,2.3);
+  for(const [x,z] of [[2.9,1.6],[3.3,1],[3.05,.4]])K.cyl(.28,.3,.62,8,'wood',x,0,z);
+  if(lv>=10)for(const x of [-1.3,1.3]){K.cyl(.6,.6,.08,10,'wood',x,.7,3.1);K.cyl(.08,.1,.7,5,'woodD',x,0,3.1);K.box(1.3,.08,.3,'woodD',x,.42,3.85);K.box(1.3,.08,.3,'woodD',x,.42,2.35)}
+  if(lv>=20){K.box(2.4,1.8+.6*k,2.6,'plaster',-3.6,0,-.6);K.gable(2.9,1.4,2.6,'roofD',-3.6,1.8+.6*k,-.6,0)}
+  if(lv>=30)for(const x of [-1.9,1.9])K.ball(.16,'gold',x,2.95,2.15)},
+ heroes(K,k,lv){const h=3+2*k;K.box(3,h,3.6,'stone',0,0,-.8);K.box(3.2,.18,3.8,'gold',0,h,-.8);K.cone(2.55,3+k,4,'slate',0,h+.18,-.8,Math.PI/4);
+  K.box(1,1.8,.12,'dark',0,0,1.03);K.box(1,.8,1,'stoneD',0,0,2.6);K.cyl(.25,.32,1.1,8,'bronze',0,.8,2.6);K.ball(.24,'bronze',0,2.1,2.6);K.box(.08,1.2,.08,'bronze',.32,1.7,2.6);
+  if(lv>=10){K.box(.06,h*.7,.6,'red',-1.53,h*.15,-.2,Math.PI/2);K.box(.06,h*.7,.6,'red',1.53,h*.15,-.2,Math.PI/2)}
+  if(lv>=20)for(const x of [-1.9,1.9]){K.cyl(.18,.32,2.2+k,4,'stoneD',x,0,2.2)}
+  if(lv>=30)K.ball(.3,'gold',0,h+3.4+k,-.8)}};
+/* layout: [id, angle°, radius, base scale]; local +z faces the castle */
+const BLAY=[['castle',0,0,1],['tavern',22,9.6,1],['heroes',-32,8.8,.95],['infantry',78,9,.95],['pikemen',128,9,.95],['archers',178,8.8,.95],['infirmary',-128,9,.95],['university',-80,9,.95]];
+function bScale(id,lv){const k=(lv-1)/29;return id==='castle'?.78+.22*k:id==='tavern'?.85+.3*k:.72+.3*k}
+/* deterministic island + decor (per address) */
+function bIsland(K,seed){const r=rng(seed);K.T.identity();
+ const top=new THREE.CylinderGeometry(14.6,13.4,1.2,16,1);K.parts.has(K.M.ground)||K.parts.set(K.M.ground,[]);
+ {const g=top.toNonIndexed();top.dispose();g.translate(0,-.6,0);K.parts.get(K.M.ground).push(g)}
+ const rk=new THREE.ConeGeometry(13.4,10.5,14,3,true);rk.rotateX(Math.PI);rk.translate(0,-6.45,0);const p=rk.attributes.position;
+ for(let j=0;j<p.count;j++){const y=p.getY(j);if(y>-1.3)continue;const x=p.getX(j),z=p.getZ(j);const f=.82+r()*.32;p.setXYZ(j,x*f,y-(r()*1.4),z*f)}
+ {const g=rk.toNonIndexed();rk.dispose();g.computeVertexNormals();if(!K.parts.has(K.M.rock))K.parts.set(K.M.rock,[]);K.parts.get(K.M.rock).push(g)}
+ for(let j=0;j<4;j++){const a=r()*6.28,d=6+r()*7;K.T.identity();const g=new THREE.IcosahedronGeometry(.7+r()*1.1,0).toNonIndexed();g.translate(Math.cos(a)*d,-12.5-r()*4,Math.sin(a)*d);K.parts.has(K.M.rockD)||K.parts.set(K.M.rockD,[]);K.parts.get(K.M.rockD).push(g)}
+ for(const [id,a,R] of BLAY){if(!R)continue;const ar=a*Math.PI/180,len=R-3.4;const g=new THREE.BoxGeometry(1.1,.05,len).toNonIndexed();g.translate(0,.03,3.4+len/2-.3);g.rotateY(ar);K.parts.has(K.M.path)||K.parts.set(K.M.path,[]);K.parts.get(K.M.path).push(g)}
+ for(let j=0;j<14;j++){const a=(j/14)*6.28+r()*.2+.22,d=12.2+r()*1.6;const x=Math.sin(a)*d,z=Math.cos(a)*d,s=.7+r()*.6;K.cyl(.12*s,.15*s,.6*s,5,'woodD',x,0,z);K.cone(.75*s,2*s,6,'pine',x,.5*s,z);K.cone(.55*s,1.4*s,6,'pine',x,1.5*s,z)}}
+function bLevels(c){const o={};for(const id of BLD)o[id]=0;if(c&&c.buildings)for(const b of c.buildings)if(o[b.id]!==undefined)o[b.id]=Math.max(1,Math.min(BMAX,b.level|0));return o}
+function bBuild(c,seed){const K=bKit();const lv=bLevels(c);const ghost=!c;BB.info=[];bIsland(K,seed);
+ for(const [id,a,R,s0] of BLAY){const L0=ghost?10:lv[id];const ar=a*Math.PI/180;const x=Math.sin(ar)*R,z=Math.cos(ar)*R;const ry=R?Math.atan2(-x,-z):0;
+  K.begin(x,z,ry,s0*bScale(id,L0));BDEF[id](K,(L0-1)/29,L0);const [box,hg]=K.end();BB.info.push({id,lv:ghost?0:lv[id],box,hg})}
+ const g=new THREE.Group();for(const [m,arr] of K.parts){const geo=mergeGeometries(arr,false);arr.forEach(x=>x.dispose());const me=new THREE.Mesh(geo,m);me.matrixAutoUpdate=false;g.add(me)}
+ BB.hits=BB.info.map((b,j)=>{const m=new THREE.Mesh(b.hg,BB.hitM||(BB.hitM=new THREE.MeshBasicMaterial({visible:false,side:THREE.DoubleSide})));m.userData.j=j;m.matrixAutoUpdate=false;g.add(m);delete b.hg;return m});
+ const wl=ghost?1:lv.wall;BB.info.push({id:'wall',lv:ghost?0:wl,box:new THREE.Box3(new THREE.Vector3(-1,BB.domeY+BB.domeR-1,-1),new THREE.Vector3(1,BB.domeY+BB.domeR,1))});
+ const dm=new THREE.Mesh(new THREE.SphereGeometry(BB.domeR,MOBILE?36:52,MOBILE?24:34),wallMat(false,1.25));dm.position.y=BB.domeY;dm.material.uniforms.uOp.value=wallOp(wl);dm.renderOrder=5;dm.raycast=()=>{};g.add(dm);BB.dome=dm;
+ BB.ids=BB.info.map(b=>b.id);return g}
+function bDispose(){if(!BB.root)return;BB.root.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material&&o.material.type==='ShaderMaterial')o.material.dispose();});BB.sc.remove(BB.root);BB.root=null}
+/* ---- renderer / camera / controls (created lazily on first open) ---- */
+function bInit(){if(BB.r)return true;try{BB.r=new THREE.WebGLRenderer({canvas:$('cvC'),antialias:!MOBILE,alpha:false,powerPreference:'high-performance'})}catch(e){return false}
+ BB.r.setPixelRatio(Math.min(devicePixelRatio||1,MOBILE?1.5:2));BB.r.outputColorSpace=THREE.SRGBColorSpace;
+ BB.sc=new THREE.Scene();{const c=document.createElement('canvas');c.width=c.height=256;const x=c.getContext('2d'),gr=x.createRadialGradient(128,104,10,128,128,190);gr.addColorStop(0,'#1e2a5c');gr.addColorStop(1,'#050816');x.fillStyle=gr;x.fillRect(0,0,256,256);const tx=new THREE.CanvasTexture(c);tx.colorSpace=THREE.SRGBColorSpace;BB.sc.background=tx}BB.cam=new THREE.PerspectiveCamera(42,1,.5,400);
+ BB.sc.add(new THREE.HemisphereLight(0xffe9c8,0x2b2340,1.15));const d=new THREE.DirectionalLight(0xffd8a0,2.1);d.position.set(22,34,16);BB.sc.add(d);const f=new THREE.DirectionalLight(0x9fb4ff,.45);f.position.set(-20,10,-24);BB.sc.add(f);
+ BB.ctl=new OrbitControls(BB.cam,$('cvC'));BB.ctl.enableDamping=true;BB.ctl.dampingFactor=.09;BB.ctl.enablePan=false;BB.ctl.minDistance=12;BB.ctl.maxDistance=78;BB.ctl.rotateSpeed=.6;BB.ctl.zoomSpeed=1.1;BB.ctl.target.set(0,2,0);
+ BB.ctl.addEventListener('change',()=>{BB.dirty=true});BB.ctl.addEventListener('start',()=>{BB.intro=null;bTip(null)});
+ const C=$('cvC');C.addEventListener('pointermove',e=>{if(e.pointerType==='touch')return;bHover(e.clientX,e.clientY)});C.addEventListener('pointerleave',e=>{if(e.pointerType!=='touch')bTip(null)});
+ C.addEventListener('pointerdown',e=>{BB.down=[e.clientX,e.clientY]});C.addEventListener('pointerup',e=>{if(e.pointerType!=='touch'||!BB.down)return;if(Math.hypot(e.clientX-BB.down[0],e.clientY-BB.down[1])<8)bHover(e.clientX,e.clientY,true)});
+ $('cvLb').onclick=()=>{BB.labOn=!BB.labOn;$('cvLb').classList.toggle('on',BB.labOn);$('cvLab').classList.toggle('off',!BB.labOn);BB.dirty=true};
+ addEventListener('resize',()=>{if(HUB.cvI>=0)bSize()});return true}
+function bSize(){const w=innerWidth,h=innerHeight;BB.r.setSize(w,h,false);BB.cam.aspect=w/h;BB.cam.fov=w<h?58:42;BB.cam.updateProjectionMatrix();BB.dirty=true}
+function bCamHome(){const dist=innerWidth<innerHeight?72:MOBILE?60:49,az=.42,el=.6;return new THREE.Vector3(Math.sin(az)*Math.cos(el)*dist,Math.sin(el)*dist+2,Math.cos(az)*Math.cos(el)*dist)}
+function bOpen(i){if(!bInit())return false;bDispose();BB.i=i;const a=SET.addr[i];BB.c=castleNow(a)||null;BB.root=bBuild(BB.c,hashA(a||String(i)));BB.sc.add(BB.root);bSize();bLabBuild();
+ const to=bCamHome();const ty=innerWidth<innerHeight?-3.5:2;BB.ctl.target.set(0,ty,0);to.y+=ty-2;BB.intro={t0:performance.now(),d:1600,from:to.clone().multiplyScalar(2.4).add(new THREE.Vector3(0,26,0)),to};BB.cam.position.copy(BB.intro.from);BB.ctl.update();BB.dirty=true;return true}
+/* ---- labels + tooltip ---- */
+function bName(id){return t('b'+id[0].toUpperCase()+id.slice(1))}
+function bTipHTML(b){return `<b>${bName(b.id)}</b>${b.lv?t('cvTipLv',{n:b.lv,m:BMAX,s:1}):t('cvTipSoon')}`}
+function bLabBuild(){const el=$('cvLab');el.innerHTML=BB.info.map((b,j)=>`<div class="bl" data-j="${j}">${bName(b.id)}<i>${b.lv?t('cvLvl',{n:b.lv}):t('cvLvlNone')}</i></div>`).join('');
+ BB.lab=[...el.children];BB.lab.forEach(l=>{if(BB.info[+l.dataset.j].id!=='wall')return;l.style.pointerEvents='auto';l.onmouseenter=()=>{const b=BB.info[+l.dataset.j];const r=l.getBoundingClientRect();bTip(b,r.left+r.width/2,r.top)};l.onmouseleave=()=>bTip(null);
+  l.onclick=()=>{const b=BB.info[+l.dataset.j];const r=l.getBoundingClientRect();bTip(b,r.left+r.width/2,r.top)}});BB.dirty=true}
+const _bl=new THREE.Vector3();
+function bLabPlace(){const w=innerWidth,h=innerHeight,P=[];BB.info.forEach((b,j)=>{const l=BB.lab[j];if(!l)return;b.box.getCenter(_bl);_bl.y=b.box.max.y+.6;
+ if(b.id==='wall')_bl.set(0,BB.domeY+BB.domeR+.4,0);const dd=_bl.distanceTo(BB.cam.position);_bl.project(BB.cam);
+ if(_bl.z>1||Math.abs(_bl.x)>1.05||Math.abs(_bl.y)>1.05){l.style.display='none';return}l.style.display='';const sc=Math.max(.72,Math.min(1.08,40/dd));
+ P.push({l,dd,sc,x:(_bl.x+1)/2*w,y:(1-_bl.y)/2*h,lw:l.offsetWidth*sc,lh:l.offsetHeight*sc})});
+ // nearest first; a label that would overlap one already placed is lifted above it
+ P.sort((a,b)=>a.dd-b.dd);const done=[];for(const q of P){for(let k=0;k<4;k++){const hit=done.find(o=>Math.abs(o.x-q.x)<(o.lw+q.lw)/2+4&&Math.abs(o.y-q.y)<(o.lh+q.lh)/2+1);if(!hit)break;q.y=hit.y-(hit.lh+q.lh)/2-2}done.push(q);
+  q.l.style.transform=`translate(${q.x.toFixed(1)}px,${q.y.toFixed(1)}px) translate(-50%,-100%) scale(${q.sc.toFixed(2)})`;q.l.style.zIndex=String(1000-Math.round(q.dd))}}
+function bTip(b,x,y){const el=$('cvTip');BB.hov=b?b.id:null;if(!b){el.style.display='none';return}el.innerHTML=bTipHTML(b);el.style.display='block';
+ const r=el.getBoundingClientRect();const X=Math.max(6,Math.min(innerWidth-r.width-6,x+14)),Y=Math.max(70,Math.min(innerHeight-r.height-6,y-r.height-12));el.style.left=X+'px';el.style.top=Y+'px'}
+const _bo=new THREE.Vector3(),_bd=new THREE.Vector3();
+function bPick(x,y){const C=$('cvC').getBoundingClientRect();BB.ndc.set((x-C.left)/C.width*2-1,-(y-C.top)/C.height*2+1);BB.ray.setFromCamera(BB.ndc,BB.cam);
+ const h=BB.ray.intersectObjects(BB.hits,false);if(h.length)return BB.info[h[0].object.userData.j];
+ // Wall: hover near the bubble's outline (distance from its centre to the ray ≈ radius)
+ _bo.set(0,BB.domeY,0);const ro=BB.ray.ray.origin,rd=BB.ray.ray.direction;_bd.copy(_bo).sub(ro);const tt=_bd.dot(rd);if(tt<0)return null;const dist=Math.sqrt(Math.max(0,_bd.lengthSq()-tt*tt));
+ if(ro.distanceTo(_bo)>BB.domeR&&dist>BB.domeR*.84&&dist<BB.domeR*1.03)return BB.info.find(b=>b.id==='wall');return null}
+function bHover(x,y,tap){if(BB.intro)return;const b=bPick(x,y);if(b)bTip(b,x,y);else if(BB.hov||tap)bTip(null)}
+/* ---- per-frame (called from hubTick); renders only when something changed ---- */
+function bTick(){if(HUB.cvI<0||!BB.r)return;if(BB.intro){const u=Math.min(1,(performance.now()-BB.intro.t0)/BB.intro.d),e=1-Math.pow(1-u,3);BB.cam.position.lerpVectors(BB.intro.from,BB.intro.to,e);BB.dirty=true;if(u>=1)BB.intro=null}
+ if(BB.ctl.update())BB.dirty=true;if(!BB.dirty)return;BB.dirty=false;BB.r.render(BB.sc,BB.cam);BB.frames++;if(BB.labOn)bLabPlace()}
+/* ---- overlay lifecycle (replaces the old SVG sketch) ---- */
+function cvRender(){const i=HUB.cvI;if(i<0)return;const a=SET.addr[i];const c=castleNow(a);
+ $('cvK').textContent=t('cvK');$('cvH').textContent=(c&&c.nick&&c.showNick!==false)?'@'+c.nick:(SET.kind==='sim'?'@'+SET.name[i]:short(a));$('cvLb').textContent=t('cvLabs');
+ $('cvS').innerHTML=c===undefined?t('scLoading'):c?(c.demo?`<span class="demoTag">${t('cvDemo')}</span>`:''):`<span class="soonTag">${t('cvSoon')}</span>`;
+ const soc=c&&c.socials||{};const sk=Object.keys(soc).filter(k=>soc[k]);const SN={x:'X',tiktok:'TikTok',youtube:'YouTube',instagram:'Instagram'};
+ const socH=sk.length?sk.map(k=>{const v=String(soc[k]);return /^https:\/\//.test(v)&&!c.demo?`<a class="soc" href="${esc(v)}" target="_blank" rel="noopener">${SN[k]||k} ↗</a>`:`<span class="soc">${SN[k]||k} ${esc(v)}</span>`}).join(''):`<span class="sm" style="color:var(--mut)">${t('cvSocNone')}</span>`;
+ $('cvInfo').innerHTML=`<div class="row2"><span>${t('cvPower')}</span><b>${c?fmt(c.power||0):t('cvSoon')}</b></div><div class="row2"><span>${t('cvArmy')}</span><b>${c?fmt(c.army||0):t('cvSoon')}</b></div><p class="note">${t('cvPowerNote')}</p>`+
+  `<div class="k" style="margin-top:6px">${t('cvSoc')}</div><div>${c?socH:`<span class="sm" style="color:var(--mut)">${t('cvSocNone')}</span>`}</div>`+
+  `<div class="tgl" title="${t('cvNickSoon')}"><i class="${c&&c.showNick!==false?'on':''}"></i>${t('cvNick')} <span class="soonTag">${t('cvNickSoon')}</span></div><p class="note">${t('cvPick')}</p>`;
+ const hj=HUB.hvOf.get(i);$('cvNote').innerHTML=t('cvNote')+(hj!=null?` · ${hvTerm(false)} <b>${hvName(HUB.hv[hj])}</b>. ${t('hvNote')}`:'');
+ if(BB.r&&BB.i===i){const key=JSON.stringify(c&&c.buildings||null);if(key!==BB.key){BB.key=key;bOpenKeep(i)}else{bLabBuild();if(BB.hov){bTip(null)}}}}
+function bOpenKeep(i){const p=BB.cam.position.clone(),tg=BB.ctl.target.clone(),intro=BB.intro;bOpen(i);if(!intro){BB.intro=null;BB.cam.position.copy(p);BB.ctl.target.copy(tg);BB.ctl.update()}}
+/* fly the main camera into the island first (if far), then open the base */
+function cvOpen(i){if(i==null||i<0||i>=NW)return false;if(HUB.cvI>=0&&HUB.cvI!==i)cvClose(true);
+ if(S.mode!=='world'&&!HUB.cvPend&&HUB.cvI<0&&camera.position.distanceTo(wPos(i))>6){HUB.cvPend={i,t:0};flyTo(wPos(i),3.4,()=>wPos(i));beep(420,.05);return true}
+ HUB.cvPend=null;HUB.cvI=i;HUB.cvNear=0;$('cv').classList.add('open');requestAnimationFrame(()=>requestAnimationFrame(()=>$('cv').classList.add('vis')));
+ clearTimeout(BB.fullT);BB.fullT=setTimeout(()=>{if(HUB.cvI===i)BB.full=true},520);
+ BB.key=undefined;if(!bOpen(i)){$('cvC').style.display='none'}BB.key=JSON.stringify((castleNow(SET.addr[i])||{}).buildings||null);
+ castleGet(SET.addr[i]).then(()=>{if(HUB.cvI===i)cvRender()});cvRender();beep(500,.08);return true}
+function cvClose(quiet){HUB.cvPend=null;if(HUB.cvI<0)return;const i=HUB.cvI;HUB.cvI=-1;BB.full=false;clearTimeout(BB.fullT);bTip(null);$('cv').classList.remove('open','vis');HUB.cvCool=2;
+ if(!quiet&&FY.sel===i)flyTo(wPos(i),MOBILE?12:9,()=>wPos(i))}
+$('cvX').onclick=()=>cvClose();
+function cvTick(dt){wallTick();bTick();
+ if(HUB.cvPend){const p=HUB.cvPend;p.t+=dt;if((!fly&&p.t>.25)||p.t>2.4){HUB.cvPend=null;cvOpen(p.i)}return}
+ if(HUB.cvCool>0){HUB.cvCool-=dt;return}if(HUB.cvI>=0||FY.sel<0||fly||S.mode==='world'||SET.cls[FY.sel]!==0){HUB.cvNear=0;return}
+ const d=camera.position.distanceTo(wPos(FY.sel));if(d<4.6){if((HUB.cvNear+=dt)>.6)cvOpen(FY.sel)}else HUB.cvNear=0}
+/* test hooks */
+function bScreen(id){const b=BB.info.find(q=>q.id===id);if(!b||!BB.cam)return null;const C=$('cvC').getBoundingClientRect();if(id==='wall'){
+  // a point just inside the bubble outline, at the top of the screen-space silhouette
+  const c=new THREE.Vector3(0,BB.domeY,0);const up=new THREE.Vector3(0,1,0).applyQuaternion(BB.cam.quaternion);const p=c.clone().addScaledVector(up,BB.domeR*.93).project(BB.cam);return {x:C.left+(p.x+1)/2*C.width,y:C.top+(1-p.y)/2*C.height}}
+ const cc=b.box.getCenter(new THREE.Vector3()),sz=b.box.getSize(new THREE.Vector3());let first=null;for(const fy of [.35,.6,.2,.8,.9,.7,.5])for(const fx of [0,-.25,.25,-.12,.12]){const p=cc.clone();p.y=b.box.min.y+sz.y*fy;p.x+=sz.x*fx;p.project(BB.cam);
+  const q={x:C.left+(p.x+1)/2*C.width,y:C.top+(1-p.y)/2*C.height};first=first||q;const h=bPick(q.x,q.y);if(h&&h.id===id)return q}return first}
+const BASEAPI={base:()=>({open:HUB.cvI>=0,i:BB.i,ids:BB.ids.slice(),levels:BB.info.map(b=>({id:b.id,lv:b.lv})),dome:BB.dome?BB.dome.material.uniforms.uOp.value:null,frames:BB.frames,full:BB.full,
+  calls:BB.r?BB.r.info.render.calls:0,tris:BB.r?BB.r.info.render.triangles:0,tip:$('cvTip').style.display==='block'?$('cvTip').textContent:''}),
+ baseScreen:id=>bScreen(id),castleDemo:a=>castleDemo(a),wallOp:lv=>wallOp(lv),bubbles:()=>({n:WB.mesh.count,max:WB.n,slots:CAST.slots.filter(s=>s.w>=0&&s.g.visible).length,op:Array.from(WB.op.array.slice(0,WB.mesh.count))}),
+ baseOrbit:(az,el,dist)=>{BB.intro=null;BB.ctl.target.set(0,2,0);BB.cam.position.set(Math.sin(az)*Math.cos(el)*dist,Math.sin(el)*dist+2,Math.cos(az)*Math.cos(el)*dist);BB.ctl.update();BB.dirty=true}};
+if(typeof R6API!=='undefined'&&R6API.r6)Object.assign(R6API.r6,BASEAPI);
+
 /* ===== Loop ===== */
 const clock=new THREE.Clock();let frame=0,fpsAcc=0,fpsN=0,statT=0;window.__fps=0;
 const NANIM=Object.keys(NODES).filter(k=>k!=='fiat'&&!NODES[k].neb).map(k=>{const n=NODES[k],sp=[];n.inner.traverse(o=>{if(/^(spin|spin2|spinr|coin|flame|lamp)$/.test(o.name))sp.push(o)});return {k,n,sp}});
@@ -3405,7 +3594,7 @@ function tick(){requestAnimationFrame(tick);
  updFly();controls.update();updLabels();
  if((statT+=dt)>.25){statT=0;updStats()}
  R6tick(dt);
- composer.render()}
+ if(!BB.full)composer.render()}  // the opaque castle-base overlay is up: skip the universe frame
 function onResize(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);composer.setSize(innerWidth,innerHeight);
  bloom.resolution.set(innerWidth*(MOBILE?.5:1),innerHeight*(MOBILE?.5:1));const u=uScale();WM.uniforms.uS.value=u;PM.uniforms.uS.value=u;BH.disk.material.uniforms.uS.value=u;if(GEM.eth)GEM.eth.uniforms.uS.value=u}
 addEventListener('resize',onResize);
