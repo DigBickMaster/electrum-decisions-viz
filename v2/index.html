@@ -1342,29 +1342,29 @@ const TIERS=[[1,3,0xffe7a3,1.25],[4,9,0xffc93c,1.6],[10,19,0xc084fc,2.0],[20,39,
 /* wallet classes (by on-chain behaviour): 0 player · 1 trader (DEX only) · 2 trading bot · 3 router/aggregator (hidden) */
 const CLS_C={trader:0x4f8dff,link:0xff6a4d,bot:0x39ff14};
 const tierOf=n=>{if(!n)return -1;for(let i=0;i<TIERS.length;i++)if(n<=TIERS[i][1])return i;return 4};
-const wVS=`attribute vec3 o2;attribute vec3 gp;attribute float sz;attribute float hl;attribute vec3 col;attribute float rb;attribute vec4 cen;attribute float ag;attribute float shp;
-uniform float uS;uniform float uM;uniform float uT;uniform float uMorph;uniform float uGR;uniform float uEra;uniform float uCB;varying float vH;varying vec3 vC;varying float vSd;varying float vAg;varying float vShp;
-void main(){if(sz<0.){gl_Position=vec4(0.,0.,2.,1.);gl_PointSize=0.;vH=0.;vC=vec3(0.);vSd=0.;vAg=1.;vShp=0.;return;}float th=position.y+position.z*uT;float rr=mix(position.x,rb,uEra);vec3 p=vec3(cos(th)*rr,o2.x*(1.-uEra*.5),sin(th)*rr);vSd=fract(position.y*7.31);
+const wVS=`attribute vec3 o2;attribute vec3 gp;attribute float sz;attribute float hl;attribute vec3 col;attribute float rb;attribute vec4 cen;attribute float ag;attribute float shp;attribute float rg;uniform float uPR;
+uniform float uS;uniform float uM;uniform float uT;uniform float uMorph;uniform float uGR;uniform float uEra;uniform float uCB;varying float vH;varying vec3 vC;varying float vSd;varying float vAg;varying float vShp;varying float vRg;
+void main(){vRg=rg*uPR;if(sz<0.){gl_Position=vec4(0.,0.,2.,1.);gl_PointSize=0.;vH=0.;vC=vec3(0.);vSd=0.;vAg=1.;vShp=0.;return;}float th=position.y+position.z*uT;float rr=mix(position.x,rb,uEra);vec3 p=vec3(cos(th)*rr,o2.x*(1.-uEra*.5),sin(th)*rr);vSd=fract(position.y*7.31);
  float ci=cos(o2.y),si=sin(o2.y);p=vec3(p.x,p.y*ci-p.z*si,p.y*si+p.z*ci);
  float co=cos(o2.z),so=sin(o2.z);p=vec3(p.x*co+p.z*so,p.y,-p.x*so+p.z*co);
  if(cen.w>.5){vec3 n=normalize(cen.xyz);p-=n*min(dot(p,n),0.)*.72;if(cen.w>1.5)p+=vec3(sin(uT*23.+position.y*9.),sin(uT*29.+position.y*5.),cos(uT*19.+position.y*7.))*.45;p+=cen.xyz;}
  float cg=cos(uGR),sg=sin(uGR);vec3 g=vec3(gp.x*cg+gp.z*sg,gp.y,-gp.x*sg+gp.z*cg);
  p=mix(p,g,uMorph);
- vec4 mv=modelViewMatrix*vec4(p,1.);gl_Position=projectionMatrix*mv;float sm=(cen.w>1.5?2.1:cen.w>.5?1.8:1.)*(.78+.22*ag)*(uCB>.5?1.45:1.);gl_PointSize=clamp(uS*.15*sz*sm*(1.+hl*1.8)/-mv.z,1.3*sm*(uCB>.5?1.6:1.),uM*sz*sm*(1.+hl*1.5));vH=hl;vC=col;vAg=ag;vShp=shp;}`;
-const wFS=`uniform float uO;uniform float uCB;varying float vH;varying vec3 vC;varying float vSd;varying float vAg;varying float vShp;
-void main(){vec2 p=gl_PointCoord-.5;float d=length(p);float an=atan(p.y,p.x);
+ vec4 mv=modelViewMatrix*vec4(p,1.);gl_Position=projectionMatrix*mv;float sm=(cen.w>1.5?2.1:cen.w>.5?1.8:1.)*(.78+.22*ag)*(uCB>.5?1.45:1.)*(vRg>.5?1.35:1.);gl_PointSize=clamp(uS*.15*sz*sm*(1.+hl*1.8)/-mv.z,1.3*sm*(uCB>.5?1.6:1.),uM*sz*sm*(1.+hl*1.5));vH=hl;vC=col;vAg=ag;vShp=shp;}`;
+const wFS=`uniform float uO;uniform float uCB;varying float vH;varying vec3 vC;varying float vSd;varying float vAg;varying float vShp;varying float vRg;
+void main(){vec2 p=gl_PointCoord-.5;float d=length(p);float rgw=vRg>2.5?.075:vRg>1.5?.048:.026;float ring=vRg>.5?smoothstep(rgw*.5+.02,rgw*.5,abs(d-(.47-rgw*.5))):0.;if(vRg>.5){p*=1.35;d*=1.35;}float an=atan(p.y,p.x);
  if(uCB>.5){float m;if(vShp<.5){m=step(abs(p.x)+abs(p.y),.46);}else if(vShp<1.5){m=step(d,.26);}else if(vShp<2.5){m=step(abs(d-.34),.09);}else{m=step(p.y,.32)*step(-.42+abs(p.x)*2.1,p.y);}
-  if(m<.5)discard;gl_FragColor=vec4(vC*(1.05+vH*.6)*(.6+.4*vAg),min(1.,uO+.35+vH*.6));return;}
+  if(m<.5&&ring<.05)discard;gl_FragColor=mix(vec4(vC*(1.05+vH*.6)*(.6+.4*vAg),min(1.,uO+.35+vH*.6)),vec4(1.,.7,.28,.95),ring*(1.-m));return;}
  float edge=.36+.07*sin(an*5.+vSd*31.)+.04*sin(an*9.-vSd*17.);
- float rock=smoothstep(edge+.03,edge-.04,d);float glow=smoothstep(.5,.0,d)*.35;if(rock+glow<.02)discard;
+ float rock=smoothstep(edge+.03,edge-.04,d);float glow=smoothstep(.5,.0,d)*.35;if(rock+glow+ring<.02)discard;
  float lit=.55+.6*clamp(dot(normalize(p+1e-4),vec2(-.7,.7))*(d/edge),-.6,1.);
  vec3 rc=mix(vec3(.42,.36,.33),vC,.72)*lit;vec3 c=mix(rc,vC,glow*.9/(rock+glow));c+=vC*smoothstep(.2,.0,d)*.55;c=mix(c,vec3(1.,.85,.45),clamp(vH*.6,0.,1.));
- gl_FragColor=vec4(c*(.75+vH*1.1)*(.5+.5*vAg),min(1.,rock+glow)*min(1.,uO+.25+vH*.6)*min(1.,.4+.6*vAg));}`;
+ vec4 o=vec4(c*(.75+vH*1.1)*(.5+.5*vAg),min(1.,rock+glow)*min(1.,uO+.25+vH*.6)*min(1.,.4+.6*vAg));gl_FragColor=mix(o,vec4(vec3(1.,.68,.24)*(1.15+vH*.5),.95),ring*(1.-rock));}`;
 const WG=new THREE.BufferGeometry();
-const WA={pos:new Float32Array(MAXW*3),o2:new Float32Array(MAXW*3),gp:new Float32Array(MAXW*3),sz:new Float32Array(MAXW),hl:new Float32Array(MAXW),col:new Float32Array(MAXW*3),rb:new Float32Array(MAXW),cen:new Float32Array(MAXW*4),ag:new Float32Array(MAXW).fill(1),shp:new Float32Array(MAXW)};
+const WA={pos:new Float32Array(MAXW*3),o2:new Float32Array(MAXW*3),gp:new Float32Array(MAXW*3),sz:new Float32Array(MAXW),hl:new Float32Array(MAXW),col:new Float32Array(MAXW*3),rb:new Float32Array(MAXW),cen:new Float32Array(MAXW*4),ag:new Float32Array(MAXW).fill(1),shp:new Float32Array(MAXW),rg:new Float32Array(MAXW)};
 const WATT={};
-for(const [k,n,dyn] of [['pos',3],['o2',3],['gp',3],['sz',1,1],['hl',1,1],['col',3,1],['rb',1,1],['cen',4,1],['ag',1,1],['shp',1,1]]){const a=new THREE.BufferAttribute(WA[k],n);if(dyn)a.setUsage(THREE.DynamicDrawUsage);WATT[k]=a;WG.setAttribute(k==='pos'?'position':k,a)}
-const WM=new THREE.ShaderMaterial({vertexShader:wVS,fragmentShader:wFS,uniforms:{uS:{value:uScale()},uM:{value:7*DPR},uT:{value:0},uMorph:{value:0},uGR:{value:0},uEra:{value:0},uO:{value:.6},uCB:{value:0}},transparent:true,depthWrite:false,blending:THREE.NormalBlending});
+for(const [k,n,dyn] of [['pos',3],['o2',3],['gp',3],['sz',1,1],['hl',1,1],['col',3,1],['rb',1,1],['cen',4,1],['ag',1,1],['shp',1,1],['rg',1,1]]){const a=new THREE.BufferAttribute(WA[k],n);if(dyn)a.setUsage(THREE.DynamicDrawUsage);WATT[k]=a;WG.setAttribute(k==='pos'?'position':k,a)}
+const WM=new THREE.ShaderMaterial({vertexShader:wVS,fragmentShader:wFS,uniforms:{uS:{value:uScale()},uM:{value:7*DPR},uT:{value:0},uMorph:{value:0},uGR:{value:0},uEra:{value:0},uO:{value:.6},uCB:{value:0},uPR:{value:1}},transparent:true,depthWrite:false,blending:THREE.NormalBlending});
 const WPTS=new THREE.Points(WG,WM);WPTS.frustumCulled=false;scene.add(WPTS);WG.setDrawRange(0,0);
 let NW=0;          // wallets in the current set
 let DRAWN=0;       // wallets currently drawn (time machine / players slider)
@@ -3710,7 +3710,7 @@ if(AST.on){
  for(let k=0;k<NT;k++){const s=surf(randDir(-.8,.55));if(!s)continue;const sz=.16+r()*.2;_q.setFromUnitVectors(up,s.n);
   const dsk=new THREE.CircleGeometry(sz,9);dsk.applyQuaternion(_q);dsk.translate(s.p.x+s.n.x*.03,s.p.y+s.n.y*.03,s.p.z+s.n.z*.03);DK.push(dsk);
   const rim=new THREE.RingGeometry(sz*.95,sz*1.12,12);rim.applyQuaternion(_q);rim.translate(s.p.x+s.n.x*.035,s.p.y+s.n.y*.035,s.p.z+s.n.z*.035);RM.push(rim);TN.push({p:s.p,n:s.n,sz})}
- AST.tunnels=TN.length;
+ AST.tunnels=TN.length;AST.TN=TN;
  const dm=new THREE.Mesh(mergeGeometries(DK,false),new THREE.MeshBasicMaterial({color:0x050302,polygonOffset:true,polygonOffsetFactor:-2}));dm.renderOrder=4;g.add(dm);
  AST.rimM=new THREE.MeshBasicMaterial({color:0xff9a30,transparent:true,opacity:.08,depthWrite:false,blending:THREE.AdditiveBlending});
  const rmM=new THREE.Mesh(mergeGeometries(RM,false),AST.rimM);rmM.renderOrder=5;g.add(rmM);
@@ -3763,8 +3763,284 @@ function updAst(dt){if(!AST.on)return;AST.t+=dt;AST.uT.value=AST.t;
  AST.uZ.value=AST.z;AST.pts.material.opacity=AST.z*.95;AST.pts.visible=AST.z>.02;AST.rimM.opacity=.07+.2*AST.z}
 function astPlantHit(x,y){if(!AST.on||!AST.g.visible)return false;_aN.set(x/innerWidth*2-1,-(y/innerHeight)*2+1);_aRay.setFromCamera(_aN,camera);
  const h=_aRay.intersectObjects([AST.plant,AST.rock],false);return !!h.length&&h[0].object===AST.plant}
-const astTipHTML=(x,y)=>astPlantHit(x,y)?`<b>${t('astPlant')}</b><br><span style="color:#8f9cc4">${t('astNote')}</span>`:
+const astTipHTML=(x,y)=>astPlantHit(x,y)?`<b>${t('astPlant')}</b><br>${T[L]&&T[L].astPlantTip?t('astPlantTip')+'<br>':''}<span style="color:#8f9cc4">${t('astNote')}</span>`:
  `<b>${t('astLab')}</b><br>${t('astTip')}<br>${t('astPick')}<br><span style="color:#8f9cc4">${t('astNote')}</span>`;
+/* ===== Phase 2 (dev only): Arena rename, Prospectors (Supplier), stake/claim flows, colour layers, economy layer toggles, ticker kinds =====
+   Live (prod) is untouched: everything below is behind PR.on (EDITION==='dev'); shader ring attribute rg stays 0 in prod. */
+const PR={on:EDITION==='dev',hov:false,pin:false,list:[],ln:null,lnP:null,waveT:2.5,clT:6,unT:5,swT:4,exT:3.5,mT:0,lastBA:-1,
+ off:{mine:0,well:0,pros:0,bat:0,stk:0,dex:0,ext:0},n:0,nExt:0,cnt:{stD:0,stS:0,cl:0,un:0,unA:0}};
+const PR_AMB=0xffb347,PR_EXT=0xdcefff,PR_NEU=[0xb7ae9f,0xa69d90,0xc6beb1,0x9b9387,0xbdb5a8],PR_PROS=[0xffb347,0xffa733,0xffbf5e],PR_PALE=0xfff0c8;
+const prTier=n=>!n?0:n>=20?3:n>=5?2:1;
+const AN='Decision Arena';const arRU=s=>s.replace(/Боевой контракт свёл/g,AN+' свела').replace(/боевой контракт матчей/g,AN+' для матчей').replace(/Боевой контракт держит пул и сам /g,AN+' держит пул и сама ').replace(/[Бб]оев(ой|ого|ому|ым|ом) контракт(а|у|ом|е)?/g,AN);
+const arEN=s=>s.replace(/\b[Tt]he battle contract('s)?\b/g,(m,a)=>AN+(a||'')).replace(/\b[Bb]attle contract\b/g,AN);
+function AR(s){return typeof s==='string'?arEN(arRU(s)):Array.isArray(s)?s.map(AR):s}
+if(PR.on){
+ /* --- 1. Decision Arena (the battle contract node; same name RU/EN) ×2.5, DEX ×2; texts renamed everywhere (RU/EN) --- */
+ for(const lg of ['ru','en']){const o=T[lg];for(const k in o)if(typeof o[k]==='string'||Array.isArray(o[k]))o[k]=AR(o[k])}
+ {const _c=card;card=function(k){const c=_c(k);if(c&&typeof c==='object'){for(const f of ['k','h','b','x'])if(typeof c[f]==='string')c[f]=AR(c[f]);if(Array.isArray(c.n))c.n=c.n.map(AR)}return c}}
+ {const a=batStatsBlock,b=batStatsHTML;batStatsBlock=function(){return AR(a.apply(this,arguments))};batStatsHTML=function(){return AR(b.apply(this,arguments))}}
+ NODES.pool.g.scale.setScalar(2.5);NODES.pool.dist=40;NODES.dex.g.scale.setScalar(3.2);NODES.dex.dist=68;
+ /* the DEX is 2× bigger: its trader / bot swarm moves out by the same margin (still outside the shield: squeezed side ×0.28) */
+ {const _so=swarmOrbit;swarmOrbit=function(i,r,kind){_so(i,r,kind);const add=kind===2?7.5:6;WA.pos[i*3]+=add;WA.rb[i]+=add}}
+ Object.assign(T.ru,{cPros:'Старатели',cExt:'Внешние кошельки Amber',prosTip:'Наведите (или нажмите) — подсветить острова старателей и их связь с шахтой',
+  lMinePros:'Шахта и старатели (держатели гномов 10K)',lPlayer:'Игроки',lExt:'Внешние кошельки Amber (вне экосистемы)',
+  lProsH:'Кольцо старателя (гномы 10K):',lPr1:'тонкое — от 1',lPr2:'среднее — от 5',lPr3:'толстое — от 20',
+  lStkD:'Стейкинг гнома 10K → вглубь шахты',lStkS:'Стейкинг обычного гнома → Источник наверху шахты',lClaim:'Клейм: только Amber к кошельку, гном остаётся',lUnstk:'Вывод: гном и накопленный Amber → к кошельку',lExtF:'Внешний перевод Amber',
+  laySecEco:'Экономика Amber',fyMine:'Шахта',fyWell:'Источник',fyPros:'Старатели',fyBat:'Бои',fyStk:'Стейкинг',fyDex:'DEX',fyExt:'Внешние',
+  feMint:'Минт гномов: {n} · сожжено {v} Amber',feStkD:'Стейкинг вглубь · гномов 10K: {n} · кошельков: {c}',feStkD1:'Стейкинг вглубь · {w} · гномов 10K: {n}',
+  feStkS:'Стейкинг у Источника · обычных гномов: {n} · кошельков: {c}',feStkS1:'Стейкинг у Источника · {w} · обычных гномов: {n}',feUnD1:'Вывод из стейкинга · {w} · гном 10K из глубины + {v} Amber',feUnS1:'Вывод из стейкинга · {w} · обычный гном от Источника + {v} Amber',feUn:'Вывод из стейкинга · гномов: {n} · {v} Amber · кошельков: {c}',
+  feClaim:'Клейм из шахты · {v} Amber · кошельков: {c}',feClaim1:'Клейм из шахты · {v} Amber → {w}',feSwap:'Обмен на DEX · {v} Amber · {w}',feExt:'Внешний перевод · {v} Amber → {w}'});
+ Object.assign(T.en,{cPros:'Prospectors',cExt:'External Amber wallets',prosTip:'Hover (or tap) to highlight the Prospectors’ islands and their link to the Mine',
+  lMinePros:'Mine and Prospectors (10K gnome holders)',lPlayer:'Players',lExt:'External Amber wallets (outside the ecosystem)',
+  lProsH:'Prospector ring (10K gnomes):',lPr1:'thin — 1 or more',lPr2:'medium — 5 or more',lPr3:'thick — 20 or more',
+  lStkD:'10K gnome staked → deep into the Mine',lStkS:'Common gnome staked → the Wellspring on top of the Mine',lClaim:'Claim: Amber only back to a wallet; the gnome stays',lUnstk:'Unstake: the gnome and accrued Amber → back to a wallet',lExtF:'External Amber transfer',
+  laySecEco:'Amber economy',fyMine:'Mine',fyWell:'Wellspring',fyPros:'Prospectors',fyBat:'Battles',fyStk:'Staking',fyDex:'DEX',fyExt:'External',
+  feMint:'Gnome mint: {n} · {v} Amber burned',feStkD:'Deep staking · 10K gnomes: {n} · wallets: {c}',feStkD1:'Deep staking · {w} · 10K gnomes: {n}',
+  feStkS:'Wellspring staking · common gnomes: {n} · wallets: {c}',feStkS1:'Wellspring staking · {w} · common gnomes: {n}',feUnD1:'Unstake · {w} · 10K gnome from deep + {v} Amber',feUnS1:'Unstake · {w} · common gnome from the Wellspring + {v} Amber',feUn:'Unstake · gnomes: {n} · {v} Amber · wallets: {c}',
+  feClaim:'Claim from the Mine · {v} Amber · wallets: {c}',feClaim1:'Claim from the Mine · {v} Amber → {w}',feSwap:'DEX swap · {v} Amber · {w}',feExt:'External transfer · {v} Amber → {w}'});
+ R6TABK.wal.push('cPros','cExt');R6tabMap=null;
+
+ /* --- 3. colour layers: amber = Mine + Prospectors, neutral stone = players, frost = external Amber wallets; DEX, bots, links unchanged --- */
+ SET.ext=new Uint8Array(MAXW);
+ {const _sc=simClasses;simClasses=function(){_sc();SET.ext.fill(0);for(let i=0;i<MAXW;i++)if(SET.cls[i]===1&&!SET.lk[i]&&((i*2654435761+97)>>>0)/4294967296<.18)SET.ext[i]=1}}
+ {const _pw=paintWallet;paintWallet=function(i){_pw(i);const c=SET.cls[i],n=SET.gn[i];let hx=-1;
+  if(c===0&&!SET.lk[i])hx=n>0?PR_PROS[i%3]:PR_NEU[((i*2654435761)>>>0)%PR_NEU.length];else if(c===1&&!SET.lk[i]&&SET.ext[i]&&SET.kind==='sim')hx=PR_EXT;
+  if(hx>=0){_c.set(hx);WA.col.set([_c.r,_c.g,_c.b],i*3)}
+  WA.rg[i]=c===0?prTier(n):0;WATT.rg.needsUpdate=true}}
+ {const _hm=hideMode;hideMode=function(i){return _hm(i)||(PR.off.ext&&SET.ext[i]===1)}}
+
+ /* castles near the camera: an amber prospector torus, tube by tier */
+ const PR_G=[null,.035,.07,.12].map(tb=>tb&&new THREE.TorusGeometry(1.6,tb,5,56).rotateX(Math.PI/2));
+ const prMat=new THREE.MeshBasicMaterial({color:PR_AMB,transparent:true,opacity:.9,depthWrite:false});
+ {const _fs=fillSlot;fillSlot=function(sl,i){_fs(sl,i);if(!sl.pr){sl.pr=new THREE.Mesh(PR_G[1],prMat);sl.pr.visible=false;sl.g.add(sl.pr)}
+  const tr=SET.cls[i]===0?prTier(SET.gn[i]):0;sl.prT=tr;if(tr)sl.pr.geometry=PR_G[tr];sl.pr.visible=tr>0&&!PR.off.pros;
+  if(tr)sl.glow.material.color.setHex(PR_AMB);else if(SET.cls[i]===0&&!SET.lk[i])sl.glow.material.color.setHex(0xa69d90)}}
+
+ /* --- 1b. Prospectors count row (Wallets tab); hover / tap highlights their islands + thin amber lines island → Mine --- */
+ {const _cr=clsRows;clsRows=function(){const r=_cr();let n=0,e=0;for(let i=0;i<DRAWN;i++){if(SET.cls[i]===0&&SET.gn[i]>0)n++;if(SET.ext[i])e++}PR.n=n;PR.nExt=e;
+  r.push([t('cPros'),fmt(n),'pros']);if(SET.kind==='sim')r.push([t('cExt'),fmt(e),'extw']);return r}}
+ const sr=$('statRows');
+ sr.addEventListener('mouseover',e=>{const el=e.target.closest&&e.target.closest('.st.pros');if(el)el.title=t('prosTip');if(!PR.pin)prHover(!!el)});
+ sr.addEventListener('mouseleave',()=>{if(!PR.pin)prHover(false)});
+ sr.addEventListener('click',e=>{const el=e.target.closest&&e.target.closest('.st.pros');if(!el)return;PR.pin=!PR.pin;prHover(PR.pin)});
+}
+function prHover(on){if(!PR.on)return;on=!!on&&!PR.off.pros;if(on===PR.hov)return;PR.hov=on;
+ if(on){PR.list=[];PR.hl0=new Map();for(let i=0;i<DRAWN;i++)if(SET.cls[i]===0&&SET.gn[i]>0&&WA.sz[i]>0){PR.list.push(i);if(i!==FY.sel){PR.hl0.set(i,WA.hl[i]);WA.hl[i]=Math.max(WA.hl[i],.55)}}}
+ else{if(PR.hl0)for(const [i,v] of PR.hl0)if(i!==FY.sel&&WA.hl[i]===Math.fround(Math.max(v,.55)))WA.hl[i]=v;PR.hl0=null}/* restore other features' highlights */
+ WATT.hl.needsUpdate=true;
+ if(on&&!PR.ln){const cap=MOBILE?240:700;PR.lnP=new Float32Array(cap*6);const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(PR.lnP,3).setUsage(THREE.DynamicDrawUsage));
+  PR.ln=new THREE.LineSegments(g,new THREE.LineBasicMaterial({color:PR_AMB,transparent:true,opacity:.28,depthWrite:false,blending:THREE.AdditiveBlending}));PR.ln.frustumCulled=false;PR.ln.cap=cap;scene.add(PR.ln)}
+ if(PR.ln)PR.ln.visible=on;for(const sl of CAST.slots)if(sl.pr&&sl.w>=0)sl.pr.scale.setScalar(on?1.25:1)}
+const _pa=new THREE.Vector3(),_pb=new THREE.Vector3(),_pc=new THREE.Vector3();
+function mineSurf(dir,out){const R=(typeof AST!=='undefined'&&AST.on)?AST.R*AST.K*.97:4;return out.copy(NODES.reserve.pos).addScaledVector(dir,R)}
+function tunnelPos(out){if(typeof AST!=='undefined'&&AST.TN&&AST.TN.length&&AST.g){const tn=AST.TN[Math.floor(Math.random()*AST.TN.length)];return AST.g.localToWorld(out.copy(tn.p))}return out.copy(NODES.reserve.pos)}
+const _pbb={b:null};function plantPos(out){const pl=typeof AST!=='undefined'&&AST.on&&AST.plant;if(!pl)return surfPos(out);
+ if(!_pbb.b){pl.geometry.computeBoundingBox();_pbb.b=pl.geometry.boundingBox}const b=_pbb.b;
+ out.set(b.min.x+(b.max.x-b.min.x)*(.2+Math.random()*.6),b.min.y+(b.max.y-b.min.y)*(.45+Math.random()*.4),b.min.z+(b.max.z-b.min.z)*(.2+Math.random()*.6));return pl.localToWorld(out)}
+function surfPos(out){_pc.set(Math.random()-.5,.55+Math.random()*.45,Math.random()-.5).normalize();return mineSurf(_pc,out)}
+
+/* --- layers: tag every flow with its economy layer; switched-off layers spawn invisible flows (callbacks still run) --- */
+function lyOf(o){if(o.ly)return o.ly;const fw=o.fw??-1,tw=o.tw??-1;
+ if((fw>=0&&SET.ext[fw])||(tw>=0&&SET.ext[tw]))return 'ext';const a=o.fn,b=o.tn;
+ if(a==='dex'||b==='dex')return 'dex';if(a==='pool'||b==='pool')return 'bat';if(a==='staking'||b==='staking')return 'stk';if(a==='reserve'||b==='reserve')return 'mine';return null}
+const prHid=q=>!!(q&&(PR.off[q.ly]||(q.ly2&&PR.off[q.ly2])));
+if(PR.on){const _sp=spawn;spawn=function(o){const ly=lyOf(o),i=FREE[FREE.length-1];const ok=_sp(o);
+ if(ok&&ly&&P[i]){const q=P[i];q.ly=ly;q.ly2=o.ly2||null;q.s0=q.s;if(prHid(q)){q.s=0;PS[i]=0}}return ok}}
+function prApplyLayers(){for(let i=0;i<PN;i++){const q=P[i];if(q&&q.ly)q.s=prHid(q)?0:q.s0}
+ WM.uniforms.uPR.value=PR.off.pros?0:1;if(PR.off.pros){PR.pin=false;prHover(false)}
+ for(const sl of CAST.slots)if(sl.pr)sl.pr.visible=sl.w>=0&&sl.prT>0&&!PR.off.pros;
+ for(let i=0;i<NW;i++)if(SET.ext[i])applyHide(i);WATT.sz.needsUpdate=true}
+const FL_LY=k=>k==='pool'?'bat':k==='staking'?'stk':k==='dex'?'dex':k==='reserve'?'mine':null;
+
+/* --- 2. stake / claim hooks (future on-chain wiring: call these with real events) --- */
+function stakeTx(w,kind,n,quiet){if(!PR.on||w==null||w<0||w>=NW)return false;n=Math.max(1,n|0);const prem=kind==='premium'||kind==='deep';
+ const k=prem?Math.min(4,n):Math.min(2,n);
+ for(let j=0;j<k;j++)spawn({fw:w,to:prem?tunnelPos(_pa):plantPos(_pa),c:prem?PR_AMB:PR_PALE,s:prem?2.1:.75,d:prem?1.9:1.5,arc:prem?3:1.6,delay:j*.14,ly:'stk',ly2:'mine'});
+ if(prem){PR.cnt.stD+=n;if(!quiet)prFeed({k:'stkD',n,c:1,i:w})}else{PR.cnt.stS+=n;if(!quiet)prFeed({k:'stkS',n,c:1,i:w})}
+ return true}
+function claimTx(w,kind,amount,quiet){if(!PR.on||w==null||w<0||w>=NW)return false;const prem=kind==='premium'||kind==='deep';amount=Math.max(0,+amount||0);
+ const k=prem?3:1;for(let j=0;j<k;j++)spawn({from:prem?tunnelPos(_pa):plantPos(_pa),tw:w,c:0xffc457,s:prem?1.9-j*.3:.8,d:1.8,arc:2.6,delay:j*.12,ly:'stk',ly2:'mine'});
+ PR.cnt.cl+=amount;if(!quiet)prFeed({k:'claim',v:amount,c:1,i:w,p:prem?1:0});return true}
+/* Mine texts (dev): common gnomes mine at the Wellspring (the plant on top), the second shared mine and the ecosystem sink */
+if(PR.on){Object.assign(T.ru,{astTip:'Шахта. Премиальные гномы спускаются вглубь тоннелей; обычные гномы добывают Amber у Источника наверху — второй общей шахты. · демо',
+  astPick:'Нажми на Шахту и выбери: гном из коллекции 10K идёт вглубь, обычный — к Источнику наверху.',
+  astPlant:'Источник',astPlantTip:'Источник — сюда стекается Amber, потраченный во всей экосистеме; обычные гномы добывают его обратно. Замкнутый цикл.'});
+ Object.assign(T.en,{astTip:'The Mine. Premium gnomes descend deep into the tunnels; common gnomes mine Amber at the Wellspring on top, the second shared mine. · demo',
+  astPick:'Tap the Mine and choose: a gnome from the 10K collection goes deep, a common one goes to the Wellspring on top.',
+  astPlant:'Wellspring',astPlantTip:'Wellspring — Amber spent across the ecosystem flows here; common gnomes mine it back. A closed loop.'})}
+/* unstake / withdraw: ONE tx — the gnome flies back from the Mine (deep tunnel or the plant) to the island together with its accrued Amber */
+function unstakeTx(w,kind,amber,quiet){if(!PR.on||w==null||w<0||w>=NW)return false;const prem=kind==='premium'||kind==='deep';amber=Math.max(0,+amber||0);
+ const src=(prem?tunnelPos(_pa):plantPos(_pa)).clone();
+ spawn({from:src,tw:w,c:prem?PR_AMB:PR_PALE,s:prem?2.1:.9,d:2,arc:prem?3:1.8,ly:'stk',ly2:'mine'});
+ for(let j=0;j<(prem?2:1);j++)spawn({from:src,tw:w,c:0xffc457,s:prem?1.4-j*.3:.7,d:2,arc:prem?3:1.8,delay:.1+j*.1,ly:'stk',ly2:'mine'});
+ PR.cnt.un+=1;PR.cnt.unA+=amber;if(!quiet)prFeed({k:'unstk',n:1,v:amber,c:1,i:w,p:prem?1:0});return true}
+const PR_FLY={mint:'mine',stkD:'stk',stkS:'stk',claim:'stk',unstk:'stk',swap:'dex',ext:'ext'};
+function prFeed(e){if(PR.off[PR_FLY[e.k]])return;e.t=S.simT;R6feedPush(e)}
+if(PR.on){Object.assign(FEIC,{mint:'💎',stkD:'⛏',stkS:'⛏',claim:'✦',unstk:'↩',swap:'⇆',ext:'↗'});
+ const _ft=feText;feText=function(e){const W=()=>e.i!=null&&e.i>=0?wName(e.i):'';
+  switch(e.k){case 'mint':return t('feMint',{n:fmt(e.n),v:fmt(Math.round(e.v))});
+   case 'stkD':return e.c>1?t('feStkD',{n:fmt(e.n),c:fmt(e.c)}):t('feStkD1',{n:fmt(e.n),w:W()});
+   case 'stkS':return e.c>1?t('feStkS',{n:fmt(e.n),c:fmt(e.c)}):t('feStkS1',{n:fmt(e.n),w:W()});
+   case 'unstk':return e.c>1?t('feUn',{n:fmt(e.n),v:fmt(Math.round(e.v)),c:fmt(e.c)}):t(e.p?'feUnD1':'feUnS1',{v:fmt(Math.round(e.v)),w:W()});
+   case 'claim':return e.c>1?t('feClaim',{v:fmt(Math.round(e.v)),c:fmt(e.c)}):t('feClaim1',{v:fmt(Math.round(e.v)),w:W()});
+   case 'swap':return t('feSwap',{v:fmt(Math.round(e.v)),w:W()});
+   case 'ext':return t('feExt',{v:fmt(Math.round(e.v)),w:W()})}
+  return _ft(e)}}
+
+/* sim driver: batched waves (a few wallets per wave, one ticker line per wave) */
+function prPick(test,tries=40){for(let k=0;k<tries;k++){const i=Math.floor(Math.random()*DRAWN);if(test(i)&&WA.sz[i]>0)return i}return -1}
+function updPros(dt){if(!PR.on)return;
+ if(PR.hov&&PR.ln){const cap=PR.ln.cap;let m=0;for(const i of PR.list){if(m>=cap)break;wPos(i,_pa);_pb.copy(_pa).sub(NODES.reserve.pos).normalize();mineSurf(_pb,_pc);PR.lnP.set([_pa.x,_pa.y,_pa.z,_pc.x,_pc.y,_pc.z],m*6);m++}
+  PR.ln.geometry.setDrawRange(0,m*2);PR.ln.geometry.attributes.position.needsUpdate=true}
+ for(const o of flowLines){const l=FL_LY(o.a)||FL_LY(o.b);if(l&&PR.off[l])o.ln.visible=false}
+ if(S.paused||SET.kind!=='sim'||S.tm||S.mode!=='uni'||!DRAWN)return;
+ const busy=live()>PN*.75,sp=Math.min(3,.6+.4*S.speed);
+ if(PR.lastBA<0)PR.lastBA=S.cBA||0;
+ if((PR.mT+=dt)>7){PR.mT=0;const d=(S.cBA||0)-PR.lastBA;PR.lastBA=S.cBA||0;if(d>=MINT_AMB_G)prFeed({k:'mint',n:Math.round(d/MINT_AMB_G),v:d})}
+ if(busy)return;
+ if((PR.waveT-=dt*sp)<=0){PR.waveT=(MOBILE?5.5:3.4)+Math.random()*2.5;const prem=Math.random()<.5,c=(MOBILE?2:3)+Math.floor(Math.random()*3);let n=0,k=0,w1=-1;
+  for(let j=0;j<c;j++){const w=prem?prPick(i=>SET.cls[i]===0&&SET.gn[i]>0):prPick(i=>SET.cls[i]===0&&!SET.lk[i]);if(w<0)continue;
+   const g=prem?1+Math.floor(Math.random()*Math.min(3,SET.gn[w])):1+Math.floor(Math.random()*2);setTimeout(()=>stakeTx(w,prem?'premium':'common',g,true),j*260);n+=g;k++;w1=w}
+  if(k)prFeed(k>1?{k:prem?'stkD':'stkS',n,c:k}:{k:prem?'stkD':'stkS',n,c:1,i:w1})}
+ if((PR.clT-=dt*sp)<=0){PR.clT=(MOBILE?8:6)+Math.random()*3;const c=2+Math.floor(Math.random()*3);let v=0,k=0,w1=-1;
+  for(let j=0;j<c;j++){const prem=Math.random()<.5;const w=prem?prPick(i=>SET.cls[i]===0&&SET.gn[i]>0):prPick(i=>SET.cls[i]===0&&!SET.lk[i]);if(w<0)continue;
+   const a=prem?Math.round(80+Math.random()*SET.gn[w]*60):Math.round(4+Math.random()*30);setTimeout(()=>claimTx(w,prem?'premium':'common',a,true),j*300);v+=a;k++;w1=w}
+  if(k)prFeed(k>1?{k:'claim',v,c:k}:{k:'claim',v,c:1,i:w1})}
+ if((PR.unT-=dt*sp)<=0){PR.unT=(MOBILE?12:9)+Math.random()*4;const c=1+Math.floor(Math.random()*3);let v=0,k=0,w1=-1,p1=0;
+  for(let j=0;j<c;j++){const prem=Math.random()<.5;const w=prem?prPick(i=>SET.cls[i]===0&&SET.gn[i]>0):prPick(i=>SET.cls[i]===0&&!SET.lk[i]);if(w<0)continue;
+   const a=prem?Math.round(150+Math.random()*SET.gn[w]*90):Math.round(10+Math.random()*60);setTimeout(()=>unstakeTx(w,prem?'premium':'common',a,true),j*320);v+=a;k++;w1=w;p1=prem?1:0}
+  if(k)prFeed(k>1?{k:'unstk',n:k,v,c:k}:{k:'unstk',n:1,v,c:1,i:w1,p:p1})}
+ if((PR.swT-=dt*sp)<=0){PR.swT=8+Math.random()*4;const w=prPick(i=>SET.cls[i]===1&&!SET.ext[i]);if(w>=0){spawn({fw:w,tn:'dex',c:0x22d3ee,s:1.1,d:1.2,arc:1});prFeed({k:'swap',v:Math.round(200+Math.random()*4800),i:w})}}
+ if((PR.exT-=dt*sp)<=0){PR.exT=(MOBILE?9:6)+Math.random()*4;const a=prPick(i=>SET.ext[i]===1,80);const b=Math.random()<.5?prPick(i=>SET.ext[i]===1,80):prPick(i=>SET.cls[i]===0);
+  if(a>=0&&b>=0&&a!==b){spawn({fw:a,tw:b,c:PR_EXT,s:1,d:2.2,arc:8,ly:'ext'});if(Math.random()<.6)prFeed({k:'ext',v:Math.round(100+Math.random()*9000),i:b})}}}
+
+/* layers panel: a new 'Amber economy' row of toggles inside the existing Layers control */
+if(PR.on){const lw=$('layP').querySelector('[data-i="laySecCast"]');
+ const sec=document.createElement('div');sec.className='lsec';sec.id='laySecEco';const row=document.createElement('div');row.className='lrow';row.id='ecoRow';
+ row.innerHTML=['mine','well','pros','bat','stk','dex','ext'].map(k=>`<button class="ck on" data-f="${k}" id="fy_${k}"></button>`).join('');
+ lw.parentNode.insertBefore(sec,lw);lw.parentNode.insertBefore(row,lw);
+ const FK={mine:'fyMine',well:'fyWell',pros:'fyPros',bat:'fyBat',stk:'fyStk',dex:'fyDex',ext:'fyExt'};
+ row.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{const k=b.dataset.f;PR.off[k]=PR.off[k]?0:1;prApplyLayers();R6lay();beep(520,.04)});
+ const _rl=R6lay;R6lay=function(){_rl();let n=0;for(const k in FK){const b=$('fy_'+k);if(b)b.classList.toggle('on',!PR.off[k]);if(PR.off[k])n++}
+  if(n){const m=$('bLay').innerHTML.match(/−(\d+)/);const tot=(m?+m[1]:0)+n;$('bLay').innerHTML=t('layBtn')+` <b>−${tot}</b>`}};
+ const _ri=R6i18n;R6i18n=function(){$('laySecEco').textContent=t('laySecEco');for(const k in FK)$('fy_'+k).textContent=t(FK[k]);_ri()};
+ /* legend (dev): class colours + prospector rings + stake / claim flows */
+ const dot=(c,k)=>`<div class="lc"><span class="dot" style="color:${c};background:${c}"></span>${t(k)}</div>`;
+ clsLegend=function(){return `<div class="sm" style="margin-bottom:2px">${t('lClsH')}</div>`+dot('#ffb347','lMinePros')+dot('#b7ae9f','lPlayer')+dot(hexC(PR_EXT),'lExt')+
+  `<div class="lc" data-c="t"><span class="dot" style="color:${hexC(CLS_C.trader)};background:${hexC(CLS_C.trader)}"></span>${t('lTrader')}</div><div class="lc" data-c="l"><span class="dot" style="color:${hexC(CLS_C.link)};background:${hexC(CLS_C.link)}"></span>${t('lLinked')}</div><div class="lc" data-c="b"><span class="dot" style="color:${hexC(CLS_C.bot)};background:${hexC(CLS_C.bot)}"></span>${t('lBot')}</div>`+
+  `<div><span class="leg2" style="background:${hexC(CLS_C.link)}"></span>${t('lLinkLine')}</div><div class="sm" id="lClsNote" style="margin:3px 0 6px;opacity:.85">${t('lClsNote')}</div>`};
+ const _rlg=renderLegend;renderLegend=function(){_rlg();const li=$('legI');const ring=w=>`<span class="dot" style="background:transparent;border:${w}px solid #ffb347;box-sizing:border-box;width:11px;height:11px"></span>`;
+  const pr=`<div class="sm" style="margin-top:6px">${t('lProsH')}</div><div>${ring(1)}${t('lPr1')}</div><div>${ring(2)}${t('lPr2')}</div><div>${ring(3.5)}${t('lPr3')}</div>`+
+   `<div><span class="leg2" style="background:#ffb347;height:3px"></span>${t('lStkD')}</div><div><span class="leg2" style="background:#fff0c8"></span>${t('lStkS')}</div><div><span class="leg2" style="background:#ffc457"></span>${t('lClaim')}</div><div><span class="leg2" style="background:linear-gradient(90deg,#fff0c8,#ffc457)"></span>${t('lUnstk')}</div><div><span class="leg2" style="background:${hexC(PR_EXT)}"></span>${t('lExtF')}</div>`;
+  /* the gnome-tier colour list is replaced by the ring thresholds (exact counts are not shown) */
+  li.innerHTML=li.innerHTML.replace(new RegExp(`<div class="sm" style="margin-top:6px">${t('lGn').replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}</div>(<div><span class="dot"[^>]*></span>[^<]*</div>){5}`),pr)};
+ Object.assign(R6API.r6,{stakeTx,claimTx,unstakeTx,
+  prPlantChk:()=>{if(typeof AST==='undefined'||!AST.plant)return null;const bx=new THREE.Box3().setFromObject(AST.plant).expandByScalar(.05);let n=0;const v=new THREE.Vector3();for(let k=0;k<20;k++)if(bx.containsPoint(plantPos(v)))n++;
+   let lastTo=0;for(let i=0;i<PN;i++){const q=P[i];if(q&&q.to&&(q.s0??q.s)===.75&&bx.containsPoint(q.to))lastTo++}return {inBox:n,of:20,paleToPlant:lastTo}},pros:()=>{let n=0,t1=0,t2=0,t3=0,e=0;for(let i=0;i<DRAWN;i++){if(SET.ext[i])e++;if(SET.cls[i]!==0)continue;const r=WA.rg[i];if(r>0){n++;if(r===1)t1++;else if(r===2)t2++;else t3++}}
+   return {n,t1,t2,t3,ext:e,hov:PR.hov,lines:PR.ln&&PR.ln.visible?PR.ln.geometry.drawRange.count/2:0,uPR:WM.uniforms.uPR.value,off:{...PR.off},cnt:{...PR.cnt},hl:PR.list.filter(i=>WA.hl[i]>0).length,
+    mT:PR.mT,lBA:PR.lastBA,cBA:S.cBA,poolS:NODES.pool.g.scale.x,dexS:NODES.dex.g.scale.x,live:live()}},
+  prHover:v=>{PR.pin=!!v;prHover(!!v);return PR.hov},
+  prLayer:(k,v)=>{PR.off[k]=v?0:1;prApplyLayers();R6lay();return {...PR.off}},
+  prHidCount:ly=>{let a=0,h=0;for(let i=0;i<PN;i++){const q=P[i];if(q&&q.ly===ly){a++;if(q.s===0)h++}}return {a,h}},
+  prFirst:k=>{for(let i=0;i<DRAWN;i++){if(k==='pros'?SET.cls[i]===0&&SET.gn[i]>0&&!SET.lk[i]:k==='ext'?SET.ext[i]===1:SET.cls[i]===0&&!SET.gn[i]&&!SET.lk[i])return i}return -1},
+  colOf:i=>[WA.col[i*3],WA.col[i*3+1],WA.col[i*3+2]],extHidden:()=>{let h=0,n=0;for(let i=0;i<DRAWN;i++)if(SET.ext[i]){n++;if(WA.sz[i]<0)h++}return {n,h}}});
+}
+/* dev: thin out match results in the ticker so economy events stay visible (max 1 win/draw line per 1.6 s) */
+if(PR.on){const _fp=R6feedPush;let lastW=-1e9;R6feedPush=function(e){if(e&&(e.k==='win'||e.k==='draw')){const n=performance.now();if(n-lastW<1600)return;lastW=n}_fp(e)}}
+/* dev: ticker clicks on economy lines without a single wallet fly to the related node instead of a 'not found' toast */
+if(PR.on){const _fc=R6feedClick,FN={mint:'gnome',unstk:'reserve',stkD:'reserve',stkS:'reserve',claim:'reserve',swap:'dex',ext:'dex'};
+ R6feedClick=function(j){const e=R6.feed[j];if(e&&FN[e.k]&&(e.i==null||e.i<0)){beep(740,.05);if(S.tm)tmClose();closePanels();focusNode(FN[e.k]);return FN[e.k]}return _fc(j)}}
+
+/* ===== Wellspring (the plant on the asteroid): the ecosystem sink, designed for ~1M tx/day =====
+   Small spends (upgrades, skills, boosts) are NOT particles: they aggregate per server into continuous streams toward the Wellspring,
+   stream thickness = volume. Big events stay individual particles (mints, 10K stakes, large claims / unstakes).
+   Ticker: a per-minute summary line + notable single events. Clicking an island lists that wallet's own recent tx.
+   'Server' in the demo: the hives when the Hives layer is on, otherwise demo servers (player groups anchored on one island each).
+   All figures are approximate demo placeholders, overridable via ED_CONFIG.ecoDemo. */
+const ECO=Object.assign({spendsPerDay:1000000,servers:12,serversMobile:8,bigClaim:200,sumEvery:20,spendMin:5,spendMax:400,smallFx:3},(typeof CFG!=='undefined'&&CFG.ecoDemo)||{});
+if(PR.on){Object.assign(T.ru,{lWell:'Траты Amber → Источник (поток от каждого сервера, толщина = объём)',
+  feSum:'За минуту: трат {s} · клеймов {c} · стейков {k} · выводов {u} · в Источник {a} Amber',feSpend:'Трата · {w} · {v} Amber → Источник',
+  wtxH:'Последние транзакции · симуляция',wtxNone:'Пока нет транзакций',wtxSp:'Трата · {v} Amber → Источник',wtxStD:'Стейкинг вглубь · гномов 10K: {n}',wtxStS:'Стейкинг у Источника · обычных гномов: {n}',
+  wtxCl:'Клейм · {v} Amber',wtxUn:'Вывод из стейкинга · гном + {v} Amber',wellLab:'Источник'});
+ Object.assign(T.en,{lWell:'Amber spends → Wellspring (one stream per server, thickness = volume)',
+  feSum:'Last minute: {s} spends · {c} claims · {k} stakes · {u} unstakes · {a} Amber into the Wellspring',feSpend:'Spend · {w} · {v} Amber → Wellspring',
+  wtxH:'Recent transactions · simulation',wtxNone:'No transactions yet',wtxSp:'Spend · {v} Amber → Wellspring',wtxStD:'Deep staking · 10K gnomes: {n}',wtxStS:'Wellspring staking · common gnomes: {n}',
+  wtxCl:'Claim · {v} Amber',wtxUn:'Unstake · gnome + {v} Amber',wellLab:'Wellspring'})}
+const WS2={srv:[],key:'',chk:0,sec:new Array(60).fill(null).map(()=>({s:0,a:0,c:0,k:0,u:0})),si:0,secT:0,sumT:8,pts:null,M:0,acc:0,tot:{s:0,a:0},lab:null};
+const wtx=new Map();
+function wtxPush(i,e){if(!PR.on||i==null||i<0)return;let a=wtx.get(i);if(!a){a=[];wtx.set(i,a);if(wtx.size>20000)wtx.delete(wtx.keys().next().value)}e.t=S.simT;a.unshift(e);if(a.length>6)a.length=6}
+const ecoMin=k=>{WS2.sec[WS2.si][k]++};
+/* small-event particle budget (token bucket): beyond it, small events are counted, not drawn */
+const PSB={v:6,max:6};function smallOK(){if(PSB.force)return true;if(PSB.v>=1){PSB.v--;return true}return false}
+{const _st=stakeTx,_cl=claimTx,_un=unstakeTx;
+ stakeTx=function(w,kind,n,quiet){const prem=kind==='premium'||kind==='deep';if(PR.on&&w>=0&&w<NW){ecoMin('k');wtxPush(w,{k:prem?'stD':'stS',n:Math.max(1,n|0)})}
+  if(PR.on&&!prem&&!smallOK()){if(w==null||w<0||w>=NW)return false;PR.cnt.stS+=Math.max(1,n|0);return true}return _st(w,kind,n,quiet)};
+ claimTx=function(w,kind,amount,quiet){const prem=kind==='premium'||kind==='deep';if(PR.on&&w>=0&&w<NW){ecoMin('c');wtxPush(w,{k:'cl',v:Math.round(+amount||0)})}
+  if(PR.on&&!prem&&(+amount||0)<ECO.bigClaim&&!smallOK()){if(w==null||w<0||w>=NW)return false;PR.cnt.cl+=Math.max(0,+amount||0);return true}return _cl(w,kind,amount,quiet)};
+ unstakeTx=function(w,kind,amber,quiet){const prem=kind==='premium'||kind==='deep';if(PR.on&&w>=0&&w<NW){ecoMin('u');wtxPush(w,{k:'un',v:Math.round(+amber||0)})}
+  if(PR.on&&!prem&&(+amber||0)<ECO.bigClaim&&!smallOK()){if(w==null||w<0||w>=NW)return false;PR.cnt.un++;PR.cnt.unA+=Math.max(0,+amber||0);return true}return _un(w,kind,amber,quiet)};
+ /* hooks called from outside (data feed / tests) always draw: the particle budget throttles only the high-volume demo stream */
+ const F=f=>function(){PSB.force=1;try{return f.apply(null,arguments)}finally{PSB.force=0}};
+ if(PR.on)Object.assign(R6API.r6,{stakeTx:F(stakeTx),claimTx:F(claimTx),unstakeTx:F(unstakeTx)})}
+/* servers */
+function srvBuild(){const hv=typeof HUB!=='undefined'&&HUB.hvApplied&&HUB.hv&&HUB.hv.length;const key=(hv?'h'+HUB.hv.length:'d')+':'+DRAWN+':'+SET.kind;if(key===WS2.key)return;WS2.key=key;
+ if(hv){WS2.srv=HUB.hv.map((h,j)=>({a:h.anchor,col:h.color,rate:0,acc:0,hv:j}));WS2.of=i=>{const j=HUB.hvOf.get(i);return j==null?-1:j}}
+ else{const pl=[];for(let i=0;i<DRAWN;i++)if(SET.cls[i]===0&&!SET.lk[i])pl.push(i);const K=Math.min(pl.length,MOBILE?ECO.serversMobile:ECO.servers);
+  WS2.srv=[];for(let j=0;j<K;j++)WS2.srv.push({a:pl[Math.floor((j+.5)*pl.length/K)],col:PR_AMB,rate:0,acc:0});WS2.of=i=>K?((i*2654435761)>>>0)%K:-1}
+ const M=MOBILE?14:22;WS2.M=M;const N=WS2.srv.length*M;
+ if(WS2.pts){scene.remove(WS2.pts);WS2.pts.geometry.dispose()}
+ if(!N){WS2.pts=null;return}
+ const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(new Float32Array(N*3),3).setUsage(THREE.DynamicDrawUsage));
+ g.setAttribute('sz',new THREE.BufferAttribute(new Float32Array(N),1).setUsage(THREE.DynamicDrawUsage));
+ if(!WS2.mat)WS2.mat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,uniforms:{uS:{value:innerHeight*.5},uC:{value:new THREE.Color(0xffb347)}},
+  vertexShader:'attribute float sz;varying float vA;uniform float uS;void main(){vec4 mv=modelViewMatrix*vec4(position,1.);vA=clamp(sz,0.,1.);gl_PointSize=sz>0.?clamp(sz*uS/-mv.z,1.,24.):0.;gl_Position=projectionMatrix*mv;}',
+  fragmentShader:'varying float vA;uniform vec3 uC;void main(){float d=length(gl_PointCoord-.5);if(d>.5)discard;float a=smoothstep(.5,.0,d);gl_FragColor=vec4(uC*(.6+.6*a),a*(.35+.5*vA));}'});
+ WS2.pts=new THREE.Points(g,WS2.mat);WS2.pts.frustumCulled=false;WS2.pts.renderOrder=3;scene.add(WS2.pts)}
+const _wA=new THREE.Vector3(),_wB=new THREE.Vector3(),_wC=new THREE.Vector3(),_wL=new THREE.Vector3();
+function wellPos(out){const pl=typeof AST!=='undefined'&&AST.on&&AST.plant;if(!pl)return out.copy(NODES.reserve.pos);if(!_pbb.b){pl.geometry.computeBoundingBox();_pbb.b=pl.geometry.boundingBox}
+ const b=_pbb.b;out.set((b.min.x+b.max.x)/2,b.min.y+(b.max.y-b.min.y)*.8,(b.min.z+b.max.z)/2);return pl.localToWorld(out)}
+/* the hook: one spend → the wallet's server bucket (no particle) */
+function spendTx(w,amber,quiet){if(!PR.on||w==null||w<0||w>=NW)return false;amber=Math.max(0,+amber||0);srvBuild();const j=WS2.of(w);
+ if(j>=0&&WS2.srv[j])WS2.srv[j].acc+=amber;else WS2.acc+=amber;const sc=WS2.sec[WS2.si];sc.s++;sc.a+=amber;WS2.tot.s++;WS2.tot.a+=amber;
+ if(!quiet)wtxPush(w,{k:'sp',v:Math.round(amber)});return true}
+function updWell(dt){if(!PR.on)return;PSB.v=Math.min(PSB.max,PSB.v+dt*ECO.smallFx);
+ if((WS2.chk-=dt)<=0){WS2.chk=2;srvBuild()}
+ /* rolling 60 s window, one-second buckets */
+ if((WS2.secT+=dt)>=1){WS2.secT=0;WS2.si=(WS2.si+1)%60;WS2.sec[WS2.si]={s:0,a:0,c:0,k:0,u:0}}
+ const run=!S.paused&&SET.kind==='sim'&&!S.tm&&S.mode==='uni'&&DRAWN>0;
+ if(run){const sp=Math.min(3,.6+.4*S.speed);const lam=ECO.spendsPerDay/86400*dt*sp;let n=Math.floor(lam)+(Math.random()<lam%1?1:0);
+  while(n-->0){const w=prPick(i=>SET.cls[i]===0,40);if(w<0)break;const r=Math.random();spendTx(w,Math.round(ECO.spendMin+(ECO.spendMax-ECO.spendMin)*r*r*r),false)}
+  if((WS2.sumT-=dt)<=0){WS2.sumT=ECO.sumEvery;const m={s:0,a:0,c:0,k:0,u:0};for(const b of WS2.sec)for(const k in m)m[k]+=b[k];if(m.s+m.c+m.k+m.u>0&&!PR.off.well)prFeed({k:'sum',s:m.s,a:m.a,c:m.c,st:m.k,u:m.u})}}
+ /* streams */
+ const P3=WS2.pts;if(!P3)return;const vis=!PR.off.well&&!PR.off.mine&&typeof AST!=='undefined'&&AST.on&&AST.g.visible&&S.mode==='uni';P3.visible=vis;
+ let rmax=1;for(const sv of WS2.srv){const inst=sv.acc/Math.max(dt,1e-3);sv.acc=0;sv.rate+=(inst-sv.rate)*Math.min(1,dt/4);if(sv.rate>rmax)rmax=sv.rate}
+ if(!vis){if(WS2.lab)WS2.lab.style.display='none';return}WS2.mat.uniforms.uS.value=innerHeight*.5;wellPos(_wB);const pa=P3.geometry.attributes.position.array,za=P3.geometry.attributes.sz.array,M=WS2.M,tm=performance.now()/1000;
+ WS2.srv.forEach((sv,j)=>{const on=sv.a!=null&&sv.a<DRAWN&&WA.sz[sv.a]>0;wPos(sv.a,_wA);const d=_wA.distanceTo(_wB);_wC.copy(_wA).add(_wB).multiplyScalar(.5);_wC.y+=d*.22;
+  const v=on?Math.sqrt(sv.rate/rmax):0;const base=v>.02?.25+1.1*v:0;
+  for(let k=0;k<M;k++){const u=((k/M)+tm*.12+j*.137)%1,o=(j*M+k)*3;const a=1-u;
+   _wL.set(a*a*_wA.x+2*a*u*_wC.x+u*u*_wB.x,a*a*_wA.y+2*a*u*_wC.y+u*u*_wB.y,a*a*_wA.z+2*a*u*_wC.z+u*u*_wB.z);pa[o]=_wL.x;pa[o+1]=_wL.y;pa[o+2]=_wL.z;
+   za[j*M+k]=base*(.75+.25*Math.sin(u*Math.PI))}});
+ P3.geometry.attributes.position.needsUpdate=true;P3.geometry.attributes.sz.needsUpdate=true;
+ /* Wellspring label (node-style), only when the Mine is reasonably close */
+ if(!WS2.lab){const e=document.createElement('div');e.className='lb';e.id='wellLab';e.dataset.k='well';$('labels').appendChild(e);WS2.lab=e}
+ const lab=WS2.lab;wellPos(_wL);_wL.y+=1.2;const dc=camera.position.distanceTo(_wL);_wL.project(camera);
+ const show=vis&&dc<95&&_wL.z<1&&Math.abs(_wL.x)<.95&&Math.abs(_wL.y)<.9&&morph<.5;lab.style.display=show?'':'none';
+ if(show){lab.textContent=t('wellLab');lab.style.transform=`translate(${((_wL.x+1)/2*innerWidth).toFixed(0)}px,${((1-_wL.y)/2*innerHeight).toFixed(0)}px) translate(-50%,-100%)`}}
+if(PR.on){PR_FLY.sum='well';PR_FLY.spend='well';FEIC.sum='Σ';FEIC.spend='⟶';
+ const _ft2=feText;feText=function(e){if(e.k==='sum')return t('feSum',{s:fmt(e.s),c:fmt(e.c),k:fmt(e.st),u:fmt(e.u),a:fmt(Math.round(e.a))});if(e.k==='spend')return t('feSpend',{v:fmt(e.v),w:wName(e.i)});return _ft2(e)};
+ const _fc2=R6feedClick;R6feedClick=function(j){const e=R6.feed[j];if(e&&e.k==='sum'){beep(740,.05);if(S.tm)tmClose();closePanels();focusNode('reserve');return 'reserve'}return _fc2(j)};
+ /* wallet card: that wallet's own recent tx */
+ const _hx=R6histExtra;R6histExtra=function(i){_hx(i);const h=$('hist');if(!h||i==null||i<0||SET.kind!=='sim')return;const a=wtx.get(i)||[];
+  const row=e=>e.k==='sp'?t('wtxSp',{v:fmt(e.v)}):e.k==='stD'?t('wtxStD',{n:fmt(e.n)}):e.k==='stS'?t('wtxStS',{n:fmt(e.n)}):e.k==='cl'?t('wtxCl',{v:fmt(e.v)}):t('wtxUn',{v:fmt(e.v)});
+  const d=document.createElement('div');d.id='wxEco';d.className='sm';d.style.cssText='margin:6px 0;padding:6px 8px;border:1px solid rgba(255,179,71,.25);border-radius:8px';
+  d.innerHTML=`<div style="color:#ffb347;font-weight:600;margin-bottom:3px">${t('wtxH')}</div>`+(a.length?a.map(e=>`<div>${row(e)} <span style="color:#8f9cc4">· ${evWhen(e.t)}</span></div>`).join(''):`<div style="color:#8f9cc4">${t('wtxNone')}</div>`);
+  const x=$('wx');if(x&&x.parentNode)(($('wxHub')||x)).after(d);else h.appendChild(d)};
+ const _rl2=renderLegend;renderLegend=function(){_rl2();const li=$('legI');if(li&&!li.querySelector('.lWell')){const d=document.createElement('div');d.className='lWell';
+  d.innerHTML=`<span class="leg2" style="background:linear-gradient(90deg,rgba(255,179,71,.35),#ffb347);height:4px"></span>${t('lWell')}`;li.appendChild(d)}};
+ const _upw=updPros;updPros=function(dt){_upw(dt);updWell(dt)};
+ Object.assign(R6API.r6,{spendTx,well:()=>{let a=0,s=0,c=0,k=0,u=0;for(const b of WS2.sec){s+=b.s;a+=b.a;c+=b.c;k+=b.k;u+=b.u}return {srv:WS2.srv.length,rates:WS2.srv.map(x=>Math.round(x.rate)),vis:!!(WS2.pts&&WS2.pts.visible),
+   pts:WS2.pts?WS2.pts.geometry.attributes.position.count:0,min:{s,a:Math.round(a),c,k,u},tot:{...WS2.tot},lab:WS2.lab?WS2.lab.style.display!=='none'&&WS2.lab.textContent:'',sb:PSB.v,ECO}},
+  wtx:i=>(wtx.get(i)||[]).map(e=>({...e}))})}
 
 /* ===== Loop ===== */
 const clock=new THREE.Clock();let frame=0,fpsAcc=0,fpsN=0,statT=0;window.__fps=0;
@@ -3788,7 +4064,7 @@ function tick(){requestAnimationFrame(tick);
   for(const o of a.sp){if(o.name==='spin'){o.rotation.y+=dt*.3;o.rotation.x+=dt*.1}else if(o.name==='spin2')o.rotation.y-=dt*.15;else if(o.name==='spinr'){o.rotation.z+=dt*.8;o.rotation.y+=dt*.3}else if(o.name==='coin')o.rotation.z+=dt*1.5;else if(o.name==='flame')o.scale.y=1+Math.sin(tm*9)*.15+n.glow*.4}}
  if(run)pulse*=.94;const pz=NODES.pool.inner.getObjectByName('pulse');if(pz){pz.material.opacity=.1+Math.min(.6,pulse*.35);pz.scale.setScalar(1+pulse*.03)}
  for(const o of flowLines){const mineLine=o.a==='reserve';const want=o.hov?.85:(mineLine&&!(MS.mineOn||eraK>.5)?.05:o.base);o.ln.material.opacity+=(want-o.ln.material.opacity)*.15;o.ln.visible=morph<.5}
- updEra(dt);updNet(dt);updRoy(dt);updWatch(dt);updGnF(dt);updCastles(dt);updAst(dt);updViewShift(dt);updLinks();
+ updEra(dt);updNet(dt);updRoy(dt);updWatch(dt);updGnF(dt);updCastles(dt);updAst(dt);if(typeof updPros==="function")updPros(dt);updViewShift(dt);updLinks();
  updParticles();updArcs(dt);updFind(dt);updTrail();updTM(dt);updMorph(dt);updInv(dt);updRegions(dt);
  if(mouseMoved&&frame%3===0){mouseMoved=false;const h=pick(mx,my);if(h&&h.k){setHover(h.k);hoverW=-1}else{setHover(null);hoverW=h&&h.w!=null?h.w:-1}showTip()}
  updFly();controls.update();updLabels();
