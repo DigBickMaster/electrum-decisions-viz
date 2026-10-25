@@ -1358,7 +1358,7 @@ void main(){vec2 p=gl_PointCoord-.5;float d=length(p);float rgw=vRg>2.5?.075:vRg
  float edge=.36+.07*sin(an*5.+vSd*31.)+.04*sin(an*9.-vSd*17.);
  float rock=smoothstep(edge+.03,edge-.04,d);float glow=smoothstep(.5,.0,d)*.35;if(rock+glow+ring<.02)discard;
  float lit=.55+.6*clamp(dot(normalize(p+1e-4),vec2(-.7,.7))*(d/edge),-.6,1.);
- vec3 rc=mix(vec3(.42,.36,.33),vC,.72)*lit;vec3 c=mix(rc,vC,glow*.9/(rock+glow));c+=vC*smoothstep(.2,.0,d)*.55;c=mix(c,vec3(1.,.85,.45),clamp(vH*.6,0.,1.));
+ vec3 rc=mix(vec3(.42,.36,.33),vC,.72)*lit;vec3 c=mix(rc,vC,glow*.9/max(rock+glow,.001));c+=vC*smoothstep(.2,.0,d)*.55;c=mix(c,vec3(1.,.85,.45),clamp(vH*.6,0.,1.));
  vec4 o=vec4(c*(.75+vH*1.1)*(.5+.5*vAg),min(1.,rock+glow)*min(1.,uO+.25+vH*.6)*min(1.,.4+.6*vAg));gl_FragColor=mix(o,vec4(vec3(1.,.68,.24)*(1.15+vH*.5),.95),ring*(1.-rock));}`;
 const WG=new THREE.BufferGeometry();
 const WA={pos:new Float32Array(MAXW*3),o2:new Float32Array(MAXW*3),gp:new Float32Array(MAXW*3),sz:new Float32Array(MAXW),hl:new Float32Array(MAXW),col:new Float32Array(MAXW*3),rb:new Float32Array(MAXW),cen:new Float32Array(MAXW*4),ag:new Float32Array(MAXW).fill(1),shp:new Float32Array(MAXW),rg:new Float32Array(MAXW)};
@@ -4041,6 +4041,24 @@ if(PR.on){PR_FLY.sum='well';PR_FLY.spend='well';FEIC.sum='Σ';FEIC.spend='⟶';
  Object.assign(R6API.r6,{spendTx,well:()=>{let a=0,s=0,c=0,k=0,u=0;for(const b of WS2.sec){s+=b.s;a+=b.a;c+=b.c;k+=b.k;u+=b.u}return {srv:WS2.srv.length,rates:WS2.srv.map(x=>Math.round(x.rate)),vis:!!(WS2.pts&&WS2.pts.visible),
    pts:WS2.pts?WS2.pts.geometry.attributes.position.count:0,min:{s,a:Math.round(a),c,k,u},tot:{...WS2.tot},lab:WS2.lab?WS2.lab.style.display!=='none'&&WS2.lab.textContent:'',sb:PSB.v,ECO}},
   wtx:i=>(wtx.get(i)||[]).map(e=>({...e}))})}
+
+/* ---------- mobile robustness (dev): frame guard, WebGL context loss, on-screen diagnostics ---------- */
+if(EDITION==='dev'){
+ const GLD={err:0,last:'',lost:0,el:null,t:null};
+ const gTx=()=>L==='en'?{fe:'Frame error',lost:'WebGL graphics were lost — restarting…',rl:'Reloading in low quality…'}:{fe:'Ошибка кадра',lost:'Графика WebGL потеряна — перезапуск…',rl:'Перезагрузка в низком качестве…'};
+ const gShow=(msg,warn)=>{if(!GLD.el){const d=document.createElement('div');d.id='glDiag';d.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:99999;padding:8px 10px;border-radius:10px;font:12px/1.35 system-ui,sans-serif;color:#fff;background:rgba(150,30,40,.92);word-break:break-word;pointer-events:auto';d.onclick=()=>{d.style.display='none'};document.body.appendChild(d);GLD.el=d}
+  GLD.el.style.background=warn?'rgba(20,40,90,.92)':'rgba(150,30,40,.92)';GLD.el.textContent=msg;GLD.el.style.display='block'};
+ const _tk=tick;
+ tick=function(){try{_tk()}catch(e){GLD.err++;const m=(e&&e.message)||String(e);
+   if(GLD.err===1||m!==GLD.last){GLD.last=m;console.error('[frame]',e);gShow(gTx().fe+': '+m+(e&&e.stack?' @ '+String(e.stack).split('\n').slice(1,2).join('').trim():''))}
+   try{if(!BB.full)composer.render()}catch(e2){}}};
+ canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();GLD.lost++;gShow(gTx().lost,true);clearTimeout(GLD.t);
+  GLD.t=setTimeout(()=>{let done=0;try{done=+sessionStorage.getItem('ed_glr')||0}catch(x){}
+   if(done<1){try{sessionStorage.setItem('ed_glr','1')}catch(x){}gShow(gTx().rl,true);const u=new URL(location.href);u.searchParams.set('q','low');setTimeout(()=>location.replace(u.toString()),600)}},4000)},false);
+ canvas.addEventListener('webglcontextrestored',()=>{clearTimeout(GLD.t);if(GLD.el)GLD.el.style.display='none'},false);
+ addEventListener('error',e=>{if(e&&e.message)gShow(gTx().fe+': '+e.message)});
+ window.__glDiag=()=>({err:GLD.err,last:GLD.last,lost:GLD.lost});
+}
 
 /* ===== Loop ===== */
 const clock=new THREE.Clock();let frame=0,fpsAcc=0,fpsN=0,statT=0;window.__fps=0;
