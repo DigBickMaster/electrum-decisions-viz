@@ -1587,7 +1587,10 @@ function updFly(){if(!isFinite(camera.position.x+camera.position.y+camera.positi
   if(u>=1){if(fly.trackFn){track={fn:fly.trackFn,last:fly.toT.clone()}}fly=null}}
  else if(track){const p=track.fn();if(!isFinite(p.x+p.y+p.z)){track=null;return}const d=p.clone().sub(track.last);controls.target.add(d);camera.position.add(d);track.last.copy(p)}
 }
-controls.addEventListener('start',()=>{fly=null;track=null});
+controls.addEventListener('start',()=>{fly=null;track=null;if(typeof HUB!=='undefined')HUB.cvPend=null});  // any drag/wheel/pinch stops every automatic camera move
+/* wheel during a fly to a wallet: steer the fly's end distance instead of cancelling it half-way (cancelling left the camera aimed at empty space) */
+addEventListener('wheel',e=>{if(e.target!==canvas||!fly||!fly.trackFn||fly.toP)return;e.preventDefault();e.stopImmediatePropagation();
+ const k=e.deltaY>0?1.2:1/1.2;fly.dist=Math.max(controls.minDistance,Math.min(controls.maxDistance,fly.dist*k));if(e.deltaY>0&&typeof HUB!=='undefined')HUB.cvPend=null},{capture:true,passive:false});
 
 /* ===== Caption panel ===== */
 let capMode=null; // 'fm' | 'tour'
@@ -1881,7 +1884,7 @@ function enterWorld(){if(SET.kind==='chain'){if(EDITION==='prod'){toast(t('world
  for(let i=0;i<NW;i++){const c=REGCOL[REG[SET.reg[i]]];_c.set(c);if(!SET.gn[i])WA.col.set([_c.r,_c.g,_c.b],i*3)}WATT.col.needsUpdate=true}
 function leaveWorld(){if(S.mode!=='world')return;S.mode='uni';morphTo=0;for(let i=0;i<NW;i++)paintWallet(i);WATT.col.needsUpdate=WATT.sz.needsUpdate=true;resetView()}
 function updMorph(dt){const k=Math.min(1,dt*1.2);morph+=(morphTo-morph)*k;if(Math.abs(morphTo-morph)<.002)morph=morphTo;WM.uniforms.uMorph.value=morph;
- if(S.mode==='world'||morph>0)gRot+=dt*.04;WM.uniforms.uGR.value=gRot;globe.rotation.y=gRot;
+ if(S.mode==='world'||morph>0)gRot+=dt*.04*(typeof FOCUS!=='undefined'?FOCUS.k:1);WM.uniforms.uGR.value=gRot;globe.rotation.y=gRot;
  const g=morph;globeMat.opacity=g*.92;gratMat.opacity=g*.35;landMat.opacity=g*.8;globe.visible=g>.01;
  uni.visible=g<.5;uni.traverse;const s=1-g;uni.scale.setScalar(Math.max(.001,s<.5?.5+s:1));}
 
@@ -2587,7 +2590,7 @@ function pick(x,y){if(morph>.5){const w=S.tok?pickWallet(x,y):-1;return w>=0?{w}
  ndc.set(x/innerWidth*2-1,-(y/innerHeight)*2+1);ray.setFromCamera(ndc,camera);
  const hn=ray.intersectObjects(hitList.filter(h=>visDeep(h)&&(h.userData.key!=='fiat'||S.fiat)),false);const node=hn.length?hn[0]:null;
  const w=S.tok?pickWallet(x,y):-1;const weak=!node||['fiat','poly'].includes(node.object.userData.key);
- if(w>=0&&weak)return {w};if(node)return {k:node.object.userData.key};return null}
+ if(w>=0&&weak)return {w};if(node&&typeof twinFront==='function'&&twinFront(x,y,node.distance))return w>=0?{w}:null;if(node)return {k:node.object.userData.key};return null}
 const tip=$('tip');
 const clsKey=i=>SET.lk[i]?'wcL':['wcP','wcT','wcB','wcR'][SET.cls[i]]||'wcP';
 const clsColor=i=>SET.lk[i]?hexC(CLS_C.link):SET.cls[i]===1?hexC(CLS_C.trader):SET.cls[i]===2?hexC(CLS_C.bot):'#f2c45a';
@@ -2595,16 +2598,18 @@ function walletTip(i){const nm=wid(i);const g=SET.gn[i];let s=`<b>${nm}</b> · $
  if(SET.kind==='sim')s+=`${t('wPlayed')}: ${fmt(WS.pl[i])} · ${t('wWon')}: ${fmt(WS.wn[i])}`;else s+=`${fmtA(SET.bal[i])} Amber`;
  if(g&&SET.cls[i]===0)s+=`<br>🜨 ${fmt(g)} · ${t('hCastle')}: ${t('sk'+skinFor(i))}`;return s+`<br><span style="color:#8f9cc4">${t('tipClick')}</span>`}
 function showTip(){
- if(hoverK){const c=card(hoverK);tip.innerHTML=`<b>${labText(hoverK)}</b><br>${c.k}<br><span style="color:#8f9cc4">${t('tipClick')}</span>`}
+ if(hoverK==='reserve'&&typeof TWIN!=='undefined'&&TWIN.on){tip.innerHTML=twinTipHTML('tw1')+`<br><span style="color:#8f9cc4">${t('tipClick')}</span>`}
+ else if(hoverK){const c=card(hoverK);tip.innerHTML=`<b>${labText(hoverK)}</b><br>${c.k}<br><span style="color:#8f9cc4">${t('tipClick')}</span>`}
  else if(hoverW>=0&&hoverW<DRAWN){tip.innerHTML=walletTip(hoverW)}
+ else if(typeof twinHit==='function'&&twinHit(mx,my)){tip.innerHTML=twinTipHTML('tw2')}
  else{tip.style.display='none';canvas.style.cursor='grab';return}
  tip.style.display='block';canvas.style.cursor='pointer';const w=tip.offsetWidth;tip.style.left=Math.min(innerWidth-w-8,mx+14)+'px';tip.style.top=(my+16)+'px'}
 canvas.addEventListener('pointermove',e=>{if(e.pointerType!=='mouse')return;mx=e.clientX;my=e.clientY;mouseMoved=true});
-canvas.addEventListener('pointerleave',()=>{setHover(null);hoverW=-1;tip.style.display='none'});
+canvas.addEventListener('pointerleave',e=>{if(e.pointerType&&e.pointerType!=='mouse')return;/* touch lift fires pointerleave: keep tap tooltips */setHover(null);hoverW=-1;tip.style.display='none'});
 let pd=null,lastTap=0;
 canvas.addEventListener('pointerdown',e=>{pd={x:e.clientX,y:e.clientY,t:performance.now()}});
 canvas.addEventListener('pointerup',e=>{if(!pd)return;const moved=Math.hypot(e.clientX-pd.x,e.clientY-pd.y),dt=performance.now()-pd.t;pd=null;
- if(moved>6||dt>600||S.kiosk)return;const h=pick(e.clientX,e.clientY);const now=performance.now();
+ if(moved>6||dt>600||S.kiosk)return;if(typeof nearSel==='function'&&nearSel(e.clientX,e.clientY)){const cp=castPick(e.clientX,e.clientY);if(cp<0||cp===FY.sel){walletClick(FY.sel);lastTap=0;return}}/* a neighbouring castle nearer to the tap than the selected one wins */let h=pick(e.clientX,e.clientY);/* Star 2 sits in front of the wallet field: its tooltip beats wallet dots, but not labelled nodes */if((!h||h.w!=null)&&typeof twinHit==='function'&&twinHit(e.clientX,e.clientY)){tip.innerHTML=twinTipHTML('tw2');tip.style.display='block';const tw=tip.offsetWidth;tip.style.left=Math.max(8,Math.min(innerWidth-tw-8,e.clientX-tw/2))+'px';tip.style.top=(e.clientY+18)+'px';clearTimeout(TWIN.tipT);TWIN.tipT=setTimeout(()=>{tip.style.display='none'},3500);return}if(!h&&typeof castPick==='function'){const w=castPick(e.clientX,e.clientY);if(w>=0)h={w}}const now=performance.now();
  if(e.pointerType!=='mouse'&&now-lastTap<320&&h&&h.k){focusNode(h.k);lastTap=0;return}lastTap=now;if(!h)return;
  if(h.w!=null){if(pickMode)pickForPlay(h.w);else walletClick(h.w)}else{openCard(h.k);beep(760,.06)}});
 canvas.addEventListener('dblclick',e=>{const h=pick(e.clientX,e.clientY);if(h&&h.k)focusNode(h.k)});
@@ -2620,7 +2625,7 @@ function openCard(k){cardKey=k;const c=card(k);let kk=c.k,hh=c.h,extra='';
  NODES[k]&&(NODES[k].glow=1)}
 function closeCard(){cardKey=null;$('card').classList.remove('open')}
 $('cX').onclick=closeCard;
-function walletClick(i){selectWallet(i,true)}
+function walletClick(i){if(i===FY.sel&&SET.cls[i]===0&&typeof cvOpen==='function'&&HUB.cvI<0){cvOpen(i);return}selectWallet(i,true)}
 
 /* ===== i18n ===== */
 const LEG=[['lEnergy','#ffcf7a'],['lEntry','#8b5cf6'],['lWin','#f6c75a'],['lRefund','#94a3b8'],['lBurn','#ff7a3d'],['lStake','#2dd4bf'],['lBank','#f6c75a'],['lTour','#f472b6'],['lMine','#ffb347'],['lMint','#7dd3fc'],['lRoy','#c4b5fd'],['lFiat','#60a5fa']];
@@ -3541,8 +3546,27 @@ function cvRender(){const i=HUB.cvI;if(i<0)return;const a=SET.addr[i];const c=ca
  if(BB.r&&BB.i===i){const key=JSON.stringify(c&&c.buildings||null);if(key!==BB.key){BB.key=key;bOpenKeep(i)}else{bLabBuild();if(BB.hov){bTip(null)}}}}
 function bOpenKeep(i){const p=BB.cam.position.clone(),tg=BB.ctl.target.clone(),intro=BB.intro;bOpen(i);if(!intro){BB.intro=null;BB.cam.position.copy(p);BB.ctl.target.copy(tg);BB.ctl.update()}}
 /* fly the main camera into the island first (if far), then open the base */
+/* camera focus: while a selected wallet is in view up close (or being flown to / opened), the orbits ease to a stop,
+   so the island holds still under the cursor: wheel zoom, clicks and the fly-in all aim at a fixed point. */
+const FOCUS={k:1};
+function focusK(dt){let w=1;const i=FY.sel;if(i>=0&&i<NW){if(HUB.cvI>=0||HUB.cvPend||(fly&&fly.trackFn))w=0;else if(camera.position.distanceTo(wPos(i))<(S.mode==='world'?80:40))w=0}
+ FOCUS.k+=(w-FOCUS.k)*Math.min(1,dt*3);if(Math.abs(w-FOCUS.k)<.002)FOCUS.k=w;return FOCUS.k}
+/* phones: a bottom sheet (wallet card / find panel) covers the lower ~60% of the screen, which hid the selected castle right under it,
+   so a second tap could never reach it. Shift the projection centre into the visible strip above the sheet (orbit/zoom still pivot on the castle). */
+const VSH={y:0,top:0,tb:0,ft:0};
+function updViewShift(dt){if(innerWidth>820){if(VSH.y){VSH.y=0;camera.clearViewOffset()}return}
+ if((VSH.ft-=dt)<=0){VSH.ft=.25;let top=innerHeight;if(FY.sel>=0&&HUB.cvI<0)for(const el of document.querySelectorAll('.ph.open,#card.open')){const r=el.getBoundingClientRect();if(r.height>40&&r.bottom>=innerHeight-2&&r.top<top)top=r.top}top=Math.max(innerHeight*.3,top);const sh=top<innerHeight;if(sh&&!VSH.sh){const fd=document.getElementById('feed');if(fd&&!fd.classList.contains('min')){fd.classList.add('min');const ft=document.getElementById('feedT');if(ft)ft.textContent='▸'}}VSH.sh=sh;let tb=0;if(top<innerHeight)for(const id of ['topr','feed']){const el=document.getElementById(id);if(!el)continue;const r=el.getBoundingClientRect();if(r.height>0&&getComputedStyle(el).visibility!=='hidden'&&r.bottom<top-90&&r.bottom>tb)tb=r.bottom}VSH.top=top;VSH.tb=tb}
+ const want=VSH.top<innerHeight?(innerHeight-VSH.top-VSH.tb)/2:0;VSH.y+=(want-VSH.y)*Math.min(1,dt*6);if(Math.abs(want-VSH.y)<.5)VSH.y=want;
+ if(VSH.y<.5){if(camera.view&&camera.view.enabled)camera.clearViewOffset();return}const v=camera.view;if(v&&v.enabled&&v.offsetY===VSH.y&&v.fullHeight===innerHeight&&v.fullWidth===innerWidth)return;camera.setViewOffset(innerWidth,innerHeight,0,VSH.y,innerWidth,innerHeight)}
+/* click within the selected castle's island on screen → treat as a click on that castle (the 9-px point pick missed it easily) */
+function islandHit(i,x,y,minPx){const p=wPos(i),q=p.clone().project(camera);if(q.z>1||q.z<-1)return -1;
+ const r=p.clone().addScaledVector(new THREE.Vector3(1,0,0).applyQuaternion(camera.quaternion),1.1).project(camera);
+ const px=Math.max(minPx,Math.hypot((r.x-q.x)*innerWidth/2,(r.y-q.y)*innerHeight/2)),d=Math.hypot((q.x*.5+.5)*innerWidth-x,(-q.y*.5+.5)*innerHeight-y);return d<=px?d:-1}
+function nearSel(x,y){const i=FY.sel;if(i<0||i>=NW||SET.cls[i]!==0||HUB.cvI>=0)return false;return islandHit(i,x,y,MOBILE?30:22)>=0}
+/* click that missed every point but lands on a drawn castle island → that castle (islands are much bigger than their wallet point) */
+function castPick(x,y){let b=-1,bd=1e9;for(const s of CAST.slots){if(s.w<0||!s.g.visible)continue;const d=islandHit(s.w,x,y,MOBILE?18:12);if(d>=0&&d<bd){bd=d;b=s.w}}return b}
 function cvOpen(i){if(i==null||i<0||i>=NW)return false;if(HUB.cvI>=0&&HUB.cvI!==i)cvClose(true);
- if(S.mode!=='world'&&!HUB.cvPend&&HUB.cvI<0&&camera.position.distanceTo(wPos(i))>6){HUB.cvPend={i,t:0};flyTo(wPos(i),3.4,()=>wPos(i));beep(420,.05);return true}
+ if(S.mode!=='world'&&!HUB.cvPend&&HUB.cvI<0&&camera.position.distanceTo(wPos(i))>6){if(FY.sel!==i){if(FY.sel>=0&&!featured.has(FY.sel))setHL(FY.sel,0);FY.sel=i;setHL(i,2.2)}HUB.cvPend={i,t:0};flyTo(wPos(i),3.4,()=>wPos(i));beep(420,.05);return true}
  HUB.cvPend=null;HUB.cvI=i;HUB.cvNear=0;$('cv').classList.add('open');requestAnimationFrame(()=>requestAnimationFrame(()=>$('cv').classList.add('vis')));
  clearTimeout(BB.fullT);BB.fullT=setTimeout(()=>{if(HUB.cvI===i)BB.full=true},520);
  BB.key=undefined;if(!bOpen(i)){$('cvC').style.display='none'}BB.key=JSON.stringify((castleNow(SET.addr[i])||{}).buildings||null);
@@ -3550,8 +3574,9 @@ function cvOpen(i){if(i==null||i<0||i>=NW)return false;if(HUB.cvI>=0&&HUB.cvI!==
 function cvClose(quiet){HUB.cvPend=null;if(HUB.cvI<0)return;const i=HUB.cvI;HUB.cvI=-1;BB.full=false;clearTimeout(BB.fullT);bTip(null);$('cv').classList.remove('open','vis');HUB.cvCool=2;
  if(!quiet&&FY.sel===i)flyTo(wPos(i),MOBILE?12:9,()=>wPos(i))}
 $('cvX').onclick=()=>cvClose();
+addEventListener('keydown',e=>{if(e.key==='Escape'&&HUB.cvI>=0){e.stopImmediatePropagation();cvClose()}},true);
 function cvTick(dt){wallTick();bTick();
- if(HUB.cvPend){const p=HUB.cvPend;p.t+=dt;if((!fly&&p.t>.25)||p.t>2.4){HUB.cvPend=null;cvOpen(p.i)}return}
+ if(HUB.cvPend){const p=HUB.cvPend;p.t+=dt;if((!fly&&p.t>.25)||p.t>2.4){HUB.cvPend=null;fly=null;if(camera.position.distanceTo(wPos(p.i))<=6)cvOpen(p.i)}return}  // never re-launch the fly: a cancelled fly-in stays cancelled
  if(HUB.cvCool>0){HUB.cvCool-=dt;return}if(HUB.cvI>=0||FY.sel<0||fly||S.mode==='world'||SET.cls[FY.sel]!==0){HUB.cvNear=0;return}
  const d=camera.position.distanceTo(wPos(FY.sel));if(d<4.6){if((HUB.cvNear+=dt)>.6)cvOpen(FY.sel)}else HUB.cvNear=0}
 /* test hooks */
@@ -3563,8 +3588,88 @@ function bScreen(id){const b=BB.info.find(q=>q.id===id);if(!b||!BB.cam)return nu
 const BASEAPI={base:()=>({open:HUB.cvI>=0,i:BB.i,ids:BB.ids.slice(),levels:BB.info.map(b=>({id:b.id,lv:b.lv})),dome:BB.dome?BB.dome.material.uniforms.uOp.value:null,frames:BB.frames,full:BB.full,
   calls:BB.r?BB.r.info.render.calls:0,tris:BB.r?BB.r.info.render.triangles:0,tip:$('cvTip').style.display==='block'?$('cvTip').textContent:''}),
  baseScreen:id=>bScreen(id),castleDemo:a=>castleDemo(a),wallOp:lv=>wallOp(lv),bubbles:()=>({n:WB.mesh.count,max:WB.n,slots:CAST.slots.filter(s=>s.w>=0&&s.g.visible).length,op:Array.from(WB.op.array.slice(0,WB.mesh.count))}),
+ camState:()=>({fly:!!fly,track:!!track,pend:!!HUB.cvPend,sel:FY.sel,cv:HUB.cvI,full:BB.full,morph,cam:camera.position.toArray(),tgt:controls.target.toArray(),dist:FY.sel>=0?camera.position.distanceTo(wPos(FY.sel)):null,auto:controls.autoRotate,tok:S.tok,drawn:DRAWN,mode:S.mode,focus:FOCUS.k,wT,vsh:[VSH.y,VSH.tb,VSH.top]}),
+ selScreen:()=>{const i=FY.sel;if(i<0)return null;const q=wPos(i).project(camera);return {x:(q.x*.5+.5)*innerWidth,y:(-q.y*.5+.5)*innerHeight}},
+ twinHitAt:(x,y)=>typeof twinHit==='function'&&twinHit(x,y),
+ twin:()=>typeof TWIN==="undefined"?null:{on:TWIN.on,u:TWIN.u,n:TWIN.n,vis:TWIN.g?TWIN.g.visible:false,r:TWIN.r,pos:TWIN.pos.toArray(),mine:NODES.reserve.pos.toArray(),s1:NODES.reserve.g.scale.x,scr:(()=>{const q=TWIN.pos.clone().project(camera);return {x:(q.x*.5+.5)*innerWidth,y:(-q.y*.5+.5)*innerHeight,z:q.z}})(),mscr:(()=>{const q=NODES.reserve.pos.clone().project(camera);return {x:(q.x*.5+.5)*innerWidth,y:(-q.y*.5+.5)*innerHeight,z:q.z}})(),tip:document.getElementById("tip").style.display==="block"?document.getElementById("tip").innerText:null},
+ castPick:(x,y)=>castPick(x,y),ihit:(i,x,y)=>{const q=wPos(i).project(camera);return {q:q.toArray(),h:islandHit(i,x,y,12),slots:CAST.slots.filter(s=>s.w===i).map(s=>[s.w,s.g.visible]),pw:pickWallet(x,y)}},castSlots:()=>CAST.slots.filter(s=>s.w>=0&&s.g.visible).map(s=>s.w),
  baseOrbit:(az,el,dist)=>{BB.intro=null;BB.ctl.target.set(0,2,0);BB.cam.position.set(Math.sin(az)*Math.cos(el)*dist,Math.sin(el)*dist+2,Math.cos(az)*Math.cos(el)*dist);BB.ctl.update();BB.dirty=true}};
 if(typeof R6API!=='undefined'&&R6API.r6)Object.assign(R6API.r6,BASEAPI);
+/* ===== Twin cores · DEV (v2) ONLY · future 4X concept with demo data =====
+   Star 1 = raw Amber / Soul Stone: the existing audited Mine (finite) — wild raw orange, rough dull glow, slowly dimmer/smaller over the demo timeline.
+   Star 2 = cut Amber · «Живая казна» / Living Treasury (fed by Amber spent in the in-game shop) — bigger, sun-like amber-gold, white energy core, faceted.
+   Streams: Star 1 → islands (mining), islands → Star 2 (shop spending). Only for castle islands already drawn by the LOD (CAST slots), one shared
+   LineSegments + one shared Points; no new assets, no post-processing. No prices, no numbers. */
+const TWIN={on:EDITION==='dev',t:0,u:0,pos:new THREE.Vector3(),r:3};
+if(TWIN.on){
+ Object.assign(T.ru,{tw1:'Сырой Amber · Шахта (конечная) · демо',tw1s:'Гномы добывают сырой Amber → огранка → обращение в экосистеме',
+  tw2:'Огранённый Amber · Живая казна (пополняется от трат в игре) · демо',tw2s:'Потраченный в игровом магазине Amber стекается сюда, и звезда растёт',
+  twNote:'Концепт будущей 4X-механики · демо-данные',twLab:'Живая казна · концепт · демо'});
+ Object.assign(T.en,{tw1:'Raw Amber · Mine (finite) · demo',tw1s:'Gnomes mine raw Amber → it gets cut → it circulates in the ecosystem',
+  tw2:'Cut Amber · Living Treasury (refilled by in-game spending) · demo',tw2s:'Amber spent in the in-game shop flows back here and the star grows',
+  twNote:'Future 4X concept · demo data',twLab:'Living Treasury · concept · demo'});
+ const g=new THREE.Group();g.name='twin2';uni.add(g);TWIN.g=g;
+ const add=(c,o,s)=>{const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:DOT,color:c,transparent:true,opacity:o,depthWrite:false,blending:THREE.AdditiveBlending,fog:false}));sp.scale.set(s,s,1);g.add(sp);return sp};
+ TWIN.halo=add(0xffb02e,.16,46);TWIN.co=add(0xffc94a,.42,20);
+ // faceted cut-amber crystal (flat facets, gold-silver edges)
+ const cg=new THREE.OctahedronGeometry(2.1,1).toNonIndexed();cg.scale(1,1.25,1);cg.computeVertexNormals();
+ const cry=new THREE.Mesh(cg,new THREE.MeshPhongMaterial({color:0xffc24a,emissive:0x9a5c08,specular:0xffffff,shininess:90,flatShading:true,transparent:true,opacity:.82,depthWrite:false}));cry.renderOrder=7;g.add(cry);TWIN.cry=cry;
+ const ed=new THREE.LineSegments(new THREE.EdgesGeometry(cg,1),new THREE.LineBasicMaterial({color:0xfff1c8,transparent:true,opacity:.55,depthWrite:false}));ed.renderOrder=8;cry.add(ed);
+ TWIN.core=add(0xffffff,.95,5.2);TWIN.core.renderOrder=9;
+ // white energy rays (one small canvas texture)
+ const RAY=(()=>{const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');x.translate(64,64);
+  for(let k=0;k<12;k++){x.rotate(Math.PI/6);const gr=x.createLinearGradient(0,0,0,-62);gr.addColorStop(0,'rgba(255,255,255,.9)');gr.addColorStop(1,'rgba(255,240,200,0)');
+   x.fillStyle=gr;x.beginPath();x.moveTo(-(k%2?1.4:2.6),0);x.lineTo(0,-(k%2?44:62));x.lineTo(k%2?1.4:2.6,0);x.fill()}return new THREE.CanvasTexture(c)})();
+ TWIN.ray=new THREE.Sprite(new THREE.SpriteMaterial({map:RAY,color:0xfff3d6,transparent:true,opacity:.55,depthWrite:false,blending:THREE.AdditiveBlending,fog:false}));TWIN.ray.scale.set(15,15,1);TWIN.ray.renderOrder=10;g.add(TWIN.ray);
+ // shared streams
+ const MAXC=48,SEG=10,DPC=3;TWIN.MAXC=MAXC;TWIN.SEG=SEG;
+ const lp=new Float32Array(MAXC*SEG*2*3),lc=new Float32Array(MAXC*SEG*2*3),lg=new THREE.BufferGeometry();
+ lg.setAttribute('position',new THREE.BufferAttribute(lp,3));lg.setAttribute('color',new THREE.BufferAttribute(lc,3));lg.setDrawRange(0,0);
+ TWIN.lines=new THREE.LineSegments(lg,new THREE.LineBasicMaterial({vertexColors:true,transparent:true,opacity:.26,depthWrite:false,blending:THREE.AdditiveBlending}));TWIN.lines.frustumCulled=false;uni.add(TWIN.lines);
+ const dp=new Float32Array(MAXC*DPC*3),dc=new Float32Array(MAXC*DPC*3),dg=new THREE.BufferGeometry();
+ dg.setAttribute('position',new THREE.BufferAttribute(dp,3));dg.setAttribute('color',new THREE.BufferAttribute(dc,3));dg.setDrawRange(0,0);
+ TWIN.dots=new THREE.Points(dg,new THREE.PointsMaterial({size:.32,map:DOT,vertexColors:true,transparent:true,opacity:.9,depthWrite:false,blending:THREE.AdditiveBlending}));TWIN.dots.frustumCulled=false;uni.add(TWIN.dots);
+ TWIN.DPC=DPC;
+ // floating label under Star 2
+ const host=(Object.values(labEls)[0]||{}).parentElement||document.body;const lb=document.createElement('div');lb.className='lb';lb.id='twinLab';lb.style.display='none';/* a caption only: taps and clicks pass through to the nodes beneath */lb.style.pointerEvents='none';lb.style.cursor='default';host.appendChild(lb);TWIN.lab=lb;
+}
+const _twA=new THREE.Vector3(),_twB=new THREE.Vector3(),_twM=new THREE.Vector3(),_twQ=new THREE.Vector3();
+const C_MINE=[1,.48,.12],C_SPEND=[1,.86,.5];
+function twinBez(a,b,lift,u,out){_twM.copy(a).add(b).multiplyScalar(.5);_twM.y+=lift;const k=1-u;return out.set(k*k*a.x+2*k*u*_twM.x+u*u*b.x,k*k*a.y+2*k*u*_twM.y+u*u*b.y,k*k*a.z+2*k*u*_twM.z+u*u*b.z)}
+function updTwin(dt){if(!TWIN.on)return;TWIN.t+=dt;const u=TWIN.u=.3+.7*(1-Math.exp(-TWIN.t/150));   // demo timeline 0.3 → 1
+ const R=NODES.reserve,off=morph>.3||S.panel==='inv'||(typeof EYE!=='undefined'&&EYE.f>.4);
+ // Star 1: raw Amber · rough orange, duller, shrinking
+ const s1=1-.32*u,fl=.85+.15*Math.sin(TWIN.t*5.3)*Math.sin(TWIN.t*2.1);R.g.scale.multiplyScalar(s1);
+ RP.hot.material.color.setHex(0xd8641a);RP.hotw.material.color.setHex(0xb0521c);RP.cor.material.color.setHex(0xe06a22);
+ RP.hot.material.opacity*=.8*(1-.35*u);RP.cor.material.opacity*=fl*(1-.45*u);RP.hotw.material.opacity*=.7;
+ // Star 2: Living Treasury · binary companion of the Mine, grows
+ const fut=eraK;TWIN.pos.copy(R.pos).add(_twQ.set(-9.5-2.5*fut,1.6+fut,7+3*fut));TWIN.g.position.copy(TWIN.pos);TWIN.g.visible=!off;
+ const s2=(.62+.5*u)*(1+.35*fut);TWIN.g.scale.setScalar(s2);TWIN.r=2.6*s2;const pu=.5+.5*Math.sin(TWIN.t*1.3);
+ TWIN.core.material.opacity=.8+.2*pu;TWIN.co.material.opacity=.32+.12*pu;TWIN.halo.material.opacity=.11+.06*u;TWIN.ray.material.opacity=.35+.25*pu;TWIN.ray.material.rotation+=dt*.05;TWIN.cry.rotation.y+=dt*.12;
+ // streams (only islands that the castle LOD currently draws)
+ const lp=TWIN.lines.geometry.attributes.position.array,lc=TWIN.lines.geometry.attributes.color.array,dp=TWIN.dots.geometry.attributes.position.array,dc=TWIN.dots.geometry.attributes.color.array;
+ let n=0;if(!off)for(const sl of CAST.slots){if(sl.w<0||!sl.g.visible||n>=TWIN.MAXC-1)continue;const i=sl.w;
+  for(const mine of [true,false]){if(mine&&!SET.gn[i]&&i%3)continue;if(n>=TWIN.MAXC)break;
+   if(mine){_twA.copy(R.pos);_twB.copy(sl.g.position)}else{_twA.copy(sl.g.position);_twB.copy(TWIN.pos)}const lift=_twA.distanceTo(_twB)*.12,col=mine?C_MINE:C_SPEND,f=sl.f;
+   for(let s=0;s<TWIN.SEG;s++){const o=(n*TWIN.SEG+s)*6;twinBez(_twA,_twB,lift,s/TWIN.SEG,_twQ);lp[o]=_twQ.x;lp[o+1]=_twQ.y;lp[o+2]=_twQ.z;twinBez(_twA,_twB,lift,(s+1)/TWIN.SEG,_twQ);lp[o+3]=_twQ.x;lp[o+4]=_twQ.y;lp[o+5]=_twQ.z;
+    const fade=f*(mine?.8:1)*(.35+.65*Math.sin(Math.PI*(s+.5)/TWIN.SEG));for(let v=0;v<2;v++)for(let c=0;c<3;c++)lc[o+v*3+c]=col[c]*fade}
+   for(let d=0;d<TWIN.DPC;d++){const o=(n*TWIN.DPC+d)*3,uu=(TWIN.t*(mine?.16:.2)+d/TWIN.DPC+(i%17)*.059)%1;twinBez(_twA,_twB,lift,uu,_twQ);dp[o]=_twQ.x;dp[o+1]=_twQ.y;dp[o+2]=_twQ.z;
+    const a=Math.sin(Math.PI*uu)*f;dc[o]=col[0]*a;dc[o+1]=col[1]*a;dc[o+2]=col[2]*a}
+   n++}}
+ TWIN.n=n;TWIN.lines.geometry.setDrawRange(0,n*TWIN.SEG*2);TWIN.dots.geometry.setDrawRange(0,n*TWIN.DPC);
+ if(n){TWIN.lines.geometry.attributes.position.needsUpdate=TWIN.lines.geometry.attributes.color.needsUpdate=true;TWIN.dots.geometry.attributes.position.needsUpdate=TWIN.dots.geometry.attributes.color.needsUpdate=true}
+ TWIN.lines.visible=TWIN.dots.visible=n>0;
+ // label
+ const lb=TWIN.lab;if(off||S.kiosk||morph>.5){lb.style.display='none'}else{_twQ.copy(TWIN.pos);_twQ.y-=TWIN.r*1.25;_twQ.project(camera);
+  if(_twQ.z>1||Math.abs(_twQ.x)>1.1||Math.abs(_twQ.y)>1.1||camera.position.distanceTo(TWIN.pos)>900)lb.style.display='none';
+  else{const tx=t('twLab');if(lb._t!==tx){lb.textContent=tx;lb._t=tx}lb.style.display='block';lb.style.left=(_twQ.x*.5+.5)*innerWidth+'px';lb.style.top=(-_twQ.y*.5+.5)*innerHeight+'px'}}}
+/* screen hit-test for Star 2 (hover tooltip / tap) */
+function twinHit(x,y){if(!TWIN.on||!TWIN.g.visible)return false;_twQ.copy(TWIN.pos).project(camera);if(_twQ.z>1)return false;
+ _twM.copy(TWIN.pos).addScaledVector(_twA.set(1,0,0).applyQuaternion(camera.quaternion),TWIN.r).project(camera);
+ const px=Math.max(14,Math.hypot((_twM.x-_twQ.x)*innerWidth/2,(_twM.y-_twQ.y)*innerHeight/2));return Math.hypot((_twQ.x*.5+.5)*innerWidth-x,(-_twQ.y*.5+.5)*innerHeight-y)<=px}
+/* Star 2 is nearer to the camera than a node hit at ray distance d → the star wins the pick */
+function twinFront(x,y,d){return twinHit(x,y)&&camera.position.distanceTo(TWIN.pos)-TWIN.r<d}
+const twinTipHTML=k=>`<b>${t(k)}</b><br>${t(k+'s')}<br><span style="color:#8f9cc4">${t('twNote')}</span>`;
 
 /* ===== Loop ===== */
 const clock=new THREE.Clock();let frame=0,fpsAcc=0,fpsN=0,statT=0;window.__fps=0;
@@ -3572,7 +3677,7 @@ const NANIM=Object.keys(NODES).filter(k=>k!=='fiat'&&!NODES[k].neb).map(k=>{cons
 function tick(){requestAnimationFrame(tick);
  const dt=Math.min(clock.getDelta(),.1);frame++;fpsAcc+=dt;fpsN++;if(fpsAcc>1){window.__fps=Math.round(fpsN/fpsAcc);fpsAcc=0;fpsN=0}
  const run=!S.paused;
- if(run){aClock+=dt;orbT+=dt*Math.min(4,.6+.4*S.speed);wT+=dt*Math.min(6,.6+.4*S.speed);fiatGroup.rotation.y+=dt*.01;
+ if(run){aClock+=dt;orbT+=dt*Math.min(4,.6+.4*S.speed);wT+=dt*Math.min(6,.6+.4*S.speed)*focusK(dt);fiatGroup.rotation.y+=dt*.01;
   if(S.src==='sim'&&!S.tm){const sd=dt*SIM_SEC*S.speed;S.simT+=sd;pushSnap();
    if(S.tok){S.acc+=Math.min(PLAYERS,JOINED)/2*MATCH_PER_PLAYER_DAY/86400*sd;let vis=0;const cap=MOBILE?6:14;
     while(S.acc>=1){S.acc--;if(vis<cap&&live()<PN*.7&&S.mode==='uni'||vis<3&&S.mode==='world'){visMatch();vis++}else numMatch()}}
@@ -3588,7 +3693,7 @@ function tick(){requestAnimationFrame(tick);
   for(const o of a.sp){if(o.name==='spin'){o.rotation.y+=dt*.3;o.rotation.x+=dt*.1}else if(o.name==='spin2')o.rotation.y-=dt*.15;else if(o.name==='spinr'){o.rotation.z+=dt*.8;o.rotation.y+=dt*.3}else if(o.name==='coin')o.rotation.z+=dt*1.5;else if(o.name==='flame')o.scale.y=1+Math.sin(tm*9)*.15+n.glow*.4}}
  if(run)pulse*=.94;const pz=NODES.pool.inner.getObjectByName('pulse');if(pz){pz.material.opacity=.1+Math.min(.6,pulse*.35);pz.scale.setScalar(1+pulse*.03)}
  for(const o of flowLines){const mineLine=o.a==='reserve';const want=o.hov?.85:(mineLine&&!(MS.mineOn||eraK>.5)?.05:o.base);o.ln.material.opacity+=(want-o.ln.material.opacity)*.15;o.ln.visible=morph<.5}
- updEra(dt);updNet(dt);updRoy(dt);updWatch(dt);updGnF(dt);updCastles(dt);updLinks();
+ updEra(dt);updNet(dt);updRoy(dt);updWatch(dt);updGnF(dt);updCastles(dt);updTwin(dt);updViewShift(dt);updLinks();
  updParticles();updArcs(dt);updFind(dt);updTrail();updTM(dt);updMorph(dt);updInv(dt);updRegions(dt);
  if(mouseMoved&&frame%3===0){mouseMoved=false;const h=pick(mx,my);if(h&&h.k){setHover(h.k);hoverW=-1}else{setHover(null);hoverW=h&&h.w!=null?h.w:-1}showTip()}
  updFly();controls.update();updLabels();
