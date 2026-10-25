@@ -499,6 +499,8 @@ ul.tech{margin:6px 0 4px;padding-left:18px;font-size:13px;line-height:1.5}ul.tec
    ===================================================================== */
 window.ED_CONFIG={
  edition:'dev',               // 'dev' (/v2/) или 'prod' (/live/) — подставляется при сборке
+ // Демо-турниры (только dev, симуляция): межсерверный раз в crossMin–crossMax с, турнир сервера раз в serverMin–serverMax с
+ tournamentDemo:{crossMin:40,crossMax:60,serverMin:15,serverMax:20,crossServers:[3,5],players:[16,64]},
  network:{name:'Polygon PoS',chainId:137,explorer:'https://polygonscan.com',
   // Публичные RPC по порядку. maxRange — лимит блоков на один eth_getLogs, archive — отдаёт старые логи.
   rpcs:[
@@ -4188,6 +4190,87 @@ if(PR.on&&typeof AST!=='undefined'&&AST.on){
  R6API.r6.minePop=()=>({hov:hoverK,tipD:tip.style.display,open:cardKey==='reserve'&&$('card').classList.contains('open'),secs:[...document.querySelectorAll('#cBody .mpSec')].map(s=>s.id),btn:[...document.querySelectorAll('#cBody .mpB')].map(b=>b.dataset.m+':'+b.dataset.a+':'+b.textContent),
   st:[...MP.st],cl:[...MP.cl],un:[...MP.un],w:[...MP.w],last:MP.last,txt:$('cBody')?$('cBody').innerText:''});
  R6API.r6.mineAction=(m,a,o)=>mineAction(m,a,o)}
+/* ---------- framing (dev): small desktop screens keep the scene focus above the bottom panels ----------
+   When the control panel (or the first-visit hint) reaches into the middle of the view, the camera gets a
+   vertical view offset so the focus sits in the middle of the free band between the top bar and the panel.
+   Large screens (panel low enough, e.g. 1440×900) keep the exact old framing; mobile keeps its own logic. */
+const FRM={y:0,want:0,ft:0,thr:.72};
+if(PR.on){const _uvs=updViewShift;updViewShift=function(dt){if(innerWidth<=820){FRM.y=0;FRM.want=0;return _uvs(dt)}
+  if((FRM.ft-=dt)<=0){FRM.ft=.25;let top=innerHeight,tb=0;const H=innerHeight;
+   const vis=el=>{if(!el)return null;const r=el.getBoundingClientRect();return r.height>8&&r.width>8&&getComputedStyle(el).display!=='none'&&getComputedStyle(el).visibility!=='hidden'?r:null};
+   for(const el of [$('ctrl'),$('hint1').classList.contains('open')?$('hint1'):null]){const r=vis(el);if(r&&r.bottom>H*.6&&r.top<top)top=r.top}
+   const rt=vis($('topr'));if(rt)tb=rt.bottom;
+   FRM.want=top<H*FRM.thr&&!S.kiosk&&!document.body.classList.contains('embed')&&!document.body.classList.contains('inv')?Math.max(0,H/2-(tb+top)/2):0}
+  FRM.y+=(FRM.want-FRM.y)*Math.min(1,dt*5);if(Math.abs(FRM.want-FRM.y)<.5)FRM.y=FRM.want;VSH.y=FRM.y;
+  if(FRM.y<.5){if(camera.view&&camera.view.enabled)camera.clearViewOffset();return}
+  const v=camera.view;if(v&&v.enabled&&v.offsetY===FRM.y&&v.fullHeight===innerHeight&&v.fullWidth===innerWidth)return;
+  camera.setViewOffset(innerWidth,innerHeight,0,FRM.y,innerWidth,innerHeight)};
+ /* first-visit hint 1: frame the whole asteroid (≈ 35 % of the view height) instead of the hidden token node */
+ const hintDist=()=>{const R=(typeof AST!=='undefined'&&AST.on)?AST.R*AST.K:6;const th=Math.tan(camera.fov*Math.PI/360);return R/(.35*th)};
+ const _hs=hintShow;hintShow=function(n){_hs(n);if(n===1&&typeof AST!=='undefined'&&AST.on)flyTo(NODES.reserve.pos.clone(),hintDist())};
+ Object.assign(R6API.r6,{frame:()=>{const R=(typeof AST!=='undefined'&&AST.on)?AST.R*AST.K:6;const c=NODES.reserve.pos.clone().project(camera),d=camera.position.distanceTo(NODES.reserve.pos);
+   const th=Math.tan(camera.fov*Math.PI/360);const r=document.getElementById('ctrl').getBoundingClientRect();
+   return {vy:FRM.y,want:FRM.want,ast:{x:(c.x*.5+.5)*innerWidth,y:(-c.y*.5+.5)*innerHeight,z:c.z},astH:R/(d*th),ctrlTop:r.top,ctrlL:r.left,ctrlR:r.right,hint:R6.hintN,fly:!!fly,dist:d,hintDist:hintDist()}},
+  hintShow:n=>hintShow(n)})}
+
+/* ---------- tournaments (dev demo): cross-server events converge on Decision Arena, intra-server ones burst locally ----------
+   Cross-server: streams from several server islands converge on Decision Arena; intra-server: a small local burst of players
+   gathering at their server's island, then one spark to the Arena. Colour: fuchsia (distinct from Amber, stakes, Wellspring, refund lime).
+   Wire-ready hook: tournamentTx({scope:'cross'|'server', servers:[...], entryAmber, players}). Frequencies: ED_CONFIG.tournamentDemo. */
+const TRNC=Object.assign({crossMin:40,crossMax:60,serverMin:15,serverMax:20,crossServers:[3,5],players:[16,64],first:8},(typeof CFG!=='undefined'&&CFG.tournamentDemo)||{});
+const TRN_C=0xd946ef,TRN_HEX='#d946ef';
+const TRS={xT:TRNC.first+6,sT:TRNC.first,lines:[],cnt:{cross:0,server:0},last:null};
+if(PR.on){PR.off.trn=0;PR_FLY.trnX='trn';PR_FLY.trnS='trn';FEIC.trnX='🏆';FEIC.trnS='🏅';
+ Object.assign(T.ru,{fyTrn:'Турниры',lTrn:'Турниры: межсерверные потоки → Decision Arena, турнир сервера — локальная вспышка',
+  feTrnX:'Межсерверный турнир · серверов: {n} · игроков: {p} → Decision Arena',feTrnS:'Турнир сервера {s} · игроков: {p}',tTourSoon:'Турниры · скоро'});
+ Object.assign(T.en,{fyTrn:'Tournaments',lTrn:'Tournaments: cross-server streams → Decision Arena, a server tournament is a local burst',
+  feTrnX:'Cross-server tournament · servers: {n} · players: {p} → Decision Arena',feTrnS:'Server {s} tournament · players: {p}',tTourSoon:'Tournaments · soon'})}
+const _tA=new THREE.Vector3(),_tB=new THREE.Vector3(),_tC=new THREE.Vector3();
+function trnLine(a,col){/* a curved fading line from island a to Decision Arena */
+ const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(new Float32Array(25*3),3).setUsage(THREE.DynamicDrawUsage));
+ const m=new THREE.LineBasicMaterial({color:col,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false});const l=new THREE.Line(g,m);l.frustumCulled=false;l.renderOrder=3;scene.add(l);
+ TRS.lines.push({l,a,t:0,d:7});}
+function tournamentTx(o){if(!PR.on)return false;o=o||{};const scope=o.scope==='cross'?'cross':'server';srvBuild();const K=WS2.srv.length;if(!K)return false;
+ let sv=(Array.isArray(o.servers)?o.servers:[]).map(x=>((x|0)%K+K)%K).filter((x,i,a)=>a.indexOf(x)===i);
+ if(!sv.length){const n=scope==='cross'?TRNC.crossServers[0]+Math.floor(Math.random()*(TRNC.crossServers[1]-TRNC.crossServers[0]+1)):1;
+  const pool=[...Array(K).keys()].sort(()=>Math.random()-.5);sv=pool.slice(0,Math.min(n,K))}
+ if(scope==='cross'&&sv.length<2)return false;
+ const pl=Math.max(2,o.players|0||TRNC.players[0]+Math.floor(Math.random()*(TRNC.players[1]-TRNC.players[0])));const hid=PR.off.trn;
+ TRS.cnt[scope]++;TRS.last={scope,servers:sv.slice(),players:pl,entryAmber:+o.entryAmber||0,t:S.simT};
+ if(!hid){if(scope==='cross'){sv.forEach((j,k)=>{const a=WS2.srv[j].a;trnLine(a,TRN_C);
+    for(let q=0;q<(MOBILE?5:8);q++)spawn({fw:a,tn:'pool',c:TRN_C,s:2.4,d:2.6,arc:10,delay:k*.15+q*.35,ly:'trn'})});
+   setTimeout(()=>{NODES.pool.glow=1},2400)}
+  else{const j=sv[0],a=WS2.srv[j].a;let n=0;for(let k=0;k<60&&n<(MOBILE?6:10);k++){const w=prPick(i=>SET.cls[i]===0&&WS2.of(i)===j,30);if(w<0||w===a)continue;
+    spawn({fw:w,tw:a,c:TRN_C,s:.9,d:1.4,arc:2,delay:n*.12,ly:'trn'});n++}
+   spawn({fw:a,tn:'pool',c:TRN_C,s:1.3,d:2.2,arc:8,delay:1.6,ly:'trn'})}}
+ if(!o.quiet)prFeed(scope==='cross'?{k:'trnX',n:sv.length,p:pl}:{k:'trnS',s:sv[0]+1,p:pl});
+ return true}
+function updTrn(dt){if(!PR.on)return;const run=!S.paused&&SET.kind==='sim'&&!S.tm&&S.mode==='uni'&&DRAWN>0;
+ if(run){const sp=Math.min(3,.6+.4*S.speed);
+  if((TRS.xT-=dt*sp)<=0){TRS.xT=TRNC.crossMin+Math.random()*(TRNC.crossMax-TRNC.crossMin);if(!PR.off.trn)tournamentTx({scope:'cross'})}
+  if((TRS.sT-=dt*sp)<=0){TRS.sT=TRNC.serverMin+Math.random()*(TRNC.serverMax-TRNC.serverMin);if(!PR.off.trn)tournamentTx({scope:'server'})}}
+ for(let i=TRS.lines.length-1;i>=0;i--){const L=TRS.lines[i];L.t+=dt;const u=L.t/L.d;
+  if(u>=1||PR.off.trn||S.mode!=='uni'){scene.remove(L.l);L.l.geometry.dispose();L.l.material.dispose();TRS.lines.splice(i,1);continue}
+  wPos(L.a,_tA);_tB.copy(NODES.pool.pos);const d=_tA.distanceTo(_tB);_tC.copy(_tA).add(_tB).multiplyScalar(.5);_tC.y+=d*.18;
+  const pa=L.l.geometry.attributes.position.array;const grow=Math.min(1,L.t/1.6);
+  for(let k=0;k<25;k++){const s=grow*k/24,a=1-s;pa[k*3]=a*a*_tA.x+2*a*s*_tC.x+s*s*_tB.x;pa[k*3+1]=a*a*_tA.y+2*a*s*_tC.y+s*s*_tB.y;pa[k*3+2]=a*a*_tA.z+2*a*s*_tC.z+s*s*_tB.z}
+  L.l.geometry.attributes.position.needsUpdate=true;L.l.material.opacity=.9*Math.min(1,L.t/.4)*Math.min(1,(L.d-L.t)/1.5)}}
+if(PR.on){
+ /* layer toggle in the Amber economy row; the old World-row button keeps driving the 'coming soon' tournament node demo */
+ {const row=$('ecoRow');if(row){const b=document.createElement('button');b.className='ck on';b.dataset.f='trn';b.id='fy_trn';row.appendChild(b);
+   b.onclick=()=>{PR.off.trn=PR.off.trn?0:1;prApplyLayers();R6lay();beep(520,.04)}}
+  const _rl3=R6lay;R6lay=function(){_rl3();const b=$('fy_trn');if(b)b.classList.toggle('on',!PR.off.trn)};
+  const _ri3=R6i18n;R6i18n=function(){_ri3();const b=$('fy_trn');if(b)b.textContent=t('fyTrn');const o=$('tTour');if(o)o.textContent=t('tTourSoon')}}
+ const _ft3=feText;feText=function(e){if(e.k==='trnX')return t('feTrnX',{n:fmt(e.n),p:fmt(e.p)});if(e.k==='trnS')return t('feTrnS',{s:e.s,p:fmt(e.p)});return _ft3(e)};
+ const _fc3=R6feedClick;R6feedClick=function(j){const e=R6.feed[j];if(e&&(e.k==='trnX'||e.k==='trnS')){beep(740,.05);if(S.tm)tmClose();closePanels();focusNode('pool');return 'pool'}return _fc3(j)};
+ const _rl4=renderLegend;renderLegend=function(){_rl4();const li=$('legI');if(li&&!li.querySelector('.lTrn')){const d=document.createElement('div');d.className='lTrn';
+  d.innerHTML=`<span class="leg2" style="background:${TRN_HEX};height:3px"></span>${t('lTrn')}`;li.appendChild(d)}};
+ const _upt=updPros;updPros=function(dt){_upt(dt);updTrn(dt)};
+ window.tournamentTx=o=>tournamentTx(o);
+ Object.assign(R6API.r6,{tournamentTx:o=>{PSB.force=1;try{return tournamentTx(o)}finally{PSB.force=0}},
+  trnView:d=>flyTo(NODES.pool.pos.clone(),d||170),trn:()=>({cnt:{...TRS.cnt},last:TRS.last,lines:TRS.lines.length,lineOp:TRS.lines.map(L=>+L.l.material.opacity.toFixed(2)),sparks:P.filter(q=>q&&q.ly==='trn').length,off:!!PR.off.trn,cfg:{...TRNC},
+   feed:R6.feed.filter(e=>e.k==='trnX'||e.k==='trnS').map(e=>feText(e)),btn:$('fy_trn')?$('fy_trn').textContent:'',old:$('tTour')?$('tTour').textContent:'',leg:($('legI')&&$('legI').querySelector('.lTrn'))?$('legI').querySelector('.lTrn').textContent:''})})}
+
 /* ---------- mobile robustness (dev): frame guard, WebGL context loss, on-screen diagnostics ---------- */
 if(EDITION==='dev'){
  const GLD={err:0,last:'',lost:0,el:null,t:null};
