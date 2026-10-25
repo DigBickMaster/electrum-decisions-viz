@@ -619,6 +619,7 @@ import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
 import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
 import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
+import {ShaderPass} from 'three/addons/postprocessing/ShaderPass.js';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
 const CFG=window.ED_CONFIG;const EDITION=CFG.edition==='prod'?'prod':'dev';
 /* ===== Numbers from the studio financial model (cell refs in README.md) ===== */
@@ -946,6 +947,7 @@ function devTok(key,c,r){const rep=(a,b)=>{if(c.b)c.b=c.b.split(a).join(b);if(c.
   c.b=r?'<p>Большинство игроков играет бесплатно, без кошелька и без Amber. Это спокойное внешнее кольцо карты.</p><p>Токен-режим — слой поверх бесплатной игры: Amber, гномы-NFT и замки-NFT.</p>':'<p>Most players play for free, with no wallet and no Amber. This is the calm outer ring of the map.</p><p>Token mode is a layer on top of free play: Amber, gnome NFTs and castle NFTs.</p>';
   c.n=[];c.x=''}
  return c}
+if(EDITION==='dev'){T.ru.nGnome='Минтер NFT-гномов';T.en.nGnome='Gnome NFT Minter';T.ru.t7h='Минтер NFT-гномов';T.en.t7h='Gnome NFT Minter';}
 /* ===== Extra UI strings (RU/EN parity) ===== */
 Object.assign(T.ru,{
  wPlayed:'Матчей',lRoy:'Роялти 1% (зашито в контракт NFT замков) · внешние площадки · в Банк · скоро',wWon:'Побед',
@@ -1026,6 +1028,12 @@ const controls=new OrbitControls(camera,canvas);
 controls.enableDamping=true;controls.dampingFactor=.08;controls.minDistance=4;controls.maxDistance=2400;controls.zoomSpeed=1.4;controls.screenSpacePanning=true;controls.rotateSpeed=.6;controls.target.copy(HOME.t);
 const composer=new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene,camera));
+/* dev: NaN/Inf scrub before bloom. One non-finite pixel (a GPU-specific shader edge case) is smeared by the bloom blur over the whole
+   frame and shows as a full-black flash on some GPUs (ANGLE/D3D11). Bit test, so fast-math cannot optimise it away; bad -> 0, else clamp. */
+const scrub=EDITION==='dev'?new ShaderPass({uniforms:{tDiffuse:{value:null}},
+ vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+ fragmentShader:'uniform sampler2D tDiffuse;varying vec2 vUv;void main(){vec4 c=texture2D(tDiffuse,vUv);uvec4 u=floatBitsToUint(c)&uvec4(0x7f800000u);bool bad=any(equal(u,uvec4(0x7f800000u)));gl_FragColor=bad?vec4(0.,0.,0.,1.):vec4(clamp(c.rgb,0.,64.),clamp(c.a,0.,1.));}'}):null;
+if(scrub){scrub.name='nanScrub';composer.addPass(scrub)}
 const bloom=new UnrealBloomPass(new THREE.Vector2(innerWidth*(MOBILE?.5:1),innerHeight*(MOBILE?.5:1)),.85,.55,.2);
 composer.addPass(bloom);composer.addPass(new OutputPass());
 function uScale(){return innerHeight*DPR/(2*Math.tan(THREE.MathUtils.degToRad(camera.fov/2)))}
@@ -1068,7 +1076,7 @@ const sunMat=new THREE.ShaderMaterial({vertexShader:sunVS,fragmentShader:sunFS,u
 const gemVS=`varying vec3 vN;varying vec3 vV;void main(){vec4 w=modelMatrix*vec4(position,1.);vN=normalize(mat3(modelMatrix)*normal);vV=normalize(cameraPosition-w.xyz);gl_Position=projectionMatrix*viewMatrix*w;}`;
 const gemFS=`uniform float uT;uniform float uB;varying vec3 vN;varying vec3 vV;
 float h(vec3 p){return fract(sin(dot(p,vec3(12.9898,78.233,37.719)))*43758.5453);}
-void main(){vec3 n=normalize(vN);if(uB>.5)n=-n;float c=abs(dot(n,vV));float fr=pow(1.-c,2.4);float fc=h(floor(n*6.)+.5);float pu=.5+.5*sin(uT*1.7);
+void main(){vec3 n=normalize(vN);if(uB>.5)n=-n;float c=abs(dot(n,vV));float fr=pow(max(1.-c,0.),2.4);float fc=h(floor(n*6.)+.5);float pu=.5+.5*sin(uT*1.7);
  vec3 deep=vec3(.32,.08,.0),mid=vec3(1.,.44,.03),hi=vec3(1.,.85,.45);
  vec3 col=mix(deep,mid,.1+c*.3+fc*.5)*.62;
  col+=hi*pow(c,5.)*(.25+.3*pu);
@@ -1078,7 +1086,7 @@ void main(){vec3 n=normalize(vN);if(uB>.5)n=-n;float c=abs(dot(n,vV));float fr=p
 const ethVS=`attribute vec3 d;uniform float uT;uniform float uS;varying float vA;
 void main(){float r=d.x;float a=d.y+uT*(.5+1.4*(1.-r));float y=d.z+.18*sin(uT*.9+d.y*3.);float sq=1.-min(1.,abs(y))*.55;
  vec3 p=vec3(cos(a)*r*sq*1.5,y*2.7,sin(a)*r*sq*1.5);vA=.5+.5*sin(uT*3.1+d.y*7.+r*5.);vec4 mv=modelViewMatrix*vec4(p,1.);gl_Position=projectionMatrix*mv;gl_PointSize=clamp(uS*.05*(.6+vA*.6)/-mv.z,1.,7.);}`;
-const ethFS=`varying float vA;void main(){vec2 p=gl_PointCoord-.5;float l=length(p);if(l>.5)discard;gl_FragColor=vec4(vec3(1.,.66,.2)*(.4+vA*.45),smoothstep(.5,0.,l)*(.2+.5*vA));}`;
+const ethFS=`varying float vA;void main(){vec2 p=gl_PointCoord-.5;float l=length(p);if(l>.5)discard;gl_FragColor=vec4(vec3(1.,.66,.2)*(.4+vA*.45),(1.-smoothstep(0.,.5,l))*(.2+.5*vA));}`;
 const GEM={};
 function gemGeo(){const pts=[[0,-4.0],[1.55,-1.7],[2.05,-.2],[2.05,.9],[1.45,2.35],[.62,3.0],[0,3.05]].map(p=>new THREE.Vector2(p[0],p[1]));
  const g=new THREE.LatheGeometry(pts,7).toNonIndexed();const a=g.attributes.position.array;
@@ -1153,7 +1161,7 @@ const BHN=new THREE.Vector3(.25,1,.18).normalize(),BHE1=new THREE.Vector3(1,0,0)
 const diskVS=`attribute vec3 d;uniform float uT;uniform float uR;uniform float uS;uniform vec3 uE1;uniform vec3 uE2;uniform vec3 uN;varying float vR;varying float vA;
 void main(){float r=d.x*uR;float a=d.y+uT*(2.2/(.35+d.x*d.x*1.6));vec3 p=(cos(a)*uE1+sin(a)*uE2)*r+uN*d.z*(.25+.6*d.x);
  vR=d.x;vA=a;vec4 mv=modelViewMatrix*vec4(p,1.);gl_Position=projectionMatrix*mv;gl_PointSize=clamp(uS*.11*(1.3-d.x*.6)/-mv.z,1.,10.);}`;
-const diskFS=`uniform float uB;varying float vR;void main(){vec2 p=gl_PointCoord-.5;float l=length(p);if(l>.5)discard;float a=smoothstep(.5,0.,l);
+const diskFS=`uniform float uB;varying float vR;void main(){vec2 p=gl_PointCoord-.5;float l=length(p);if(l>.5)discard;float a=(1.-smoothstep(0.,.5,l));
  vec3 c=mix(vec3(1.,.95,.75),mix(vec3(1.,.45,.12),vec3(.7,.1,.25),smoothstep(.5,1.,vR)),smoothstep(.12,.55,vR));gl_FragColor=vec4(c*(.45+uB*1.1),a*(1.-vR*.55));}`;
 addNode('burn',BH_POS,(g,G)=>{
  g.add(new THREE.Mesh(new THREE.SphereGeometry(1.6,40,24),new THREE.MeshBasicMaterial({color:0x000000})));
@@ -1230,7 +1238,7 @@ const ringFS=`uniform float uT;uniform vec3 uA;uniform vec3 uB;uniform float uR;
 float h(vec2 p){return fract(sin(dot(p,vec2(12.9898,78.233)))*43758.5453);}
 float n2(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}
 float fbm(vec2 p){float s=0.,a=.5;for(int i=0;i<5;i++){s+=a*n2(p);p=p*2.07+vec2(3.1,1.7);a*=.5;}return s;}
-void main(){float r=length(vP),an=atan(vP.y,vP.x);float v=(r-uR)/uW;float t=uT*.015;
+void main(){float r=length(vP),an=atan(vP.y,vP.x);float v=(r-uR)/max(uW,1e-4);float t=uT*.015;
  vec2 q=vec2(cos(an),sin(an))*3.2+vec2(v*1.6,0.);float w=fbm(q+vec2(t,-t));float n=fbm(q*1.8+w*1.4-vec2(t*.6));
  float prof=exp(-v*v*(2.6+1.4*w))*smoothstep(.15,.85,n+.15);float wisp=pow(n,3.)*exp(-v*v*.9)*.6;
  vec3 c=mix(uA,uB,.5+.5*sin(an+t*3.+w*2.));float a=(prof+wisp)*uI;gl_FragColor=vec4(c*a,1.);}`;
@@ -1269,7 +1277,7 @@ const shieldMat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blen
  fragmentShader:`uniform float uT,uOp;varying vec3 vN;varying vec3 vV;varying vec3 vP;
  float h21(vec2 p){return fract(sin(dot(p,vec2(41.3,289.1)))*43758.5);}
  float hexE(vec2 p){p.x*=1.1547;p.y+=mod(floor(p.x),2.)*.5;vec2 f=abs(fract(p)-.5);return max(f.x*1.5+f.y,f.y*2.);}
- void main(){vec3 n=normalize(vP);float fr=pow(1.-abs(dot(normalize(vN),vV)),3.2);
+ void main(){vec3 n=normalize(vP);float fr=pow(max(1.-abs(dot(normalize(vN),vV)),0.),3.2);
   vec2 sp=vec2(atan(n.z,n.x)*9.,asin(clamp(n.y,-1.,1.))*9.);float e=hexE(sp*1.6);float edge=smoothstep(.88,.99,e);
   float flow=.5+.5*sin(n.y*7.+uT*.35+sin(n.x*4.+uT*.2)*1.6)*sin(n.z*5.-uT*.27);
   vec3 gold=vec3(1.,.78,.38),silver=vec3(.78,.84,.96);vec3 col=mix(silver,gold,smoothstep(.2,.8,flow*.6+fr*.5));
@@ -1352,13 +1360,13 @@ void main(){vRg=rg*uPR;if(sz<0.){gl_Position=vec4(0.,0.,2.,1.);gl_PointSize=0.;v
  p=mix(p,g,uMorph);
  vec4 mv=modelViewMatrix*vec4(p,1.);gl_Position=projectionMatrix*mv;float sm=(cen.w>1.5?2.1:cen.w>.5?1.8:1.)*(.78+.22*ag)*(uCB>.5?1.45:1.)*(vRg>.5?1.35:1.);gl_PointSize=clamp(uS*.15*sz*sm*(1.+hl*1.8)/-mv.z,1.3*sm*(uCB>.5?1.6:1.),uM*sz*sm*(1.+hl*1.5));vH=hl;vC=col;vAg=ag;vShp=shp;}`;
 const wFS=`uniform float uO;uniform float uCB;varying float vH;varying vec3 vC;varying float vSd;varying float vAg;varying float vShp;varying float vRg;
-void main(){vec2 p=gl_PointCoord-.5;float d=length(p);float rgw=vRg>2.5?.075:vRg>1.5?.048:.026;float ring=vRg>.5?smoothstep(rgw*.5+.02,rgw*.5,abs(d-(.47-rgw*.5))):0.;if(vRg>.5){p*=1.35;d*=1.35;}float an=atan(p.y,p.x);
+void main(){vec2 p=gl_PointCoord-.5;float d=length(p);float rgw=vRg>2.5?.075:vRg>1.5?.048:.026;float ring=vRg>.5?(1.-smoothstep(rgw*.5,rgw*.5+.02,abs(d-(.47-rgw*.5)))):0.;if(vRg>.5){p*=1.35;d*=1.35;}float an=atan(p.y,p.x);
  if(uCB>.5){float m;if(vShp<.5){m=step(abs(p.x)+abs(p.y),.46);}else if(vShp<1.5){m=step(d,.26);}else if(vShp<2.5){m=step(abs(d-.34),.09);}else{m=step(p.y,.32)*step(-.42+abs(p.x)*2.1,p.y);}
   if(m<.5&&ring<.05)discard;gl_FragColor=mix(vec4(vC*(1.05+vH*.6)*(.6+.4*vAg),min(1.,uO+.35+vH*.6)),vec4(1.,.7,.28,.95),ring*(1.-m));return;}
  float edge=.36+.07*sin(an*5.+vSd*31.)+.04*sin(an*9.-vSd*17.);
- float rock=smoothstep(edge+.03,edge-.04,d);float glow=smoothstep(.5,.0,d)*.35;if(rock+glow+ring<.02)discard;
+ float rock=(1.-smoothstep(edge-.04,edge+.03,d));float glow=(1.-smoothstep(.0,.5,d))*.35;if(rock+glow+ring<.02)discard;
  float lit=.55+.6*clamp(dot(normalize(p+1e-4),vec2(-.7,.7))*(d/edge),-.6,1.);
- vec3 rc=mix(vec3(.42,.36,.33),vC,.72)*lit;vec3 c=mix(rc,vC,glow*.9/max(rock+glow,.001));c+=vC*smoothstep(.2,.0,d)*.55;c=mix(c,vec3(1.,.85,.45),clamp(vH*.6,0.,1.));
+ vec3 rc=mix(vec3(.42,.36,.33),vC,.72)*lit;vec3 c=mix(rc,vC,glow*.9/max(rock+glow,.001));c+=vC*(1.-smoothstep(.0,.2,d))*.55;c=mix(c,vec3(1.,.85,.45),clamp(vH*.6,0.,1.));
  vec4 o=vec4(c*(.75+vH*1.1)*(.5+.5*vAg),min(1.,rock+glow)*min(1.,uO+.25+vH*.6)*min(1.,.4+.6*vAg));gl_FragColor=mix(o,vec4(vec3(1.,.68,.24)*(1.15+vH*.5),.95),ring*(1.-rock));}`;
 const WG=new THREE.BufferGeometry();
 const WA={pos:new Float32Array(MAXW*3),o2:new Float32Array(MAXW*3),gp:new Float32Array(MAXW*3),sz:new Float32Array(MAXW),hl:new Float32Array(MAXW),col:new Float32Array(MAXW*3),rb:new Float32Array(MAXW),cen:new Float32Array(MAXW*4),ag:new Float32Array(MAXW).fill(1),shp:new Float32Array(MAXW),rg:new Float32Array(MAXW)};
@@ -1407,7 +1415,7 @@ function pickWallet(x,y,maxPx=MOBILE?16:9){let best=-1,bd=maxPx*maxPx,bz=9;const
 const PN=MOBILE?2600:7000;
 const pVS=`attribute float sz;attribute vec3 col;uniform float uS;uniform float uD;varying vec3 vC;
 void main(){vec4 mv=modelViewMatrix*vec4(position,1.);gl_Position=projectionMatrix*mv;gl_PointSize=sz>0.?clamp(uS*.3*sz/-mv.z,2.,22.*uD):0.;vC=col;}`;
-const pFS=`varying vec3 vC;void main(){vec2 p=gl_PointCoord-.5;float d=length(p);if(d>.5)discard;float a=smoothstep(.5,0.,d);gl_FragColor=vec4(vC*(1.2+a),a);}`;
+const pFS=`varying vec3 vC;void main(){vec2 p=gl_PointCoord-.5;float d=length(p);if(d>.5)discard;float a=(1.-smoothstep(0.,.5,d));gl_FragColor=vec4(vC*(1.2+a),a);}`;
 const PG=new THREE.BufferGeometry(),PP=new Float32Array(PN*3),PC=new Float32Array(PN*3),PS=new Float32Array(PN);
 PG.setAttribute('position',new THREE.BufferAttribute(PP,3).setUsage(THREE.DynamicDrawUsage));
 PG.setAttribute('col',new THREE.BufferAttribute(PC,3).setUsage(THREE.DynamicDrawUsage));
@@ -1561,8 +1569,8 @@ function book(a,b,e,win){const pool=2*e;S.cM++;if(Math.random()<CANCEL_P*.3)S.cM
  const lose=win===a?b:a;rec(a,[S.simT,'contrib',e,b]);rec(b,[S.simT,'contrib',e,a]);rec(win,[S.simT,'win',pool*M.win,lose]);rec(lose,[S.simT,'loss',0,win]);
  bhScale(S.cB+S.cBB*0)}
 const featured=new Set();let pulse=0;
-function visMatch(forceDraw){
- const a=randW(-1),b=partner(a),e=sampleEntry(),win=Math.random()<.5?a:b,s=.55+Math.log10(e)*.18;let n=0;const draw=forceDraw||Math.random()<DRAW_P;
+function visMatch(forceDraw,eIn){
+ const a=randW(-1),b=partner(a),e=eIn||sampleEntry(),win=Math.random()<.5?a:b,s=.55+Math.log10(e)*.18;let n=0;const draw=forceDraw||Math.random()<DRAW_P;
  if(draw&&S.mode!=='world'){let k=0;const back=()=>{if(++k<2)return;bookDraw(a,b,e);pulse=.6;window.ED_lastDraw={a,b,e,t:Date.now()};
    for(const w of [a,b])spawn({fn:'pool',tw:w,c:REFUND_COL,s:s*.95,d:1.7,arc:2,cb:()=>{if(!featured.has(w))setHL(w,0)}})};
   setHL(a,.9);setHL(b,.9);if(!spawn({fw:a,tn:'pool',c:COL.vio,s,d:1.5,arc:2,cb:back})){bookDraw(a,b,e);return}if(!spawn({fw:b,tn:'pool',c:COL.vio,s,d:1.5,arc:2,cb:back}))back();return}
@@ -1579,7 +1587,7 @@ function visMatch(forceDraw){
  if(!spawn({fw:b,tn:'pool',c:COL.vio,s,d:1.5,arc:2,cb:arrive}))arrive();
 }
 function numMatch(){const a=randW(-1),b=partner(a),e=sampleEntry();if(Math.random()<DRAW_P)bookDraw(a,b,e);else book(a,b,e,Math.random()<.5?a:b)}
-const REFUND_COL=0x94a3b8;
+const REFUND_COL=EDITION==='dev'?0xbef264:0x94a3b8;
 let energyAcc=0;
 function energy(dt){energyAcc+=dt*(MOBILE?5:11);while(energyAcc>=1){energyAcc--;if(live()<PN*.75&&DRAWN>0){const fut=eraK>.5;let w=randW(-1);if(fut&&MS.owners.length&&Math.random()<.75){const o=MS.owners[Math.floor(Math.random()*MS.owners.length)];if(o<DRAWN)w=o}spawn({fn:fut?'reserve':'contract',tw:w,c:fut?0xffb347:0xffcf7a,s:fut?.55:.45,d:2.6+Math.random(),arc:1.2})}}
  if(SET.kind==='sim')dexSwarm(dt)}
@@ -2925,7 +2933,7 @@ const eyeMat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,depthTe
   blue*=(.25+.75*smoothstep(.12,.75,rq))*.55;
   float stars=pow(h(floor(q*90.)),70.)*(.6+.4*sin(uT*3.+h(floor(q*90.))*30.));blue+=vec3(.7,.85,1.)*stars;
   /* pupil with the auditor's logo */
-  float pr=.25;float pup=smoothstep(pr+.012,pr-.008,rq);
+  float pr=.25;float pup=(1.-smoothstep(pr-.008,pr+.012,rq));
   vec2 lu=q/(pr*.96)*.5+.5;vec4 lg=texture2D(uLogo,lu);lg.a*=step(0.,lu.x)*step(lu.x,1.)*step(0.,lu.y)*step(lu.y,1.);
   vec3 pc=vec3(.0,.005,.02);pc=mix(pc,lg.rgb*(.55+.06*sin(uT*1.3)),lg.a*(1.-uBl));
   vec3 c=mix(blue,pc,pup)+vec3(.3,.6,1.)*exp(-abs(rq-pr)*40.)*.35*(1.-pup);
@@ -2938,7 +2946,7 @@ const eyeMat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,depthTe
   float sw=fb(vec2(ang*2.-log(max(e,.1))*3.+uT*.12*uSd,e*2.2-uT*.1));float outS=smoothstep(.45,.9,sw)*exp(-max(0.,e-1.)*2.2)*(1.-ins);
   vec3 col=c*ins+rc*rim*.85+vec3(1.,.55,.18)*halo*.5+vec3(.2,.45,.9)*outS*.5;
   float a=clamp(ins+rim+halo*.6+outS*.45,0.,1.)*uOp*(1.-step(1.,abs(vU.x))*0.);
-  a*=smoothstep(1.,.88,max(abs(vU.x),abs(vU.y)));
+  a*=(1.-smoothstep(.88,1.,max(abs(vU.x),abs(vU.y))));
   gl_FragColor=vec4(col,a);}`});
 /* the deity: a colossal HEAD made of nebula (head only — no body) */
 const headMat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,depthTest:false,fog:false,blending:THREE.AdditiveBlending,uniforms:{uT:{value:0},uOp:{value:0}},
@@ -2954,15 +2962,15 @@ const headMat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,depthT
   float d=sme(w,vec2(0.,1.15),vec2(3.05,3.5));            // cranium
   d=smin(d,sme(w,vec2(0.,-1.35),vec2(2.15,2.75)),1.3);     // cheeks + jaw, tapering to the chin
   d=smin(d,sme(w,vec2(0.,-.1),vec2(3.15,1.9)),.9);         // temples / cheekbones
-  float inside=smoothstep(.55,-.9,d);float rim=exp(-abs(d+.05)*2.4);
+  float inside=(1.-smoothstep(-.9,.55,d));float rim=exp(-abs(d+.05)*2.4);
   /* streams swirl around and into both eyes */
   vec2 s=p;for(int k=0;k<2;k++){vec2 c=vec2(k==0?-1.55:1.55,.7);vec2 v=s-c;float r=length(v);float th=(1.9*exp(-r*.75)+uT*.04*exp(-r*.5))*(k==0?1.:-1.);
    float cs=cos(th),sn=sin(th);s=c+mat2(cs,-sn,sn,cs)*v;}
   float n=fbm(s*.55+vec2(0.,uT*.02)),n3=fbm(s*vec2(1.8,.6)-uT*.03),str=fbm(s*vec2(3.5,.9)+n*2.);
   vec3 deep=vec3(.015,.04,.13),blu=vec3(.09,.27,.62),cy=vec3(.4,.7,1.),gold=vec3(1.,.66,.28);
   vec3 c=mix(deep,blu,smoothstep(.3,.75,n));c=mix(c,cy,smoothstep(.55,.85,str)*.55);c+=vec3(.25,.12,.4)*smoothstep(.65,.9,n3)*.4;
-  float brow=exp(-pow((p.y-.95)/.5,2.))*smoothstep(3.4,.4,abs(p.x));
-  float nose=exp(-pow(p.x/.35,2.))*smoothstep(-.2,-1.8,p.y)*smoothstep(-2.6,-1.6,p.y);
+  float brow=exp(-pow((p.y-.95)/.5,2.))*(1.-smoothstep(.4,3.4,abs(p.x)));
+  float nose=exp(-pow(p.x/.35,2.))*(1.-smoothstep(-1.8,-.2,p.y))*smoothstep(-2.6,-1.6,p.y);
   float shade=1.+brow*.3+nose*.25;
   float tw=.6+.4*sin(uT*2.+h(floor(vU*vec2(600.,660.)))*40.);
   float dust=pow(h(floor(vU*vec2(600.,660.))),55.)*(inside*.9+.25)*1.6*tw;
@@ -2992,7 +3000,7 @@ function updEyes(dt){const d=camera.position.distanceTo(controls.target);const w
  for(const [id,p] of [['eyeL',a],['eyeR',b]]){const e=$(id).style;e.left=p.x+'px';e.top=p.y+'px';e.width=wpx+'px';e.height=hpx+'px'}
  const bb=$('eyeB').style;bb.left=((a.x+b.x)/2)+'px';bb.top=Math.max(70,(a.y+b.y)/2-wpx*.95)+'px'}
 /* --- audits panel: one slot per contract --- */
-const AUD_C=[['amber','amber',{ru:'Amber Soul Stone (AMBER)',en:'Amber Soul Stone (AMBER)'}],['battle','battle',{ru:'Арена · контракт матчей',en:'Arena · match contract'}],
+const AUD_C=[['amber','amber',{ru:'Amber Soul Stone (AMBER)',en:'Amber Soul Stone (AMBER)'}],['battle','battle',{ru:'Decision Arena · контракт матчей',en:'Decision Arena · match contract'}],
  ['staking','staking',{ru:'Стейкинг',en:'Staking'}],['bank','bank',{ru:'Банк Студии',en:'Studio Bank'}],['gnomeNft','gnomeNft',{ru:'NFT гномов',en:'Gnome NFT'}],
  ['dexPair','dexPair',{ru:'Пул ликвидности DEX',en:'DEX liquidity pair'}],['mine','mining',{ru:'Шахта (ещё не выпущена)',en:'Mine (not released yet)'}],
  ['tournament','tournament',{ru:'Турниры',en:'Tournaments'}],['castleNft','castleNft',{ru:'NFT замков · ERC-1155',en:'Castle NFTs · ERC-1155'}]];
@@ -3149,7 +3157,7 @@ function R6i18n(){['lyP','lyT','lyL','lyB'].forEach(id=>$(id).textContent=t(id))
 {const _ai=applyI18n;applyI18n=function(){_ai();try{R6i18n()}catch(e){}}}
 {const _ub=updBtns;updBtns=function(){_ub();try{R6lay()}catch(e){}}}
 /* ---------- quality ---------- */
-function R6applyQ(q){R6.qCur=q;const low=q==='low';bloom.enabled=!low;PCAP=low?Math.floor(PN*.55):0;for(const k in RINGS){RINGS[k].pts.visible=!low}
+function R6applyQ(q){R6.qCur=q;const low=q==='low';bloom.enabled=!low;if(scrub)scrub.enabled=!low;PCAP=low?Math.floor(PN*.55):0;for(const k in RINGS){RINGS[k].pts.visible=!low}
  const pr=low?Math.min(DPR,1):DPR;if(renderer.getPixelRatio()!==pr){renderer.setPixelRatio(pr);if(composer.setPixelRatio)composer.setPixelRatio(pr);onResize()}R6lay()}
 function R6setQ(q,manual){R6.q=q;R6.fpsLow=0;R6.qT=0;if(manual)try{localStorage.setItem('ed_q',q)}catch(e){}R6applyQ(q==='auto'?'high':q)}
 function R6qTick(dt){if(R6.q!=='auto'||R6.qCur==='low'||document.hidden)return;R6.qT+=dt;if(R6.qT<6)return;const f=window.__fps||60;
@@ -3299,7 +3307,14 @@ function R6init(){R6lay();R6i18n();if(MOBILE)$('ctrl').addEventListener('click',
 let R6slow=0;
 function R6tick(dt){R6qTick(dt);R6agTick(dt);R6feedTick(dt);deepTick(dt);if(typeof hubTick==='function')hubTick(dt);
  if((R6slow+=dt)>2){R6slow=0;$('stFoot').textContent=$('foot').textContent;if($('layP').classList.contains('open'))R6lay();if($('lbP').classList.contains('open')&&$('lbP').matches(':hover')===false)lbRender()}}
-const R6API={r6:{setQ:q=>R6setQ(q),q:()=>({q:R6.q,cur:R6.qCur,bloom:bloom.enabled,pcap:PCAP}),feed:()=>R6.feed.map(e=>({k:e.k,txt:feText(e)})),feedClick:j=>R6feedClick(j),
+const R6API={r6:{setQ:q=>R6setQ(q),q:()=>({q:R6.q,cur:R6.qCur,bloom:bloom.enabled,scrub:!!(scrub&&scrub.enabled),pcap:PCAP}),
+ nanScan:()=>{/* dev test hook: list non-finite numbers in scene geometry attributes and shader uniforms */
+  const bad=[];scene.traverse(o=>{const g=o.geometry;if(g&&g.attributes)for(const k in g.attributes){const a=g.attributes[k].array;if(!a)continue;const n=g.drawRange&&isFinite(g.drawRange.count)?Math.min(a.length,(g.drawRange.start+g.drawRange.count)*g.attributes[k].itemSize):a.length;for(let i=0;i<n;i++)if(!Number.isFinite(a[i])){bad.push((o.name||o.type)+'.'+k+'['+i+']');break}}
+   const ms=o.material?(Array.isArray(o.material)?o.material:[o.material]):[];for(const m of ms)if(m&&m.uniforms)for(const k in m.uniforms){const v=m.uniforms[k].value;const vs=typeof v==='number'?[v]:(v&&v.isVector2||v&&v.isVector3||v&&v.isVector4||v&&v.isColor)?Object.values(v).filter(x=>typeof x==='number'):[];if(vs.some(x=>!Number.isFinite(x)))bad.push((o.name||o.type)+'.u.'+k)}
+   if(o.visible&&!(Number.isFinite(o.position.x+o.position.y+o.position.z)&&Number.isFinite(o.scale.x+o.scale.y+o.scale.z)))bad.push((o.name||o.type)+'.xform')});return bad.slice(0,20)},
+ nanProbe:(on,noScrub)=>{/* dev test hook: a small quad that outputs NaN/Inf at runtime, to prove the scrub stops the bloom blackout */
+  if(EDITION!=='dev')return null;if(!R6.nanM){R6.nanM=new THREE.Mesh(new THREE.PlaneGeometry(2,2),new THREE.ShaderMaterial({uniforms:{uZ:{value:0}},vertexShader:'void main(){gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:'uniform float uZ;void main(){float n=uZ/uZ;gl_FragColor=vec4(n,1./uZ,n,1.);}',depthTest:false}));R6.nanM.renderOrder=9999;R6.nanM.frustumCulled=false}
+  const m=R6.nanM;if(on){m.position.copy(controls.target);m.lookAt(camera.position);scene.add(m)}else scene.remove(m);if(scrub)scrub.enabled=noScrub?false:bloom.enabled;return{on:!!on,scrub:!!(scrub&&scrub.enabled)}},feed:()=>R6.feed.map(e=>({k:e.k,txt:feText(e)})),feedClick:j=>R6feedClick(j),
  ms:()=>R6milestones().map(m=>({v:m.v,l:m.l,d:m.d})),lb:tb=>{R6.lbTab=tb||'w';lbOpen();return $('lbB').querySelectorAll('.lbr[data-a],[data-hv]').length},lbGo:a=>lbGo(a),
  share:i=>shareOpen(i).then(s=>({ok:!!(s&&s.data),len:s&&s.data?s.data.length:0,url:s&&s.url})),deep:()=>R6.deepHit,ag:()=>{let n=0,lo=0,hi=0;for(let i=0;i<NW;i++){n++;if(WA.ag[i]<.8)lo++;if(WA.ag[i]>1.2)hi++}return {n,lo,hi}},
  cb:on=>{if(on!==undefined&&!!on!==S.cb)$('tCB').click();return {cb:S.cb,u:WM.uniforms.uCB.value}},hint:()=>R6.hintN,hintShow:n=>hintShow(n),hintClose:()=>hintClose(true),
@@ -3433,7 +3448,7 @@ function wallMat(inst,gain){return new THREE.ShaderMaterial({transparent:true,de
  void main(){vP=position;${inst?'mat4 m=modelMatrix*instanceMatrix;vO=aOp;':'mat4 m=modelMatrix;vO=1.;'}vec4 w=m*vec4(position,1.);vN=normalize(mat3(m)*normal);vV=normalize(cameraPosition-w.xyz);gl_Position=projectionMatrix*viewMatrix*w;}`,
  fragmentShader:`uniform float uOp,uG;varying vec3 vN;varying vec3 vV;varying vec3 vP;varying float vO;
  float hexE(vec2 p){p.x*=1.1547;p.y+=mod(floor(p.x),2.)*.5;vec2 f=abs(fract(p)-.5);return max(f.x*1.5+f.y,f.y*2.);}
- void main(){vec3 n=normalize(vP);float fr=pow(1.-abs(dot(normalize(vN),vV)),2.6);
+ void main(){vec3 n=normalize(vP);float fr=pow(max(1.-abs(dot(normalize(vN),vV)),0.),2.6);
   vec2 sp=vec2(atan(n.z,n.x)*4.,asin(clamp(n.y,-1.,1.))*4.);float e=hexE(sp*1.6);float edge=smoothstep(.86,.99,e);
   float flow=.5+.5*sin(n.y*7.+.6+sin(n.x*4.+.35)*1.6)*sin(n.z*5.-.45);
   vec3 gold=vec3(1.,.78,.38),silver=vec3(.78,.84,.96);vec3 col=mix(silver,gold,smoothstep(.2,.8,flow*.6+fr*.5));
@@ -3701,7 +3716,7 @@ if(AST.on){
  const aeth=new THREE.ShaderMaterial({uniforms:{uT:AST.uT,uZ:AST.uZ},transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide,
   vertexShader:`attribute vec3 aul;varying vec3 vA;void main(){vA=aul;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
   fragmentShader:`uniform float uT;uniform float uZ;varying vec3 vA;
-   void main(){float across=1.-abs(vA.x);float u=vA.y;
+   void main(){float across=max(1.-abs(vA.x),0.);float u=vA.y;
     if(vA.z<.5){float a=pow(across,1.6);float sh=.82+.18*sin(uT*1.1+u*9.);vec3 c=mix(vec3(1.,.42,.05),vec3(1.,.86,.42),a*a);gl_FragColor=vec4(c*a*sh*(.5+.16*uZ),1.);}
     else{float fl=.5+.5*sin(u*14.-uT*1.6)*sin(u*5.+uT*.7);float a=pow(across,2.2)*(.35+.65*fl)*sin(3.1416*u);gl_FragColor=vec4(vec3(1.,.6,.16)*a*.3,1.);}}`});
  const cm=new THREE.Mesh(cg,aeth);cm.renderOrder=6;cm.frustumCulled=false;g.add(cm);AST.aeth=aeth;
@@ -3779,14 +3794,14 @@ if(PR.on){
  for(const lg of ['ru','en']){const o=T[lg];for(const k in o)if(typeof o[k]==='string'||Array.isArray(o[k]))o[k]=AR(o[k])}
  {const _c=card;card=function(k){const c=_c(k);if(c&&typeof c==='object'){for(const f of ['k','h','b','x'])if(typeof c[f]==='string')c[f]=AR(c[f]);if(Array.isArray(c.n))c.n=c.n.map(AR)}return c}}
  {const a=batStatsBlock,b=batStatsHTML;batStatsBlock=function(){return AR(a.apply(this,arguments))};batStatsHTML=function(){return AR(b.apply(this,arguments))}}
- NODES.pool.g.scale.setScalar(2.5);NODES.pool.dist=40;NODES.dex.g.scale.setScalar(3.2);NODES.dex.dist=68;
+ NODES.pool.g.scale.setScalar(5);NODES.pool.dist=76;NODES.pool.orb={r:39,a:.22,w:0,y:3};NODES.dex.g.scale.setScalar(3.2);NODES.dex.dist=68;
  /* the DEX is 2× bigger: its trader / bot swarm moves out by the same margin (still outside the shield: squeezed side ×0.28) */
  {const _so=swarmOrbit;swarmOrbit=function(i,r,kind){_so(i,r,kind);const add=kind===2?7.5:6;WA.pos[i*3]+=add;WA.rb[i]+=add}}
  Object.assign(T.ru,{cPros:'Старатели',cExt:'Внешние кошельки Amber',prosTip:'Наведите (или нажмите) — подсветить острова старателей и их связь с шахтой',
   lMinePros:'Шахта и старатели (держатели гномов 10K)',lPlayer:'Игроки',lExt:'Внешние кошельки Amber (вне экосистемы)',
   lProsH:'Кольцо старателя (гномы 10K):',lPr1:'тонкое — от 1',lPr2:'среднее — от 5',lPr3:'толстое — от 20',
   lStkD:'Стейкинг гнома 10K → вглубь шахты',lStkS:'Стейкинг обычного гнома → Источник наверху шахты',lClaim:'Клейм: только Amber к кошельку, гном остаётся',lUnstk:'Вывод: гном и накопленный Amber → к кошельку',lExtF:'Внешний перевод Amber',
-  laySecEco:'Экономика Amber',fyMine:'Шахта',fyWell:'Источник',fyPros:'Старатели',fyBat:'Бои',fyStk:'Стейкинг',fyDex:'DEX',fyExt:'Внешние',
+  laySecEco:'Экономика Amber',fyMine:'Шахта',fyWell:'Источник',fyPros:'Старатели',fyBat:'Бои',fyRef:'Возвраты',fyStk:'Стейкинг',fyDex:'DEX',fyExt:'Внешние',
   feMint:'Минт гномов: {n} · сожжено {v} Amber',feStkD:'Стейкинг вглубь · гномов 10K: {n} · кошельков: {c}',feStkD1:'Стейкинг вглубь · {w} · гномов 10K: {n}',
   feStkS:'Стейкинг у Источника · обычных гномов: {n} · кошельков: {c}',feStkS1:'Стейкинг у Источника · {w} · обычных гномов: {n}',feUnD1:'Вывод из стейкинга · {w} · гном 10K из глубины + {v} Amber',feUnS1:'Вывод из стейкинга · {w} · обычный гном от Источника + {v} Amber',feUn:'Вывод из стейкинга · гномов: {n} · {v} Amber · кошельков: {c}',
   feClaim:'Клейм из шахты · {v} Amber · кошельков: {c}',feClaim1:'Клейм из шахты · {v} Amber → {w}',feSwap:'Обмен на DEX · {v} Amber · {w}',feExt:'Внешний перевод · {v} Amber → {w}'});
@@ -3794,7 +3809,7 @@ if(PR.on){
   lMinePros:'Mine and Prospectors (10K gnome holders)',lPlayer:'Players',lExt:'External Amber wallets (outside the ecosystem)',
   lProsH:'Prospector ring (10K gnomes):',lPr1:'thin — 1 or more',lPr2:'medium — 5 or more',lPr3:'thick — 20 or more',
   lStkD:'10K gnome staked → deep into the Mine',lStkS:'Common gnome staked → the Wellspring on top of the Mine',lClaim:'Claim: Amber only back to a wallet; the gnome stays',lUnstk:'Unstake: the gnome and accrued Amber → back to a wallet',lExtF:'External Amber transfer',
-  laySecEco:'Amber economy',fyMine:'Mine',fyWell:'Wellspring',fyPros:'Prospectors',fyBat:'Battles',fyStk:'Staking',fyDex:'DEX',fyExt:'External',
+  laySecEco:'Amber economy',fyMine:'Mine',fyWell:'Wellspring',fyPros:'Prospectors',fyBat:'Battles',fyRef:'Refunds',fyStk:'Staking',fyDex:'DEX',fyExt:'External',
   feMint:'Gnome mint: {n} · {v} Amber burned',feStkD:'Deep staking · 10K gnomes: {n} · wallets: {c}',feStkD1:'Deep staking · {w} · 10K gnomes: {n}',
   feStkS:'Wellspring staking · common gnomes: {n} · wallets: {c}',feStkS1:'Wellspring staking · {w} · common gnomes: {n}',feUnD1:'Unstake · {w} · 10K gnome from deep + {v} Amber',feUnS1:'Unstake · {w} · common gnome from the Wellspring + {v} Amber',feUn:'Unstake · gnomes: {n} · {v} Amber · wallets: {c}',
   feClaim:'Claim from the Mine · {v} Amber · wallets: {c}',feClaim1:'Claim from the Mine · {v} Amber → {w}',feSwap:'DEX swap · {v} Amber · {w}',feExt:'External transfer · {v} Amber → {w}'});
@@ -3842,7 +3857,7 @@ function surfPos(out){_pc.set(Math.random()-.5,.55+Math.random()*.45,Math.random
 /* --- layers: tag every flow with its economy layer; switched-off layers spawn invisible flows (callbacks still run) --- */
 function lyOf(o){if(o.ly)return o.ly;const fw=o.fw??-1,tw=o.tw??-1;
  if((fw>=0&&SET.ext[fw])||(tw>=0&&SET.ext[tw]))return 'ext';const a=o.fn,b=o.tn;
- if(a==='dex'||b==='dex')return 'dex';if(a==='pool'||b==='pool')return 'bat';if(a==='staking'||b==='staking')return 'stk';if(a==='reserve'||b==='reserve')return 'mine';return null}
+ if(a==='dex'||b==='dex')return 'dex';if(a==='pool'||b==='pool')return o.c===REFUND_COL?'ref':'bat';if(a==='staking'||b==='staking')return 'stk';if(a==='reserve'||b==='reserve')return 'mine';return null}
 const prHid=q=>!!(q&&(PR.off[q.ly]||(q.ly2&&PR.off[q.ly2])));
 if(PR.on){const _sp=spawn;spawn=function(o){const ly=lyOf(o),i=FREE[FREE.length-1];const ok=_sp(o);
  if(ok&&ly&&P[i]){const q=P[i];q.ly=ly;q.ly2=o.ly2||null;q.s0=q.s;if(prHid(q)){q.s=0;PS[i]=0}}return ok}}
@@ -3917,9 +3932,9 @@ function updPros(dt){if(!PR.on)return;
 /* layers panel: a new 'Amber economy' row of toggles inside the existing Layers control */
 if(PR.on){const lw=$('layP').querySelector('[data-i="laySecCast"]');
  const sec=document.createElement('div');sec.className='lsec';sec.id='laySecEco';const row=document.createElement('div');row.className='lrow';row.id='ecoRow';
- row.innerHTML=['mine','well','pros','bat','stk','dex','ext'].map(k=>`<button class="ck on" data-f="${k}" id="fy_${k}"></button>`).join('');
+ row.innerHTML=['mine','well','pros','bat','ref','stk','dex','ext'].map(k=>`<button class="ck on" data-f="${k}" id="fy_${k}"></button>`).join('');
  lw.parentNode.insertBefore(sec,lw);lw.parentNode.insertBefore(row,lw);
- const FK={mine:'fyMine',well:'fyWell',pros:'fyPros',bat:'fyBat',stk:'fyStk',dex:'fyDex',ext:'fyExt'};
+ const FK={mine:'fyMine',well:'fyWell',pros:'fyPros',bat:'fyBat',ref:'fyRef',stk:'fyStk',dex:'fyDex',ext:'fyExt'};
  row.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{const k=b.dataset.f;PR.off[k]=PR.off[k]?0:1;prApplyLayers();R6lay();beep(520,.04)});
  const _rl=R6lay;R6lay=function(){_rl();let n=0;for(const k in FK){const b=$('fy_'+k);if(b)b.classList.toggle('on',!PR.off[k]);if(PR.off[k])n++}
   if(n){const m=$('bLay').innerHTML.match(/−(\d+)/);const tot=(m?+m[1]:0)+n;$('bLay').innerHTML=t('layBtn')+` <b>−${tot}</b>`}};
@@ -3994,7 +4009,7 @@ function srvBuild(){const hv=typeof HUB!=='undefined'&&HUB.hvApplied&&HUB.hv&&HU
  g.setAttribute('sz',new THREE.BufferAttribute(new Float32Array(N),1).setUsage(THREE.DynamicDrawUsage));
  if(!WS2.mat)WS2.mat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,uniforms:{uS:{value:innerHeight*.5},uC:{value:new THREE.Color(0xffb347)}},
   vertexShader:'attribute float sz;varying float vA;uniform float uS;void main(){vec4 mv=modelViewMatrix*vec4(position,1.);vA=clamp(sz,0.,1.);gl_PointSize=sz>0.?clamp(sz*uS/-mv.z,1.,24.):0.;gl_Position=projectionMatrix*mv;}',
-  fragmentShader:'varying float vA;uniform vec3 uC;void main(){float d=length(gl_PointCoord-.5);if(d>.5)discard;float a=smoothstep(.5,.0,d);gl_FragColor=vec4(uC*(.6+.6*a),a*(.35+.5*vA));}'});
+  fragmentShader:'varying float vA;uniform vec3 uC;void main(){float d=length(gl_PointCoord-.5);if(d>.5)discard;float a=(1.-smoothstep(.0,.5,d));gl_FragColor=vec4(uC*(.6+.6*a),a*(.35+.5*vA));}'});
  WS2.pts=new THREE.Points(g,WS2.mat);WS2.pts.frustumCulled=false;WS2.pts.renderOrder=3;scene.add(WS2.pts)}
 const _wA=new THREE.Vector3(),_wB=new THREE.Vector3(),_wC=new THREE.Vector3(),_wL=new THREE.Vector3();
 function wellPos(out){const pl=typeof AST!=='undefined'&&AST.on&&AST.plant;if(!pl)return out.copy(NODES.reserve.pos);if(!_pbb.b){pl.geometry.computeBoundingBox();_pbb.b=pl.geometry.boundingBox}
@@ -4042,6 +4057,84 @@ if(PR.on){PR_FLY.sum='well';PR_FLY.spend='well';FEIC.sum='Σ';FEIC.spend='⟶';
    pts:WS2.pts?WS2.pts.geometry.attributes.position.count:0,min:{s,a:Math.round(a),c,k,u},tot:{...WS2.tot},lab:WS2.lab?WS2.lab.style.display!=='none'&&WS2.lab.textContent:'',sb:PSB.v,ECO}},
   wtx:i=>(wtx.get(i)||[]).map(e=>({...e}))})}
 
+/* ===== Decision Arena at load (~10k games/hour): aggregated match streams, load pulse, counter, draw refunds ===== */
+const ARC=Object.assign({gamesPerHour:10000,matchMin:6,bigEntry:50000,drawShare:.03,M:16,Mm:10},CFG.arenaDemo||{});
+const ARN={win:Array.from({length:60},()=>0),wi:0,secT:0,tot:{g:0,w:0,d:0,big:0,a:0},acc:0,rate:0,load:0,pts:null,mat:null,key:'',S:[],lab:null,ph:0,shown:0};
+const REF_HEX='#bef264';
+if(PR.on){Object.assign(T.ru,{arnLab:'≈ {g} игр за час · ≈ {m} матчей сейчас',arnSim:'(симуляция)',lArnH:'Decision Arena под нагрузкой',
+  lArnIn:'Взносы → Decision Arena (общий поток от острова)',lArnOut:'Доля победителя: Decision Arena → острова',lArnRef:'Ничья: возврат взноса обоим (поток)',lArnBig:'Крупные матчи и турниры — отдельными искрами'});
+ Object.assign(T.en,{arnLab:'≈ {g} games per hour · ≈ {m} matches now',arnSim:'(simulation)',lArnH:'Decision Arena under load',
+  lArnIn:'Contributions → Decision Arena (one stream per island)',lArnOut:'Winner\'s share: Decision Arena → islands',lArnRef:'Draw: contribution refunded to both (stream)',lArnBig:'Large matches and tournaments fly as single sparks'});
+ const lr=LEG.find(x=>x[0]==='lRefund');if(lr)lr[1]=REF_HEX}
+/* per-island buckets: 0 contributions in, 1 winnings out, 2 refunds out */
+function arnBuild(){srvBuild();if(WS2.key===ARN.key&&ARN.pts)return;ARN.key=WS2.key;const K=WS2.srv.length;
+ ARN.S=WS2.srv.map(()=>({acc:[0,0,0],rate:[0,0,0],t:[-99,-99,-99]}));const M=MOBILE?ARC.Mm:ARC.M;ARN.M=M;const N=K*3*M;
+ if(ARN.pts){scene.remove(ARN.pts);ARN.pts.geometry.dispose();ARN.pts=null}if(!N)return;
+ const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(new Float32Array(N*3),3).setUsage(THREE.DynamicDrawUsage));
+ g.setAttribute('sz',new THREE.BufferAttribute(new Float32Array(N),1).setUsage(THREE.DynamicDrawUsage));
+ const cc=new Float32Array(N*3),C=[new THREE.Color(COL.vio),new THREE.Color(COL.gold),new THREE.Color(0xbef264)];
+ for(let j=0;j<K;j++)for(let c=0;c<3;c++)for(let k=0;k<M;k++){const o=((j*3+c)*M+k)*3;cc[o]=C[c].r;cc[o+1]=C[c].g;cc[o+2]=C[c].b}
+ g.setAttribute('col',new THREE.BufferAttribute(cc,3));
+ if(!ARN.mat)ARN.mat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,uniforms:{uS:{value:innerHeight*.5},uB:{value:1}},
+  vertexShader:'attribute float sz;attribute vec3 col;varying float vA;varying vec3 vC;uniform float uS;void main(){vec4 mv=modelViewMatrix*vec4(position,1.);vA=clamp(sz,0.,1.);vC=col;float z=max(-mv.z,.1);gl_PointSize=sz>0.?clamp(sz*uS/z,1.,22.):0.;gl_Position=projectionMatrix*mv;}',
+  fragmentShader:'varying float vA;varying vec3 vC;uniform float uB;void main(){float d=length(gl_PointCoord-.5);if(d>.5)discard;float a=1.-smoothstep(0.,.5,d);gl_FragColor=vec4(vC*(.55+.5*a)*uB,clamp(a*(.3+.5*vA),0.,1.));}'});
+ ARN.pts=new THREE.Points(g,ARN.mat);ARN.pts.frustumCulled=false;ARN.pts.renderOrder=3;scene.add(ARN.pts)}
+/* individual sparks: big entries only (and the sim's own big matches / tournaments) */
+function arnSpark(a,b,e,res){const s=.55+Math.log10(Math.max(10,e))*.18;let k=0;
+ const done=()=>{if(++k<2)return;pulse=Math.max(pulse,.6);if(res==='draw'){for(const w of [a,b])spawn({fn:'pool',tw:w,c:REFUND_COL,s:s*.95,d:1.7,arc:2})}
+  else spawn({fn:'pool',tw:res==='win'?a:b,c:COL.gold,s:s*1.1,d:1.6,arc:2})};
+ if(!spawn({fw:a,tn:'pool',c:COL.vio,s,d:1.5,arc:2,cb:done}))done();if(!spawn({fw:b,tn:'pool',c:COL.vio,s,d:1.5,arc:2,cb:done}))done()}
+/* the hook: one finished match (entry tx in from both, payout or refund tx out) */
+function matchTx(a,b,entry,result,o){if(!PR.on)return false;a=+a;b=+b;if(!(a>=0&&a<NW&&b>=0&&b<NW))return false;
+ const e=Math.max(0,+entry||0);const res=result==='draw'?'draw':result==='loss'?'loss':'win';arnBuild();
+ ARN.win[ARN.wi]++;ARN.tot.g++;ARN.tot.a+=2*e;if(res==='draw')ARN.tot.d++;else ARN.tot.w++;ARN.acc++;
+ const tn=performance.now()/1000;const add=(w,c,v)=>{const j=WS2.of(w);if(j>=0&&ARN.S[j]){ARN.S[j].acc[c]+=v;ARN.S[j].t[c]=tn}};add(a,0,e);add(b,0,e);
+ if(res==='draw'){add(a,2,e);add(b,2,e)}else add(res==='win'?a:b,1,2*e);
+ if(e>=ARC.bigEntry&&!(o&&o.noSpark)&&S.mode==='uni'){ARN.tot.big++;arnSpark(a,b,e,res)}return true}
+if(PR.on){
+ /* sim: small matches are booked without a particle; big ones keep their own sparks */
+ const _vm=visMatch;visMatch=function(fd,eIn){if(S.mode!=='uni'||fd)return _vm(fd,eIn);const e=eIn||sampleEntry();if(e<ARC.bigEntry){numMatch();return}return _vm(fd,e)};
+ R6API.r6.matchTx=(a,b,e,r)=>matchTx(a,b,e,r);
+ R6API.r6.arena=()=>({cfg:{...ARC},tot:{...ARN.tot},gph:Math.round(ARN.rate*3600),now:Math.round(ARN.rate*60*ARC.matchMin),load:+ARN.load.toFixed(3),
+  pts:ARN.pts?ARN.pts.geometry.attributes.position.count:0,vis:!!(ARN.pts&&ARN.pts.visible),isl:ARN.S.length,
+  rates:ARN.S.map(x=>x.rate.map(v=>Math.round(v))),lab:ARN.lab&&ARN.lab.style.display!=='none'?ARN.lab.textContent:'',scale:NODES.pool.g.scale.x,orb:{...NODES.pool.orb},islD:(()=>{const c=NODES.pool.g.getWorldPosition(new THREE.Vector3()),q=new THREE.Vector3();let m=1e9;for(const sv of WS2.srv)if(sv.a!=null&&sv.a<DRAWN)m=Math.min(m,wPos(sv.a,q).distanceTo(c));return Math.round(m*10)/10})()});
+ const _rl3=renderLegend;renderLegend=function(){_rl3();const li=$('legI');if(li&&!li.querySelector('.lArn')){const d=document.createElement('div');d.className='lArn';
+  const st=c=>`<span class="leg2" style="background:linear-gradient(90deg,${c}55,${c});height:4px"></span>`;
+  d.innerHTML=`<div class="sm" style="margin-top:6px">${t('lArnH')}</div><div>${st('#8b5cf6')}${t('lArnIn')}</div><div>${st('#f6c75a')}${t('lArnOut')}</div><div>${st(REF_HEX)}${t('lArnRef')}</div><div class="lc"><span class="dot" style="color:#f6c75a;background:#f6c75a"></span>${t('lArnBig')}</div>`;li.appendChild(d)}};
+ const _upa=updPros;updPros=function(dt){_upa(dt);try{updArena(dt)}catch(err){if(!ARN.err){ARN.err=1;console.warn('arena',err)}}}}
+const _aA=new THREE.Vector3(),_aB=new THREE.Vector3(),_aC=new THREE.Vector3(),_aL=new THREE.Vector3();
+function updArena(dt){if(!PR.on)return;dt=Math.min(.25,Math.max(0,dt||0));if((ARN.chk=(ARN.chk||0)-dt)<=0){ARN.chk=2;arnBuild()}
+ const nowS=performance.now()/1000;const rdt=ARN.last?Math.min(1,Math.max(0,nowS-ARN.last)):0;ARN.last=nowS;ARN.el=(ARN.el||0)+rdt;
+ if((ARN.secT+=rdt)>=1){ARN.secT-=1;ARN.wi=(ARN.wi+1)%60;ARN.win[ARN.wi]=0}
+ /* demo driver: real-time ~gamesPerHour; feeds only the streams and the counter (the sim books its own matches) */
+ const run=!S.paused&&SET.kind==='sim'&&!S.tm&&S.mode==='uni'&&DRAWN>1;
+ if(run){const lam=ARC.gamesPerHour/3600*rdt;let n=Math.floor(lam)+(Math.random()<lam%1?1:0);
+  while(n-->0){const a=randW(-1),b=partner(a);if(a==null||b==null||a<0||b<0)break;let e=sampleEntry();if(e>=ARC.bigEntry)e=ARC.bigEntry*.5;
+   const r=Math.random();matchTx(a,b,e,r<ARC.drawShare?'draw':r<.5+ARC.drawShare/2?'win':'loss',{noSpark:1})}}
+ /* rate (games/s): 60 s window early on falls back to an EMA of arrivals */
+ ARN.acc=0;{let sum=0;for(const v of ARN.win)sum+=v;const span=Math.min(60,Math.max(3,ARN.el));const r=sum/span;ARN.rate+=(r-ARN.rate)*Math.min(1,rdt/1.5)}
+ const ref=ARC.gamesPerHour/3600||1;const L=Math.min(2,ARN.rate/ref);ARN.load+=(L-ARN.load)*Math.min(1,dt/2);const ld=ARN.load;
+ /* pulse: ring and outer torus breathe faster and stronger with load */
+ ARN.ph+=dt*(1.2+2.2*Math.min(1.5,ld));const sw=.5+.5*Math.sin(ARN.ph);const pz=NODES.pool.inner.getObjectByName('pulse');
+ if(pz){const o=.1+Math.min(.45,ld*.3)*sw;if(o>pz.material.opacity)pz.material.opacity=o;pz.scale.setScalar(Math.max(pz.scale.x,1+Math.min(.12,ld*.07)*sw))}
+ const P3=ARN.pts;if(!P3)return;const vis=S.mode==='uni'&&morph<.5&&!PR.off.bat;P3.visible=vis;
+ const rm=[1,1,1];for(const sv of ARN.S)for(let c=0;c<3;c++){const v=sv.acc[c]/Math.max(dt,1e-3);sv.acc[c]=0;sv.rate[c]+=(v-sv.rate[c])*Math.min(1,dt/12);if(sv.rate[c]>rm[c])rm[c]=sv.rate[c]}
+ if(vis){ARN.mat.uniforms.uS.value=innerHeight*1.1;ARN.mat.uniforms.uB.value=.6+.5*Math.min(1.4,ld);NODES.pool.g.getWorldPosition(_aB);
+  const pa=P3.geometry.attributes.position.array,za=P3.geometry.attributes.sz.array,M=ARN.M,tm=performance.now()/1000,K=ARN.S.length,lw=Math.min(1.3,Math.sqrt(ld));
+  for(let j=0;j<K;j++){const sv=WS2.srv[j],ar=ARN.S[j];const on=sv&&sv.a!=null&&sv.a<DRAWN&&WA.sz[sv.a]>0;if(on)wPos(sv.a,_aA);else _aA.copy(_aB);const d=_aA.distanceTo(_aB);
+   for(let c=0;c<3;c++){const hide=c===2&&PR.off.ref;const fl=nowS-ar.t[c]<(c===2?40:25)?.3:0;const v=on&&!hide?Math.max(fl,Math.sqrt(ar.rate[c]/rm[c])):0;const base=v>.03?(.2+.9*v)*(.35+.65*lw)*(c===2?1.15:1):0;
+    _aC.copy(_aA).add(_aB).multiplyScalar(.5);_aC.y+=d*(.16+.08*c);
+    for(let k=0;k<M;k++){const i=(j*3+c)*M+k,o=i*3;let u=((k/M)+tm*(.1+.06*Math.min(1.5,ld))+j*.137+c*.29)%1;const q=c===0?u:1-u,a=1-q;
+     pa[o]=a*a*_aA.x+2*a*q*_aC.x+q*q*_aB.x;pa[o+1]=a*a*_aA.y+2*a*q*_aC.y+q*q*_aB.y;pa[o+2]=a*a*_aA.z+2*a*q*_aC.z+q*q*_aB.z;
+     za[i]=base*(.7+.3*Math.sin(u*Math.PI))}}}
+  P3.geometry.attributes.position.needsUpdate=true;P3.geometry.attributes.sz.needsUpdate=true}
+ /* counter label under the Arena name */
+ if(!ARN.lab){const e=document.createElement('div');e.className='lb';e.id='arenaLab';e.dataset.k='arenaCnt';e.style.cssText='font-size:10.5px;font-weight:500;padding:2px 8px;border-color:rgba(246,199,90,.4);color:#f3e6c4';$('labels').appendChild(e);ARN.lab=e;e.onclick=()=>{beep(620,.04);focusNode('pool')}}
+ const lab=ARN.lab;NODES.pool.g.getWorldPosition(_aL);const dc=camera.position.distanceTo(_aL);_aL.y-=NODES.pool.g.scale.x*3.6;_aL.project(camera);
+ const show=S.mode==='uni'&&morph<.5&&!PR.off.bat&&dc<260&&_aL.z<1&&Math.abs(_aL.x)<.95&&Math.abs(_aL.y)<.92&&ARN.rate>0;lab.style.display=show?'':'none';
+ if(show){const gph=Math.round(ARN.rate*3600/100)*100,now=Math.round(ARN.rate*60*ARC.matchMin/10)*10;
+  lab.textContent=t('arnLab',{g:fmt(gph),m:fmt(now)})+(SET.kind==='sim'?' '+t('arnSim'):'');
+  lab.style.transform=`translate(${((_aL.x+1)/2*innerWidth).toFixed(0)}px,${((1-_aL.y)/2*innerHeight).toFixed(0)}px) translate(-50%,0)`}}
 /* ---------- mobile robustness (dev): frame guard, WebGL context loss, on-screen diagnostics ---------- */
 if(EDITION==='dev'){
  const GLD={err:0,last:'',lost:0,el:null,t:null};
