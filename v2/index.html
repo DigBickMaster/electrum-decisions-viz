@@ -4135,6 +4135,59 @@ function updArena(dt){if(!PR.on)return;dt=Math.min(.25,Math.max(0,dt||0));if((AR
  if(show){const gph=Math.round(ARN.rate*3600/100)*100,now=Math.round(ARN.rate*60*ARC.matchMin/10)*10;
   lab.textContent=t('arnLab',{g:fmt(gph),m:fmt(now)})+(SET.kind==='sim'?' '+t('arnSim'):'');
   lab.style.transform=`translate(${((_aL.x+1)/2*innerWidth).toFixed(0)}px,${((1-_aL.y)/2*innerHeight).toFixed(0)}px) translate(-50%,0)`}}
+/* ---------- Mine popup (dev): one label + one card for the asteroid, two mines, demo stake / claim / withdraw ---------- */
+if(PR.on&&typeof AST!=='undefined'&&AST.on){
+ Object.assign(T.ru,{astLab:'Шахта / Источник',mpK:'Две шахты · (симуляция)',
+  mpWH:'Источник · шахта для всех',mpWB:'Здесь добывают обычные гномы — отдельная будущая коллекция, которую каждый игрок постепенно получает в игре. Каждый такой гном добывает понемногу. Сюда же стекается Amber, потраченный во всей экосистеме.',
+  mpPH:'Премиум-шахта · NFT-гномы',mpPB:'Только NFT-гномы из коллекции 10K. Они спускаются вглубь тоннелей и копают глубоко.',
+  mpGnW:'Обычных гномов поставлено',mpGnP:'NFT-гномов поставлено',mpIn:'Amber поступило в Источник',mpCl:'Клеймы, Amber',mpUn:'Выведено (гном + Amber)',
+  mpRes:'Резерв шахты',mpMon:'Выдача в месяц ≈',mpPer:'Срок (допущение)',mpMo:' мес.',mpSim:'Цифры — примерная симуляция.',
+  mpDep:'Депозит гнома',mpClaim:'Клейм',mpOut:'Вывести всё',mpDepW:'обычный гном → Источник',mpDepP:'NFT-гном → вглубь шахты',mpClT:'Amber → на остров, гном остаётся',mpOutT:'гном + весь накопленный Amber → на остров',
+  mpNote:'Демо: настоящие транзакции после подключения кошелька.',mpWho:'Демо-кошелёк: {w}'});
+ Object.assign(T.en,{astLab:'Mine / Wellspring',mpK:'Two mines · (simulation)',
+  mpWH:'Wellspring · mine for everyone',mpWB:'Common gnomes mine here: a separate future collection that every player gradually receives through the game. Each of these gnomes mines a little. Amber spent across the ecosystem also flows in here.',
+  mpPH:'Premium Mine · NFT gnomes',mpPB:'Only NFT gnomes from the 10K collection. They descend into the tunnels and dig deep.',
+  mpGnW:'Common gnomes staked',mpGnP:'NFT gnomes staked',mpIn:'Amber flowed into the Wellspring',mpCl:'Claims, Amber',mpUn:'Withdrawn (gnome + Amber)',
+  mpRes:'Mine reserve',mpMon:'Paid out per month ≈',mpPer:'Period (assumption)',mpMo:' months',mpSim:'Figures are an approximate simulation.',
+  mpDep:'Deposit gnome',mpClaim:'Claim',mpOut:'Withdraw all',mpDepW:'common gnome → Wellspring',mpDepP:'NFT gnome → deep into the Mine',mpClT:'Amber → to the island, the gnome stays',mpOutT:'gnome + all accrued Amber → to the island',
+  mpNote:'Demo: real transactions once a wallet is connected.',mpWho:'Demo wallet: {w}'});
+ const MP={st:[0,0],cl:[0,0],un:[0,0],w:[-1,-1],acc:[0,0],last:null,tm:null};
+ /* session counters per mine (sim driver + demo buttons) */
+ {const _s=stakeTx,_c=claimTx,_u=unstakeTx,P=k=>k==='premium'||k==='deep'?1:0;
+  stakeTx=function(w,k,n){const r=_s.apply(null,arguments);if(r)MP.st[P(k)]+=Math.max(1,n|0);return r};
+  claimTx=function(w,k,a){const r=_c.apply(null,arguments);if(r)MP.cl[P(k)]+=Math.max(0,+a||0);return r};
+  unstakeTx=function(w,k,a){const r=_u.apply(null,arguments);if(r)MP.un[P(k)]++;return r}}
+ const mpWallet=p=>{let w=MP.w[p];const okW=i=>i>=0&&i<DRAWN&&SET.cls[i]===0&&WA.sz[i]>0&&(!p||SET.gn[i]>0)&&(p||!SET.lk[i]);if(!okW(w)){/* a nearby island, so the flight is visible next to the Mine */let bd=1e18;w=-1;for(let k=0;k<400;k++){const i=Math.floor(Math.random()*DRAWN);if(!okW(i))continue;const d=wPos(i,_wA).distanceToSquared(NODES.reserve.pos);if(d<bd){bd=d;w=i}}MP.w[p]=w}return w};
+ /* the single wire-ready handler: later this is where the contract calls go (deposit / claim / withdraw on the chosen mine) */
+ window.mineAction=async function(mine,act,opts){const p=mine==='premium'?1:0,kind=p?'premium':'common';
+  if(CFG.mineContracts&&CFG.mineContracts.live&&typeof CFG.mineContracts.send==='function')return CFG.mineContracts.send({mine:kind,act,...(opts||{})});
+  const w=opts&&opts.wallet!=null?opts.wallet:mpWallet(p);if(w<0)return{ok:false,demo:true};const H=R6API.r6;let ok=false;
+  if(act==='deposit'){ok=H.stakeTx(w,kind,1);if(ok){MP.st[p]++;MP.acc[p]=0}}
+  else if(act==='claim'){const a=MP.acc[p]||Math.round(p?80+Math.random()*120:4+Math.random()*26);ok=H.claimTx(w,kind,a);if(ok){MP.cl[p]+=a;MP.acc[p]=0}}
+  else if(act==='withdraw'){const a=Math.round(p?150+Math.random()*200:10+Math.random()*50);ok=H.unstakeTx(w,kind,a);if(ok){MP.un[p]++;MP.acc[p]=0}}
+  MP.last={mine:kind,act,w,ok,t:Date.now()};mpStats();return{ok,demo:true,wallet:w,mine:kind,act}};
+ const sec=(p)=>`<div class="mpSec" id="mp_${p?'p':'w'}" style="margin:10px 0 12px;padding:10px 10px 8px;border:1px solid ${p?'rgba(255,179,71,.45)':'rgba(120,200,255,.35)'};border-radius:10px">
+  <div style="font-weight:700;color:${p?'#ffb347':'#9fd8ff'};margin-bottom:4px">${t(p?'mpPH':'mpWH')}</div><p style="font-size:12.5px">${t(p?'mpPB':'mpWB')}</p><div id="mpN${p}"></div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">${[['deposit','mpDep',p?'mpDepP':'mpDepW'],['claim','mpClaim','mpClT'],['withdraw','mpOut','mpOutT']].map(([a,k,tt])=>`<button class="mpB" data-m="${p?'premium':'common'}" data-a="${a}" title="${t(tt)}" style="flex:1 1 auto;padding:6px 8px;font-size:12.5px">${t(k)}</button>`).join('')}</div>
+  <div class="sm" id="mpW${p}"></div></div>`;
+ function mpStats(){if(cardKey!=='reserve')return;const W=WS2.tot?WS2.tot.a:0;
+  const n0=$('mpN0'),n1=$('mpN1');if(!n0||!n1)return;
+  n0.innerHTML=rows([[t('mpGnW'),'≈ '+fmt(MP.st[0])],[t('mpIn'),'≈ '+fmt(W)+' Amber'],[t('mpCl'),'≈ '+fmt(MP.cl[0])],[t('mpUn'),fmt(MP.un[0])]]);
+  n1.innerHTML=rows([[t('mpGnP'),'≈ '+fmt(MP.st[1])],[t('mpCl'),'≈ '+fmt(MP.cl[1])],[t('mpUn'),fmt(MP.un[1])],[t('mpRes'),big(M.reserve)+' Amber'],[t('mpMon'),big(M.monthRel)+' Amber'],[t('mpPer'),'~'+M.mineMonths+t('mpMo')]]);
+  for(const p of [0,1]){const e=$('mpW'+p);if(e)e.textContent=MP.w[p]>=0?t('mpWho',{w:wName(MP.w[p])}):''}}
+ const _oc=openCard;openCard=function(k){_oc(k);if(k!=='reserve'||!AST.on)return;
+  $('cBody').innerHTML=`<div class="k">${t('mpK')}</div><h3 style="word-break:normal">${t('astLab')}</h3>${sec(0)}${sec(1)}<p class="note mpNote">${t('mpNote')} ${t('mpSim')}</p>`;tip.style.display='none';
+  $('cBody').querySelectorAll('.mpB').forEach(b=>b.onclick=ev=>{ev.stopPropagation();beep(b.dataset.a==='deposit'?520:b.dataset.a==='claim'?880:660,.06);mineAction(b.dataset.m,b.dataset.a)});
+  mpStats();clearInterval(MP.tm);MP.tm=setInterval(()=>{if(cardKey!=='reserve'){clearInterval(MP.tm);return}mpStats()},1000)};
+ /* hover tooltip stays hidden while the Mine popup is open */
+ const mpOpen=()=>cardKey==='reserve'&&$('card').classList.contains('open');
+ const _st=showTip;showTip=function(){if(mpOpen()&&hoverK==='reserve'){tip.style.display='none';canvas.style.cursor='pointer';return}_st()};
+ {const st=document.createElement('style');st.textContent=`#cBody .mpNote{position:sticky;bottom:-14px;margin:0 -18px -14px;padding:8px 18px 10px;background:linear-gradient(rgba(14,18,38,.0),rgba(14,18,38,.96) 30%);font-size:12px;color:#c8d0ec}#cBody .mpSec p{margin:0 0 6px;line-height:1.45}`;document.head.appendChild(st)}
+ /* merged label: the separate Wellspring label stays hidden */
+ const _uw=updWell;updWell=function(dt){_uw(dt);if(WS2.lab)WS2.lab.style.display='none'};
+ R6API.r6.minePop=()=>({hov:hoverK,tipD:tip.style.display,open:cardKey==='reserve'&&$('card').classList.contains('open'),secs:[...document.querySelectorAll('#cBody .mpSec')].map(s=>s.id),btn:[...document.querySelectorAll('#cBody .mpB')].map(b=>b.dataset.m+':'+b.dataset.a+':'+b.textContent),
+  st:[...MP.st],cl:[...MP.cl],un:[...MP.un],w:[...MP.w],last:MP.last,txt:$('cBody')?$('cBody').innerText:''});
+ R6API.r6.mineAction=(m,a,o)=>mineAction(m,a,o)}
 /* ---------- mobile robustness (dev): frame guard, WebGL context loss, on-screen diagnostics ---------- */
 if(EDITION==='dev'){
  const GLD={err:0,last:'',lost:0,el:null,t:null};
