@@ -232,7 +232,10 @@ button.gold{background:linear-gradient(135deg,#b8862a,#f6c75a 42%,#efe9d6 60%,#d
  <div class="sthd"><h4 data-i="dataH"></h4><button class="stMin" title="▾">▾</button></div>
  <div class="src"><button id="srcSim" data-i="srcSim"></button><button id="srcChain" data-i="srcChain"></button></div>
  <div id="stTabs"><button data-t="eco" class="on" data-i="tabEco"></button><button data-t="mt" data-i="tabMt"></button><button data-t="wal" data-i="tabWal"></button><button data-t="gn" data-i="tabGn"></button></div>
+ <div id="statBrief"></div>
  <div id="statRows" data-tab="eco"></div>
+ <button id="stMore" aria-expanded="false"><span></span><i>▾</i></button>
+ <div id="stSlot"></div>
  <div id="clock"></div>
  <div id="stFoot"></div>
 </div>
@@ -340,6 +343,15 @@ button.gold{background:linear-gradient(135deg,#b8862a,#f6c75a 42%,#efe9d6 60%,#d
 .cgb{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 #bLay b{color:var(--gold);font-weight:600;margin-left:4px}
 .sthd{display:flex;align-items:center;justify-content:space-between}.sthd h4{margin:0!important}
+#statBrief .st b{color:var(--amb,#f6c75a)}
+#stats.brief #stTabs,#stats.brief #statRows{display:none}
+#stats:not(.brief) #statBrief{display:none}
+#stMore{display:flex;align-items:center;gap:6px;margin:6px 0 2px;padding:2px 8px;font-size:11px;background:transparent;border:1px solid rgba(255,255,255,.14);border-radius:6px;color:var(--mut);cursor:pointer}
+#stMore:hover{color:#fff;border-color:rgba(255,255,255,.3)}
+#stMore i{font-style:normal;transition:transform .2s}
+#stats:not(.brief) #stMore i{transform:rotate(180deg)}
+#stats.coll #statBrief,#stats.coll #stMore{display:none}
+#stSlot:empty{display:none}
 .stMin{padding:1px 8px;font-size:11px;transition:transform .2s}
 #stats.coll .stMin{transform:rotate(-90deg)}
 #stats.coll #statRows,#stats.coll #clock,#stats.coll .src,#stats.coll #stTabs{display:none}
@@ -2769,6 +2781,7 @@ function updStats(){let r;
  else r=[[t('chMatches'),fmt(S.cM+S.cMC)],[t('chWinG'),fmt(S.cM-S.cMD)],[t('chDrawG'),fmt(S.cMD)],[t('chCancel'),fmt(S.cMC)],[t('cBurn'),fmt(Math.round(S.cB))],[t('cMintBB'),EDITION==='dev'?fmt(Math.round(S.cBA||0)):usd(Math.round(S.cBB))],[t('cStake'),fmt(Math.round(S.cS))],[t('cBank'),fmt(Math.round(S.cK))],
   [t('cTour'),fmt(Math.round(S.cT))],[t('cMine'),fmt(Math.round(S.cN))],[t('cWallets'),fmt(DRAWN)],...clsRows(),[t('cGnHands'),fmt(GN.hands)],[t('cGnContract'),fmt(GN.inC)]];
  const h=r.map((x,j)=>`<div class="st${j>3?" x2":""}${x[2]?' '+x[2]:''} tb-${typeof R6tab==='function'?R6tab(x[0]):'eco'}"><i>${x[0]}</i><b>${x[1]}</b></div>`).join('');if($('statRows')._h!==h){$('statRows').innerHTML=h;$('statRows')._h=h}
+ if(typeof stBriefRender==='function')stBriefRender(r);
  if(S.src==='chain'){$('clock').textContent=CH.state==='ok'&&CH.updAt?t('chainClock',{t:new Date(CH.updAt).toLocaleTimeString(L==='ru'?'ru-RU':'en-GB'),r:(CH.rpc||'').replace(/^https?:\/\//,'').split('/')[0]}):''}
  else $('clock').textContent=simWhen(S.simT)}
 function fitLegend(){if(MOBILE||innerWidth<=820)return;const st=$('stats'),lg=$('legend');if(!st||!lg)return;const b=st.getBoundingClientRect().bottom;const h=Math.max(70,innerHeight-108-b-14);lg.style.maxHeight=h+'px'}
@@ -3321,6 +3334,25 @@ const R6API={r6:{setQ:q=>R6setQ(q),q:()=>({q:R6.q,cur:R6.qCur,bloom:bloom.enable
  share:i=>shareOpen(i).then(s=>({ok:!!(s&&s.data),len:s&&s.data?s.data.length:0,url:s&&s.url})),deep:()=>R6.deepHit,ag:()=>{let n=0,lo=0,hi=0;for(let i=0;i<NW;i++){n++;if(WA.ag[i]<.8)lo++;if(WA.ag[i]>1.2)hi++}return {n,lo,hi}},
  cb:on=>{if(on!==undefined&&!!on!==S.cb)$('tCB').click();return {cb:S.cb,u:WM.uniforms.uCB.value}},hint:()=>R6.hintN,hintShow:n=>hintShow(n),hintClose:()=>hintClose(true),
  cOff:()=>({...S.cOff}),arcOff:()=>S.arcOff,frameLink:i=>frameLinkFly(i),tab:tb=>{R6setTab(tb);return document.querySelectorAll('#statRows .st.tb-'+tb).length}}};
+
+/* ===== Data panel: short view by default (3–4 key lines) + «Подробнее/Свернуть» toggle; state in localStorage ===== */
+Object.assign(T.ru,{stMore:'Подробнее',stLess:'Свернуть',brBurn:'Сожжено Amber',brPlayed:'Матчей сыграно',brGMint:'Гномов сминчено',brHolders:'Держателей Amber',brGHands:'Гномов у игроков',brWallets:'Кошельков'});
+Object.assign(T.en,{stMore:'More',stLess:'Less',brBurn:'Amber burned',brPlayed:'Matches played',brGMint:'Gnomes minted',brHolders:'Amber holders',brGHands:'Gnomes held by players',brWallets:'Wallets'});
+const ST_BRIEF_KEY='ed.statsBrief';
+function stBriefGet(){try{const v=localStorage.getItem(ST_BRIEF_KEY);return v==null?true:v==='1'}catch(e){return true}}
+function stBriefSet(on){$('stats').classList.toggle('brief',on);try{localStorage.setItem(ST_BRIEF_KEY,on?'1':'0')}catch(e){}
+ const b=$('stMore');if(b){b.querySelector('span').textContent=t(on?'stMore':'stLess');b.setAttribute('aria-expanded',on?'false':'true')}
+ if(typeof fitLegend==='function')fitLegend()}
+function stBriefRows(r){const pick=k=>{const lab=t(k);const x=r.find(y=>y[0]===lab);return x?x[1]:'—'};
+ if(S.src==='chain'){let played='—';if(CH.state==='ok'&&typeof batCounts==='function'){const c=batCounts();played=fmt((c.win||0)+(c.draw||0))}
+  const holders=pick('chHolders');
+  return [[t('brBurn'),pick('chDead')],[t('brPlayed'),played],[t('brGMint'),GN.known?fmt(CH.gnm.minted)+' / '+fmt(GN_CAP):'—'],[t('brHolders'),holders]]}
+ return [[t('brBurn'),fmt(Math.round(S.cB))],[t('brPlayed'),fmt(S.cM)],[t('brGHands'),fmt(GN.hands)],[t('brWallets'),fmt(DRAWN)]]}
+function stBriefRender(r){const el=$('statBrief');if(!el)return;const h=stBriefRows(r).map(x=>`<div class="st"><i>${x[0]}</i><b>${x[1]}</b></div>`).join('');
+ if(el._h!==h){el.innerHTML=h;el._h=h}const b=$('stMore');if(b){const w=t($('stats').classList.contains('brief')?'stMore':'stLess');const sp=b.querySelector('span');if(sp.textContent!==w)sp.textContent=w}}
+$('stMore').onclick=e=>{e.stopPropagation();stBriefSet(!$('stats').classList.contains('brief'))};
+stBriefSet(stBriefGet());
+R6API.statsBrief=on=>{if(on!=null)stBriefSet(!!on);return {brief:$('stats').classList.contains('brief'),rows:[...document.querySelectorAll('#statBrief .st')].map(e=>[e.querySelector('i').textContent,e.querySelector('b').textContent])}};
 
 /* ===== Round 6 · Part 2: Hives (Ульи), castle deep zoom (4X entry point), account slot, Technology card, planned game chain =====
    All data comes through ED_CONFIG hooks (castleProvider / legionProvider / authProvider), which connect to the studio's EXISTING server.
