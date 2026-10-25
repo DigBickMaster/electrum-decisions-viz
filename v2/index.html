@@ -792,6 +792,21 @@ const T={ru:{
  t7h:'Gnome NFTs',t7:'9,999 gnomes maximum in total. Unsold ones sit in the contract; minted ones fly to their owners. Mint round: 5,555 × $300, 80% buys and burns Amber. At 7,999 of 9,999 held by players, mining switches on.',
  t8h:'The fiat ring',t8:'The core of the business: free play, ads and in-store purchases. No tokens here. Everything inside the ring is extra upside.'
 }};
+/* dev (v2): the outer ring is free play, so no «Фиат/Fiat» wording (live keeps its texts until it is rebuilt on purpose) */
+if(EDITION==='dev'){Object.assign(T.ru,{nFiat:'Бесплатный режим · free-to-play',lFiat:'Бесплатный режим (без токенов)',tFiat:'Бесплатное кольцо',t8h:'Бесплатное кольцо',
+  intro3:T.ru.intro3.replace('бесплатный фиат-режим без токенов','бесплатный режим (free-to-play) без токенов')});
+ Object.assign(T.en,{nFiat:'Free-to-play mode',lFiat:'Free-to-play mode (no tokens)',tFiat:'Free-to-play ring',t8h:'The free-to-play ring',
+  intro3:T.en.intro3.replace('the free-to-play fiat mode with no tokens','the free-to-play mode with no tokens')})}
+/* dev (v2): the spectator map talks only in tokens: no $, no mint price, no mint split (investor panel inv* untouched) */
+const MINT_AMB_G=+(CFG.mintBurnAmberPerGnome||12000); /* ILLUSTRATIVE sim-only: Amber bought back and burned per minted gnome (no on-chain figure yet) */
+if(EDITION==='dev'){Object.assign(T.ru,{cMintBB:'Минт → выкуплено и сожжено, Amber',
+  mintTxt:'Раунд минта: {n} из 5 555 NFT · минт выкупает Amber в пуле и сжигает его',
+  t7:'Всего максимум 9 999 гномов. Непроданные лежат в контракте, сминченные улетают владельцам. Раунд минта: 5 555 NFT; минт выкупает Amber и сжигает его. При 7 999 из 9 999 у игроков включается майнинг.',
+  sbNote:T.ru.sbNote.replace('Всё в штуках Amber, без цены.','Всё в штуках Amber.')});
+ Object.assign(T.en,{cMintBB:'Mint → bought back and burned, Amber',
+  mintTxt:'Mint round: {n} of 5,555 NFTs · the mint buys back Amber in the pool and burns it',
+  t7:'9,999 gnomes maximum in total. Unsold ones sit in the contract; minted ones fly to their owners. Mint round: 5,555 NFTs; the mint buys back Amber and burns it. At 7,999 of 9,999 held by players, mining switches on.',
+  sbNote:T.en.sbNote.replace('Everything in Amber units, no price.','Everything in Amber units.')})}
 let L='ru';try{L=localStorage.getItem('ed_lang')||'ru'}catch(e){}
 {const q=new URLSearchParams(location.search).get('lang');if(q)L=q}
 if(!T[L])L='ru';
@@ -908,8 +923,29 @@ function card(key){
  n:[[r?'Платящих в месяц (базовый)':'Paying users per month (base)',pct(M.payer)+' MAU'],[r?'ARPPU в месяц (базовый)':'ARPPU per month (base)',usd(M.arppu)],[r?'Rewarded-показов на DAU в день':'Rewarded views per DAU per day',fmt2(M.rw,1)]],
  x:`<p class="note">${r?'Базовый сценарий финансовой модели, это допущения.':'Base scenario of the financial model; these are assumptions.'}</p>`})
  };
- const c=C[key]();c.x=(c.x||'')+cAddrNote(key);return c;
+ const c=C[key]();if(EDITION==='dev')devTok(key,c,r);c.x=(c.x||'')+cAddrNote(key);return c;
 }
+/* dev (v2): token-only wording for the map cards (live keeps its texts until rebuilt on purpose) */
+function devTok(key,c,r){const rep=(a,b)=>{if(c.b)c.b=c.b.split(a).join(b);if(c.x)c.x=c.x.split(a).join(b)};
+ const rows=(f)=>{c.n=(c.n||[]).map(f).filter(Boolean)};
+ const tok=v=>typeof v==='string'?v.replace(' · POL/USDC',r?' · токены POL/USDC':' · POL/USDC tokens'):v;
+ if(key==='ext'||key==='bank'||key==='tw')rows(([a,v])=>[a,tok(v)]);
+ if(key==='ext'){rep('роялти 1% в POL/USDC','роялти 1% в токенах POL/USDC');rep('a 1% royalty in POL/USDC','a 1% royalty in POL/USDC tokens');
+  rep('Это дополнительный доход в криптовалюте сверх модели, поэтому в расчётах модели он не учтён.','Это дополнительные токены сверх модели, поэтому в расчётах модели они не учтены.');
+  rep('It is extra crypto income on top of the model, so the model’s numbers leave it out.','These are extra tokens on top of the model, so the model’s numbers leave them out.')}
+ if(key==='bank'){rep('Сверх модели, в криптовалюте: роялти','Сверх модели, в токенах: роялти');rep('вне игры, в POL/USDC.','вне игры, в токенах POL/USDC.');
+  rep('On top of the model, in crypto: a 1% royalty','On top of the model, in tokens: a 1% royalty');rep('outside the game, in POL/USDC.','outside the game, in POL/USDC tokens.')}
+ if(key==='link')rows(([a,v])=>[a==='VRF и ценовые фиды'?'VRF и фиды данных':a==='VRF and price feeds'?'VRF and data feeds':a,v]);
+ if(key==='burn'){rep('Сюда же падает Amber, купленный на 80% от минта гномов. Сколько Amber при этом сгорит, зависит от рынка, поэтому эту часть мы показываем в долларах и в Amber не прогнозируем.','Сюда же падает Amber, выкупленный в пуле за счёт минта гномов. Сколько Amber при этом сгорит, зависит от рынка, поэтому в Amber эту часть мы не прогнозируем.');
+  rep('Amber bought with 80% of the gnome mint falls in here too. How much Amber that burns depends on the market, so we show that part in dollars and do not forecast it in Amber.','Amber bought back in the pool through the gnome mint falls in here too. How much Amber that burns depends on the market, so we do not forecast that part in Amber.');
+  rows(([a,v])=>/^(Минт гномов: на выкуп|Gnome mint: buy)/.test(a)?[r?'Минт гномов':'Gnome mint',r?'выкуп и сжигание Amber':'Amber buy-back and burn']:[a,v])}
+ if(key==='gnome'){rep('Раунд минта — 5 555 гномов по $300 в USDC внутри общего лимита 9 999. 80% выручки сразу выкупает Amber в пуле, и купленные Amber сжигаются.','Раунд минта — 5 555 гномов (NFT) внутри общего лимита 9 999. Минт сразу выкупает Amber в пуле, и выкупленные Amber сжигаются.');
+  rep('The mint round is 5,555 gnomes at $300 in USDC within the overall 9,999 cap. 80% of the revenue immediately buys Amber in the pool, and that Amber is burned.','The mint round is 5,555 gnomes (NFTs) within the overall 9,999 cap. The mint immediately buys back Amber in the pool, and that Amber is burned.');
+  rows(([a,v])=>/^(Раунд минта|Mint round)$/.test(a)?[a,fmt(M.mintAvail)+' NFT']:/^(На выкуп и сжигание|Buy & burn)/.test(a)?null:[a,v])}
+ if(key==='fiat'){c.k=r?'Бесплатная игра · без токенов':'Free play · no tokens';
+  c.b=r?'<p>Большинство игроков играет бесплатно, без кошелька и без Amber. Это спокойное внешнее кольцо карты.</p><p>Токен-режим — слой поверх бесплатной игры: Amber, гномы-NFT и замки-NFT.</p>':'<p>Most players play for free, with no wallet and no Amber. This is the calm outer ring of the map.</p><p>Token mode is a layer on top of free play: Amber, gnome NFTs and castle NFTs.</p>';
+  c.n=[];c.x=''}
+ return c}
 /* ===== Extra UI strings (RU/EN parity) ===== */
 Object.assign(T.ru,{
  wPlayed:'Матчей',lRoy:'Роялти 1% (зашито в контракт NFT замков) · внешние площадки · в Банк · скоро',wWon:'Побед',
@@ -1065,8 +1101,9 @@ addNode('contract',V(0,0,0),g=>{
  const sp2=new THREE.Sprite(new THREE.SpriteMaterial({map:DOT,color:0xff8a1a,transparent:true,opacity:.24,depthWrite:false,blending:THREE.AdditiveBlending}));sp2.scale.set(36,36,1);g.add(sp2);GEM.co2=sp2;
 },new THREE.SphereGeometry(4.2,12,8),{lab:6.6,dist:24,ck:'amber'});
 function updGem(){const tt=sunMat.uniforms.uT.value,pu=.5+.5*Math.sin(tt*1.7);if(GEM.cs)GEM.cs.material.opacity=.12+.16*pu;if(GEM.co)GEM.co.material.opacity=.1+.06*pu;if(GEM.co2)GEM.co2.material.opacity=.07+.04*pu}
-/* --- mining reserve: a moon of the sun --- */
-addNode('reserve',V(6.5,0,0),g=>{
+/* --- mining reserve: a moon of the sun (dev/v2: the Mine asteroid sits in the centre, see e7_asteroid.js) --- */
+const ASTER=EDITION==='dev';
+addNode('reserve',V(ASTER?0:6.5,0,0),g=>{
  // era "now": a dim core still in formation; era "future": the Mine, the bright centre (opacity driven by eraK in e4)
  const core=new THREE.Mesh(new THREE.DodecahedronGeometry(.75),new THREE.MeshBasicMaterial({color:0x6b4a2a,transparent:true,opacity:.75}));core.name='core';g.add(core);
  const w=wire(new THREE.DodecahedronGeometry(1.15),COL.amber,.28);w.name='spin';g.add(w);
@@ -1076,7 +1113,7 @@ addNode('reserve',V(6.5,0,0),g=>{
  const hot=new THREE.Mesh(new THREE.IcosahedronGeometry(1.05,1),new THREE.MeshBasicMaterial({color:0xffb347,transparent:true,opacity:0}));hot.name='hot';g.add(hot);
  const hw=wire(new THREE.IcosahedronGeometry(1.5,0),0xffd27a,0);hw.name='hotw';g.add(hw);
  const cor=new THREE.Sprite(new THREE.SpriteMaterial({map:DOT,color:0xffa53a,transparent:true,opacity:0,depthWrite:false,blending:THREE.AdditiveBlending}));cor.scale.set(9,9,1);cor.name='cor';g.add(cor);
-},new THREE.SphereGeometry(1.6,10,8),{lab:1.9,dist:10,orb:{r:10.5,a:-1.57,w:.05,y:1.2},ck:'mining'});
+},new THREE.SphereGeometry(1.6,10,8),{lab:1.9,dist:10,orb:ASTER?null:{r:10.5,a:-1.57,w:.05,y:1.2},ck:'mining'});
 /* --- stations --- */
 function ring(r,t,c,o){const m=new THREE.Mesh(new THREE.TorusGeometry(r,t,8,96),bmat(c,o));m.rotation.x=Math.PI/2;return m}
 addNode('pool',V(27,0,0),g=>{
@@ -1259,7 +1296,7 @@ let orbT=0; // station orbit clock
 const _cmt=new THREE.Vector3();
 function updStations(){const ct=orbT*.05;NODES.tour.pos.set(84+Math.cos(ct)*8,22+Math.sin(ct*1.7)*3,-68+Math.sin(ct)*9);_cmt.copy(NODES.tour.pos).multiplyScalar(2);NODES.tour.inner.getObjectByName('tail').parent.lookAt(_cmt);
  for(const k in NODES){const n=NODES[k];if(!n.orb)continue;const o=n.orb,a=o.a+orbT*o.w;n.pos.set(Math.cos(a)*o.r,o.y+Math.sin(a*2)*.6,Math.sin(a)*o.r)}
- if(eraK>0){NODES.reserve.pos.multiplyScalar(1-eraK);const a=orbT*.1+2.4,r=14*eraK;NODES.contract.pos.set(Math.cos(a)*r,Math.sin(a*2)*.5*eraK,Math.sin(a)*r)}}
+ if(eraK>0&&!ASTER){NODES.reserve.pos.multiplyScalar(1-eraK);const a=orbT*.1+2.4,r=14*eraK;NODES.contract.pos.set(Math.cos(a)*r,Math.sin(a*2)*.5*eraK,Math.sin(a)*r)}}
 updStations();updFlowLines();
 
 /* ===== Globe (world map mode) ===== */
@@ -1511,7 +1548,7 @@ function buildPrehistory(){
  for(let t=-PRE;t<=0;t+=step){const w=joinedAt(t);const mt=w*MATCH_PER_PLAYER_DAY/2*step/86400,v=mt*2*AVG_E;m+=mt;vol+=v;b+=v*M.burn;s+=v*M.stake;k+=v*M.studio;
   let lo=0,hi=SET.gTimes.length;while(lo<hi){const q=(lo+hi)>>1;if(SET.gTimes[q]<=t)lo=q+1;else hi=q}
   SNAP.push({t,w,b,s,k,bb:0,g:lo,m,n:0})}
- S.cM=Math.round(m);S.cMD=Math.round(m*.0057);S.cMC=Math.round(m*.238);S.cB=b;S.cS=s;S.cK=k;S.vol=vol;S.cT=0;S.cN=0;S.cBB=0;S.cTB=0;S.simT=0;S.lastSnap=0;S.day0={m:S.cM,b,s,k};
+ S.cM=Math.round(m);S.cMD=Math.round(m*.0057);S.cMC=Math.round(m*.238);S.cB=b;S.cS=s;S.cK=k;S.vol=vol;S.cT=0;S.cN=0;S.cBB=0;S.cBA=0;S.cTB=0;S.simT=0;S.lastSnap=0;S.day0={m:S.cM,b,s,k};
  bhScale(S.cB)}
 function pushSnap(){if(S.simT-S.lastSnap>=3600){S.lastSnap=S.simT;SNAP.push(snapNow());if(SNAP.length>20000)SNAP.splice(540,1)}}
 
@@ -1701,11 +1738,24 @@ function mint(){
  if(MS.minted>=M.mintAvail){toast(t('mintDone'));return}
  MS.running=true;beep(620,.15);updBtns();
 }
-function giveGnome(){const id=SET.gPool.pop();if(id==null)return -1;let w;
- if(Math.random()<.4&&MS.owners.length){w=MS.owners[Math.floor(Math.random()*MS.owners.length)];if(w>=DRAWN)w=randW(-1)}else w=randW(-1);
+function giveGnome(wf){const id=SET.gPool.pop();if(id==null)return -1;let w;
+ if(wf>=0)w=wf;else if(Math.random()<.4&&MS.owners.length){w=MS.owners[Math.floor(Math.random()*MS.owners.length)];if(w>=DRAWN)w=randW(-1)}else w=randW(-1);
  if(!SET.gn[w])MS.owners.push(w);SET.gn[w]++;let a=SET.gids.get(w);if(!a){a=[];SET.gids.set(w,a)}a.push(id);paintWallet(w);rec(w,[S.simT,'gnome',0,id]);return w}
+/* dev (v2) demo: one mint() call = one transaction for N gnomes (1..7). Hookable: a live reader can call mintTx(wallet,N,amberBurned) per real mint event. */
+function mintTx(w,n,amb,anim){let got=0,lw=-1;for(let k=0;k<n;k++){if(GN.hands>=M.gnomes)break;const x=giveGnome(w);if(x<0)break;GN.hands++;got++;lw=x;if(w<0)w=x}
+ if(!got)return 0;S.cBA=(S.cBA||0)+(amb==null?got*MINT_AMB_G:amb);S.cBB+=got*M.mintPx*M.mintBurn;WATT.col.needsUpdate=WATT.sz.needsUpdate=true;setGnomeCluster(M.gnomes-GN.hands);
+ if(anim){spawn({fw:lw,tn:'gnome',c:COL.usdc,s:.8,d:1.3,arc:1.5});
+  spawn({fn:'dex',tn:'burn',c:COL.amber,s:.6+.1*got,d:2.2,arc:5,cb:()=>{BH.flash=Math.min(1.5,BH.flash+.2);sndBurn()}});
+  for(let j=0;j<Math.min(got,4);j++)spawn({fn:'gnome',tw:lw,c:COL.lil,s:1.1,d:1.4+j*.15,arc:2.5})}
+ return got}
+function updMintTx(dt){const prev=MS.minted;MS.minted=Math.min(M.mintAvail,MS.minted+dt*M.mintAvail/8);MS.txQ=(MS.txQ||0)+(MS.minted-prev);MS.vis+=dt;
+ while(MS.txQ>=1&&GN.hands<M.gnomes){const n=Math.min(Math.floor(MS.txQ),1+Math.floor(Math.random()*7));const anim=MS.vis>.07;if(anim)MS.vis=0;const got=mintTx(-1,n,null,anim);MS.txQ-=n;if(!got)break}}
 function updMint(dt){
- if(MS.running){const prev=Math.floor(MS.minted);MS.minted=Math.min(M.mintAvail,MS.minted+dt*M.mintAvail/8);const now=Math.floor(MS.minted);
+ if(MS.running&&EDITION==='dev'){updMintTx(dt);
+  if(GN.hands>=M.mineThr&&!MS.mineOn){MS.mineOn=true;S.mineAt=S.simT;if(S.eraAuto!==false)setEra('future');toast(t('toastMine'),3600);sndChord(392);NODES.gnome.glow=1;NODES.reserve.glow=1}
+  if(MS.minted>=M.mintAvail){MS.running=false;updBtns();toast(t('mintDone'),3000)}
+  updMintBar()}
+ else if(MS.running){const prev=Math.floor(MS.minted);MS.minted=Math.min(M.mintAvail,MS.minted+dt*M.mintAvail/8);const now=Math.floor(MS.minted);
   let lastW=-1;for(let k=prev;k<now;k++){if(GN.hands>=M.gnomes)break;const w=giveGnome();if(w<0)break;GN.hands++;lastW=w}
   if(now>prev){WATT.col.needsUpdate=WATT.sz.needsUpdate=true;S.cBB+=(now-prev)*M.mintPx*M.mintBurn;setGnomeCluster(M.gnomes-GN.hands)}
   MS.vis+=dt;if(MS.vis>.07&&lastW>=0){MS.vis=0;
@@ -2420,7 +2470,7 @@ function simEraRadii(){if(SET.kind!=='sim')return;for(let i=0;i<NW;i++){if(WA.ce
 /* era visuals: the mine grows into the centre, the Soul Stone stays large and orbits it */
 const RP={};['core','form','spin','hot','hotw','cor'].forEach(n=>RP[n]=NODES.reserve.inner.getObjectByName(n));
 const RP0={core:.75,form:.45,spin:.28};
-function eraVisual(){const e=eraK;NODES.reserve.g.scale.setScalar(1+e*2.2);NODES.contract.g.scale.setScalar(1-e*.3);
+function eraVisual(){const e=eraK;NODES.reserve.g.scale.setScalar(ASTER?1:1+e*2.2);NODES.contract.g.scale.setScalar(1-e*.3);
  RP.core.material.opacity=RP0.core*(1-e);RP.form.material.opacity=RP0.form*(1-e*.85);RP.spin.material.opacity=RP0.spin*(1-e)+.12*e;
  RP.hot.material.opacity=.95*e;RP.hotw.material.opacity=.6*e;RP.cor.material.opacity=.75*e;RP.core.visible=e<.99;RP.hot.visible=RP.hotw.visible=RP.cor.visible=e>.01;
  WM.uniforms.uEra.value=e;for(const r of ERING)r.material.opacity=e*.16}
@@ -2506,7 +2556,7 @@ function updCastles(dt){const off=morph>.3||S.panel==='inv';
  CAST.t-=dt;if(CAST.t<=0){CAST.t=MOBILE?.45:.3;
   const want=off?[]:lodPick(),ws=new Set(want);for(const sl of CAST.slots)if(sl.w>=0&&(!ws.has(sl.w)||sl.w>=DRAWN))freeSlot(sl);
   for(const i of want){if(CAST.of.has(i))continue;const sl=CAST.slots.find(x=>x.w<0);if(!sl)break;fillSlot(sl,i)}}
- sunLight.position.copy(eraK>.5?NODES.reserve.pos:NODES.contract.pos);
+ if(ASTER)sunLight.position.set(0,AST.R*AST.K+14,0);else sunLight.position.copy(eraK>.5?NODES.reserve.pos:NODES.contract.pos);
  for(const sl of CAST.slots){if(sl.w<0)continue;const i=sl.w;sl.f=Math.min(1,sl.f+dt*2.5);wPos(i,sl.g.position);
   const R=(.3+.085*Math.min(4,Math.abs(WA.sz[i])))*(.4+.6*sl.f);sl.g.scale.setScalar(R);sl.g.visible=WA.hl[i]>0||sl.g.position.distanceTo(camera.position)>R*7;sl.spin+=dt*.25;sl.g.rotation.set(.18,sl.spin,.08);
   const sel=WA.hl[i]>0;sl.glow.scale.setScalar(sel?3.4:3.6);if(sel){sl.glow.material.color.setHex(0xffd27a);sl.glow.material.opacity=.32}
@@ -2559,7 +2609,7 @@ for(const k in LBL){const e=document.createElement('div');e.className='lb'+(k===
  e.addEventListener('click',ev=>{ev.stopPropagation();openCard(k);beep(760,.06)});
  e.addEventListener('dblclick',ev=>{ev.stopPropagation();focusNode(k)});
  e.addEventListener('mouseenter',()=>setHover(k));e.addEventListener('mouseleave',()=>setHover(null))}
-function labText(k){if(k==='contract'&&eraK<=.5&&innerWidth<700)return 'Amber';if(k==='reserve'){if(eraK>.5)return t('nMineOn')+(eraPreview()?' · '+t('eraPrev'):'');return t('nReserve')}
+function labText(k){if(k==='reserve'&&typeof AST!=='undefined'&&AST.on)return t('astLab');if(k==='contract'&&eraK<=.5&&innerWidth<700)return 'Amber';if(k==='reserve'){if(eraK>.5)return t('nMineOn')+(eraPreview()?' · '+t('eraPrev'):'');return t('nReserve')}
  if(k==='ext')return t('nExt')+(CA('castleNft')?'':' · '+t('soon').toLowerCase());if(k==='tour'&&(CFG.contracts.tournament||{}).address)return t('nTour').replace(/ · .*$/,'');return t(LBL[k])}
 const _p=new THREE.Vector3(),_fq=new THREE.Vector3(),_v2=new THREE.Vector3();
 function fiatLab(out){fiatGroup.updateMatrixWorld();let best=null,bs=1e9;
@@ -2569,7 +2619,7 @@ function fiatLab(out){fiatGroup.updateMatrixWorld();let best=null,bs=1e9;
   if(sc<bs){bs=sc;best=w}}
  return best&&bs<5?out.copy(best):out.set(0,0,9999)}
 function labWorld(k,out){const n=NODES[k];if(k==='fiat')return fiatLab(out);const s=n.g.scale?n.g.scale.x:1;return out.copy(n.pos).add(_v2.set(0,n.lab*s,0))}
-function labVisible(k){if(S.kiosk&&k!=='contract'&&k!=='burn')return false;if(typeof EYE!=='undefined'&&EYE.f>.4)return false;if(morph>.5)return false;if(k==='fiat'&&!S.fiat)return false;if((k==='poly'||k==='link'||k==='tw'||k==='gchain')&&!S.net)return false;if(k==='gchain'&&eraK<=.5)return false;
+function labVisible(k){if(k==='contract'&&ASTER)return false;if(S.kiosk&&k!=='contract'&&k!=='burn'&&!(ASTER&&k==='reserve'))return false;if(typeof EYE!=='undefined'&&EYE.f>.4)return false;if(morph>.5)return false;if(k==='fiat'&&!S.fiat)return false;if((k==='poly'||k==='link'||k==='tw'||k==='gchain')&&!S.net)return false;if(k==='gchain'&&eraK<=.5)return false;
  if(S.panel==='inv')return false;return true}
 function updLabels(){const P=[];for(const k in labEls){const e=labEls[k];if(!labVisible(k)){e.style.display='none';continue}
   labWorld(k,_p);_p.project(camera);if(_p.z>1||_p.x<-1.2||_p.x>1.2||_p.y<-1.2||_p.y>1.2){e.style.display='none';continue}
@@ -2590,7 +2640,7 @@ function pick(x,y){if(morph>.5){const w=S.tok?pickWallet(x,y):-1;return w>=0?{w}
  ndc.set(x/innerWidth*2-1,-(y/innerHeight)*2+1);ray.setFromCamera(ndc,camera);
  const hn=ray.intersectObjects(hitList.filter(h=>visDeep(h)&&(h.userData.key!=='fiat'||S.fiat)),false);const node=hn.length?hn[0]:null;
  const w=S.tok?pickWallet(x,y):-1;const weak=!node||['fiat','poly'].includes(node.object.userData.key);
- if(w>=0&&weak)return {w};if(node&&typeof twinFront==='function'&&twinFront(x,y,node.distance))return w>=0?{w}:null;if(node)return {k:node.object.userData.key};return null}
+ if(w>=0&&weak)return {w};if(node)return {k:node.object.userData.key};return null}
 const tip=$('tip');
 const clsKey=i=>SET.lk[i]?'wcL':['wcP','wcT','wcB','wcR'][SET.cls[i]]||'wcP';
 const clsColor=i=>SET.lk[i]?hexC(CLS_C.link):SET.cls[i]===1?hexC(CLS_C.trader):SET.cls[i]===2?hexC(CLS_C.bot):'#f2c45a';
@@ -2598,10 +2648,9 @@ function walletTip(i){const nm=wid(i);const g=SET.gn[i];let s=`<b>${nm}</b> · $
  if(SET.kind==='sim')s+=`${t('wPlayed')}: ${fmt(WS.pl[i])} · ${t('wWon')}: ${fmt(WS.wn[i])}`;else s+=`${fmtA(SET.bal[i])} Amber`;
  if(g&&SET.cls[i]===0)s+=`<br>🜨 ${fmt(g)} · ${t('hCastle')}: ${t('sk'+skinFor(i))}`;return s+`<br><span style="color:#8f9cc4">${t('tipClick')}</span>`}
 function showTip(){
- if(hoverK==='reserve'&&typeof TWIN!=='undefined'&&TWIN.on){tip.innerHTML=twinTipHTML('tw1')+`<br><span style="color:#8f9cc4">${t('tipClick')}</span>`}
+ if(hoverK==='reserve'&&typeof AST!=='undefined'&&AST.on){tip.innerHTML=astTipHTML(mx,my)+`<br><span style="color:#8f9cc4">${t('tipClick')}</span>`}
  else if(hoverK){const c=card(hoverK);tip.innerHTML=`<b>${labText(hoverK)}</b><br>${c.k}<br><span style="color:#8f9cc4">${t('tipClick')}</span>`}
  else if(hoverW>=0&&hoverW<DRAWN){tip.innerHTML=walletTip(hoverW)}
- else if(typeof twinHit==='function'&&twinHit(mx,my)){tip.innerHTML=twinTipHTML('tw2')}
  else{tip.style.display='none';canvas.style.cursor='grab';return}
  tip.style.display='block';canvas.style.cursor='pointer';const w=tip.offsetWidth;tip.style.left=Math.min(innerWidth-w-8,mx+14)+'px';tip.style.top=(my+16)+'px'}
 canvas.addEventListener('pointermove',e=>{if(e.pointerType!=='mouse')return;mx=e.clientX;my=e.clientY;mouseMoved=true});
@@ -2609,7 +2658,7 @@ canvas.addEventListener('pointerleave',e=>{if(e.pointerType&&e.pointerType!=='mo
 let pd=null,lastTap=0;
 canvas.addEventListener('pointerdown',e=>{pd={x:e.clientX,y:e.clientY,t:performance.now()}});
 canvas.addEventListener('pointerup',e=>{if(!pd)return;const moved=Math.hypot(e.clientX-pd.x,e.clientY-pd.y),dt=performance.now()-pd.t;pd=null;
- if(moved>6||dt>600||S.kiosk)return;if(typeof nearSel==='function'&&nearSel(e.clientX,e.clientY)){const cp=castPick(e.clientX,e.clientY);if(cp<0||cp===FY.sel){walletClick(FY.sel);lastTap=0;return}}/* a neighbouring castle nearer to the tap than the selected one wins */let h=pick(e.clientX,e.clientY);/* Star 2 sits in front of the wallet field: its tooltip beats wallet dots, but not labelled nodes */if((!h||h.w!=null)&&typeof twinHit==='function'&&twinHit(e.clientX,e.clientY)){tip.innerHTML=twinTipHTML('tw2');tip.style.display='block';const tw=tip.offsetWidth;tip.style.left=Math.max(8,Math.min(innerWidth-tw-8,e.clientX-tw/2))+'px';tip.style.top=(e.clientY+18)+'px';clearTimeout(TWIN.tipT);TWIN.tipT=setTimeout(()=>{tip.style.display='none'},3500);return}if(!h&&typeof castPick==='function'){const w=castPick(e.clientX,e.clientY);if(w>=0)h={w}}const now=performance.now();
+ if(moved>6||dt>600||S.kiosk)return;if(typeof nearSel==='function'&&nearSel(e.clientX,e.clientY)){const cp=castPick(e.clientX,e.clientY);if(cp<0||cp===FY.sel){walletClick(FY.sel);lastTap=0;return}}/* a neighbouring castle nearer to the tap than the selected one wins */let h=pick(e.clientX,e.clientY);if(!h&&typeof castPick==='function'){const w=castPick(e.clientX,e.clientY);if(w>=0)h={w}}const now=performance.now();
  if(e.pointerType!=='mouse'&&now-lastTap<320&&h&&h.k){focusNode(h.k);lastTap=0;return}lastTap=now;if(!h)return;
  if(h.w!=null){if(pickMode)pickForPlay(h.w);else walletClick(h.w)}else{openCard(h.k);beep(760,.06)}});
 canvas.addEventListener('dblclick',e=>{const h=pick(e.clientX,e.clientY);if(h&&h.k)focusNode(h.k)});
@@ -2620,7 +2669,8 @@ function openCard(k){cardKey=k;const c=card(k);let kk=c.k,hh=c.h,extra='';
  if(k==='reserve'&&eraK>.5){hh=t('nMineOn');kk=t('nMineSub')+(eraPreview()?' · '+t('eraPrev'):'')}
  if(k==='gnome'&&SET.kind==='chain'&&GN.known)extra='<div class="gths" id="cThumbs"></div>';
  if(k==='gnome')extra+=`<p class="note"><a href="${CFG.contracts.gnomeNft.collection||'https://opensea.io/collection/amber-digger'}" target="_blank" rel="noopener">OpenSea · amber-digger ↗</a></p>`;
- $('cBody').innerHTML=`<div class="k">${kk}</div><h3>${hh}</h3>${c.b}${rows(c.n||[])}${extra}${c.x||''}`;$('card').classList.add('open');
+ if(k==='reserve'&&typeof AST!=='undefined'&&AST.on){hh=t('astLab')}
+ $('cBody').innerHTML=`<div class="k">${kk}</div><h3>${hh}</h3>${k==='reserve'&&typeof AST!=='undefined'&&AST.on?`<p>${t('astTip')}</p><p>${t('astPick')}</p>`:''}${c.b}${rows(c.n||[])}${extra}${c.x||''}`;$('card').classList.add('open');
  if($('cThumbs')){const ids=[];for(const [w,a] of SET.gids)for(const id of a)ids.push(id);if(!ids.length&&CH.gnm&&CH.gnm.own)ids.push(...CH.gnm.own.keys());gnomeThumbs(ids,$('cThumbs'))}
  NODES[k]&&(NODES[k].glow=1)}
 function closeCard(){cardKey=null;$('card').classList.remove('open')}
@@ -2684,7 +2734,7 @@ $('srcSim').onclick=()=>setSource(EDITION==='prod'?'demo':'sim');
 $('srcChain').onclick=()=>setSource('chain');
 $('bFind').onclick=()=>{if($('findP').classList.contains('open'))closeFind();else openFind()};
 $('sbX').onclick=()=>{closeSbx();renderModeMenu()};
-$('bRst').onclick=()=>{S.cM=S.cMD=S.cMC=S.cB=S.cS=S.cK=S.cT=S.cN=S.cBB=0;S.simT=0;WS.pl.fill(0);WS.wn.fill(0);WS.inA.fill(0);WS.outA.fill(0);buildSimSet();S.eraAuto=true;MS.mineOn=false;MS.minted=0;MS.running=false;S.mineAt=null;setEra('now');updMintBar();updStats()};
+$('bRst').onclick=()=>{S.cM=S.cMD=S.cMC=S.cB=S.cS=S.cK=S.cT=S.cN=S.cBB=0;S.cBA=0;S.simT=0;WS.pl.fill(0);WS.wn.fill(0);WS.inA.fill(0);WS.outA.fill(0);buildSimSet();S.eraAuto=true;MS.mineOn=false;MS.minted=0;MS.txQ=0;MS.running=false;S.mineAt=null;setEra('now');updMintBar();updStats()};
 $('bReset').onclick=()=>resetView();
 $('bSound').onclick=()=>{S.sound=!S.sound;updBtns();beep(660,.1)};
 $('bLang').onclick=()=>setLang(L==='ru'?'en':'ru');
@@ -2706,7 +2756,7 @@ window.__play=()=>{closeCard();openPlay()};window.__tour=()=>{closeCard();launch
 function clsRows(){const c=clsCounts();return [[t('cPl'),fmt(c.p)],[t('cTr'),fmt(c.t)],[t('cLk'),t('cLkV',{n:fmt(c.lw),p:fmt(c.lp)})],[t('cBot'),fmt(c.b)]]}
 function updStats(){let r;
  if(S.src==='chain')r=chainStatRows();
- else r=[[t('chMatches'),fmt(S.cM+S.cMC)],[t('chWinG'),fmt(S.cM-S.cMD)],[t('chDrawG'),fmt(S.cMD)],[t('chCancel'),fmt(S.cMC)],[t('cBurn'),fmt(Math.round(S.cB))],[t('cMintBB'),usd(Math.round(S.cBB))],[t('cStake'),fmt(Math.round(S.cS))],[t('cBank'),fmt(Math.round(S.cK))],
+ else r=[[t('chMatches'),fmt(S.cM+S.cMC)],[t('chWinG'),fmt(S.cM-S.cMD)],[t('chDrawG'),fmt(S.cMD)],[t('chCancel'),fmt(S.cMC)],[t('cBurn'),fmt(Math.round(S.cB))],[t('cMintBB'),EDITION==='dev'?fmt(Math.round(S.cBA||0)):usd(Math.round(S.cBB))],[t('cStake'),fmt(Math.round(S.cS))],[t('cBank'),fmt(Math.round(S.cK))],
   [t('cTour'),fmt(Math.round(S.cT))],[t('cMine'),fmt(Math.round(S.cN))],[t('cWallets'),fmt(DRAWN)],...clsRows(),[t('cGnHands'),fmt(GN.hands)],[t('cGnContract'),fmt(GN.inC)]];
  const h=r.map((x,j)=>`<div class="st${j>3?" x2":""}${x[2]?' '+x[2]:''} tb-${typeof R6tab==='function'?R6tab(x[0]):'eco'}"><i>${x[0]}</i><b>${x[1]}</b></div>`).join('');if($('statRows')._h!==h){$('statRows').innerHTML=h;$('statRows')._h=h}
  if(S.src==='chain'){$('clock').textContent=CH.state==='ok'&&CH.updAt?t('chainClock',{t:new Date(CH.updAt).toLocaleTimeString(L==='ru'?'ru-RU':'en-GB'),r:(CH.rpc||'').replace(/^https?:\/\//,'').split('/')[0]}):''}
@@ -2800,6 +2850,8 @@ Object.assign(T.en,{tCc:'Castle collections',ccH:'Castle collections',ccEx:'exam
  ccNoteChain:'On-chain: the castle NFT contract (ERC-1155)',ccIss:'{a} of {b} issued',ccHold:'{n} holders',ccShow:'Holders',ccAll:'All',
  ccFoot:'Cosmetic only: castle skin, deck design, icons. A 1% royalty in POL/USDC on every resale on external marketplaces goes to the Studio Bank; it is hardcoded in the castle NFT contract and cannot change (soon). Holders set prices outside the game, so none are shown here.',
  ccFT:'Showing holders of “{c}”: {n}'});
+if(EDITION==='dev'){T.ru.ccFoot=T.ru.ccFoot.replace('Роялти 1% в POL/USDC','Роялти 1% в токенах POL/USDC').replace(' Цены назначают держатели вне игры, поэтому здесь их нет.',' Сделки идут вне игры, поэтому здесь их нет.');
+ T.en.ccFoot=T.en.ccFoot.replace('A 1% royalty in POL/USDC','A 1% royalty in POL/USDC tokens').replace(' Holders set prices outside the game, so none are shown here.',' Trades happen outside the game, so none are shown here.')}
 if(SET.kind==='sim'&&!CC.list.length)ccSim();else if(SET.kind==='chain')ccChainMap();
 /* ===== Electrum Decisions shield · thirdweb skin-factory drops · far zoom-out «watchers» easter egg + audits panel ===== */
 /* --- shield update --- */
@@ -3590,86 +3642,129 @@ const BASEAPI={base:()=>({open:HUB.cvI>=0,i:BB.i,ids:BB.ids.slice(),levels:BB.in
  baseScreen:id=>bScreen(id),castleDemo:a=>castleDemo(a),wallOp:lv=>wallOp(lv),bubbles:()=>({n:WB.mesh.count,max:WB.n,slots:CAST.slots.filter(s=>s.w>=0&&s.g.visible).length,op:Array.from(WB.op.array.slice(0,WB.mesh.count))}),
  camState:()=>({fly:!!fly,track:!!track,pend:!!HUB.cvPend,sel:FY.sel,cv:HUB.cvI,full:BB.full,morph,cam:camera.position.toArray(),tgt:controls.target.toArray(),dist:FY.sel>=0?camera.position.distanceTo(wPos(FY.sel)):null,auto:controls.autoRotate,tok:S.tok,drawn:DRAWN,mode:S.mode,focus:FOCUS.k,wT,vsh:[VSH.y,VSH.tb,VSH.top]}),
  selScreen:()=>{const i=FY.sel;if(i<0)return null;const q=wPos(i).project(camera);return {x:(q.x*.5+.5)*innerWidth,y:(-q.y*.5+.5)*innerHeight}},
- twinHitAt:(x,y)=>typeof twinHit==='function'&&twinHit(x,y),
- twin:()=>typeof TWIN==="undefined"?null:{on:TWIN.on,u:TWIN.u,n:TWIN.n,vis:TWIN.g?TWIN.g.visible:false,r:TWIN.r,pos:TWIN.pos.toArray(),mine:NODES.reserve.pos.toArray(),s1:NODES.reserve.g.scale.x,scr:(()=>{const q=TWIN.pos.clone().project(camera);return {x:(q.x*.5+.5)*innerWidth,y:(-q.y*.5+.5)*innerHeight,z:q.z}})(),mscr:(()=>{const q=NODES.reserve.pos.clone().project(camera);return {x:(q.x*.5+.5)*innerWidth,y:(-q.y*.5+.5)*innerHeight,z:q.z}})(),tip:document.getElementById("tip").style.display==="block"?document.getElementById("tip").innerText:null},
+ ast:()=>typeof AST==="undefined"||!AST.on?{on:false}:{on:true,vis:AST.g.visible,z:AST.z,cracks:AST.cracks,tunnels:AST.tunnels,deep:AST.deep,surf:AST.surf,ptsOp:AST.pts.material.opacity,pos:NODES.reserve.pos.toArray(),contractHit:hitList.includes(NODES.contract.hit),scr:(()=>{const q=NODES.reserve.pos.clone().project(camera);return {x:(q.x*.5+.5)*innerWidth,y:(-q.y*.5+.5)*innerHeight,z:q.z}})(),pscr:(()=>{const q=AST.g.localToWorld(new THREE.Vector3(-.2,AST.top+1.0,.66));q.project(camera);return {x:(q.x*.5+.5)*innerWidth,y:(-q.y*.5+.5)*innerHeight,z:q.z}})(),plantAt:(x,y)=>astPlantHit(x,y),tip:document.getElementById("tip").style.display==="block"?document.getElementById("tip").innerText:null},
+ nodePos:k=>NODES[k]?NODES[k].pos.toArray():null,dexHome:()=>typeof DEX_POS!=="undefined"?DEX_POS.toArray():null,
+ txt:(lg)=>{setLang(lg);const ks=['dex','poly','link','tw','tech','gchain','shield','ext','contract','pool','burn','staking','bank','tour','gnome','reserve','fiat'];return {T:T[lg],cards:ks.map(k=>{try{const c=card(k);return {k,s:[c.k,c.h,c.b,c.x,...(c.n||[]).flat()].join(' | ')}}catch(e){return {k,s:'ERR '+e.message}}})}},mintSet:(n)=>{S.cBB=n*M.mintPx*M.mintBurn;S.cBA=n*MINT_AMB_G},mintTx:(n)=>mintTx(-1,n,null,true),mintState:()=>({cBA:S.cBA||0,minted:MS.minted,hands:GN.hands,running:MS.running}),astTopY:()=>typeof AST!=="undefined"&&AST.on?(AST.top+1.2)*AST.K:0,
+ astPlantAt:(x,y)=>typeof astPlantHit==='function'&&astPlantHit(x,y),
  castPick:(x,y)=>castPick(x,y),ihit:(i,x,y)=>{const q=wPos(i).project(camera);return {q:q.toArray(),h:islandHit(i,x,y,12),slots:CAST.slots.filter(s=>s.w===i).map(s=>[s.w,s.g.visible]),pw:pickWallet(x,y)}},castSlots:()=>CAST.slots.filter(s=>s.w>=0&&s.g.visible).map(s=>s.w),
  baseOrbit:(az,el,dist)=>{BB.intro=null;BB.ctl.target.set(0,2,0);BB.cam.position.set(Math.sin(az)*Math.cos(el)*dist,Math.sin(el)*dist+2,Math.cos(az)*Math.cos(el)*dist);BB.ctl.update();BB.dirty=true}};
 if(typeof R6API!=='undefined'&&R6API.r6)Object.assign(R6API.r6,BASEAPI);
-/* ===== Twin cores · DEV (v2) ONLY · future 4X concept with demo data =====
-   Star 1 = raw Amber / Soul Stone: the existing audited Mine (finite) — wild raw orange, rough dull glow, slowly dimmer/smaller over the demo timeline.
-   Star 2 = cut Amber · «Живая казна» / Living Treasury (fed by Amber spent in the in-game shop) — bigger, sun-like amber-gold, white energy core, faceted.
-   Streams: Star 1 → islands (mining), islands → Star 2 (shop spending). Only for castle islands already drawn by the LOD (CAST slots), one shared
-   LineSegments + one shared Points; no new assets, no post-processing. No prices, no numbers. */
-const TWIN={on:EDITION==='dev',t:0,u:0,pos:new THREE.Vector3(),r:3};
-if(TWIN.on){
- Object.assign(T.ru,{tw1:'Сырой Amber · Шахта (конечная) · демо',tw1s:'Гномы добывают сырой Amber → огранка → обращение в экосистеме',
-  tw2:'Огранённый Amber · Живая казна (пополняется от трат в игре) · демо',tw2s:'Потраченный в игровом магазине Amber стекается сюда, и звезда растёт',
-  twNote:'Концепт будущей 4X-механики · демо-данные',twLab:'Живая казна · концепт · демо'});
- Object.assign(T.en,{tw1:'Raw Amber · Mine (finite) · demo',tw1s:'Gnomes mine raw Amber → it gets cut → it circulates in the ecosystem',
-  tw2:'Cut Amber · Living Treasury (refilled by in-game spending) · demo',tw2s:'Amber spent in the in-game shop flows back here and the star grows',
-  twNote:'Future 4X concept · demo data',twLab:'Living Treasury · concept · demo'});
- const g=new THREE.Group();g.name='twin2';uni.add(g);TWIN.g=g;
- const add=(c,o,s)=>{const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:DOT,color:c,transparent:true,opacity:o,depthWrite:false,blending:THREE.AdditiveBlending,fog:false}));sp.scale.set(s,s,1);g.add(sp);return sp};
- TWIN.halo=add(0xffb02e,.16,46);TWIN.co=add(0xffc94a,.42,20);
- // faceted cut-amber crystal (flat facets, gold-silver edges)
- const cg=new THREE.OctahedronGeometry(2.1,1).toNonIndexed();cg.scale(1,1.25,1);cg.computeVertexNormals();
- const cry=new THREE.Mesh(cg,new THREE.MeshPhongMaterial({color:0xffc24a,emissive:0x9a5c08,specular:0xffffff,shininess:90,flatShading:true,transparent:true,opacity:.82,depthWrite:false}));cry.renderOrder=7;g.add(cry);TWIN.cry=cry;
- const ed=new THREE.LineSegments(new THREE.EdgesGeometry(cg,1),new THREE.LineBasicMaterial({color:0xfff1c8,transparent:true,opacity:.55,depthWrite:false}));ed.renderOrder=8;cry.add(ed);
- TWIN.core=add(0xffffff,.95,5.2);TWIN.core.renderOrder=9;
- // white energy rays (one small canvas texture)
- const RAY=(()=>{const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');x.translate(64,64);
-  for(let k=0;k<12;k++){x.rotate(Math.PI/6);const gr=x.createLinearGradient(0,0,0,-62);gr.addColorStop(0,'rgba(255,255,255,.9)');gr.addColorStop(1,'rgba(255,240,200,0)');
-   x.fillStyle=gr;x.beginPath();x.moveTo(-(k%2?1.4:2.6),0);x.lineTo(0,-(k%2?44:62));x.lineTo(k%2?1.4:2.6,0);x.fill()}return new THREE.CanvasTexture(c)})();
- TWIN.ray=new THREE.Sprite(new THREE.SpriteMaterial({map:RAY,color:0xfff3d6,transparent:true,opacity:.55,depthWrite:false,blending:THREE.AdditiveBlending,fog:false}));TWIN.ray.scale.set(15,15,1);TWIN.ray.renderOrder=10;g.add(TWIN.ray);
- // shared streams
- const MAXC=48,SEG=10,DPC=3;TWIN.MAXC=MAXC;TWIN.SEG=SEG;
- const lp=new Float32Array(MAXC*SEG*2*3),lc=new Float32Array(MAXC*SEG*2*3),lg=new THREE.BufferGeometry();
- lg.setAttribute('position',new THREE.BufferAttribute(lp,3));lg.setAttribute('color',new THREE.BufferAttribute(lc,3));lg.setDrawRange(0,0);
- TWIN.lines=new THREE.LineSegments(lg,new THREE.LineBasicMaterial({vertexColors:true,transparent:true,opacity:.26,depthWrite:false,blending:THREE.AdditiveBlending}));TWIN.lines.frustumCulled=false;uni.add(TWIN.lines);
- const dp=new Float32Array(MAXC*DPC*3),dc=new Float32Array(MAXC*DPC*3),dg=new THREE.BufferGeometry();
- dg.setAttribute('position',new THREE.BufferAttribute(dp,3));dg.setAttribute('color',new THREE.BufferAttribute(dc,3));dg.setDrawRange(0,0);
- TWIN.dots=new THREE.Points(dg,new THREE.PointsMaterial({size:.32,map:DOT,vertexColors:true,transparent:true,opacity:.9,depthWrite:false,blending:THREE.AdditiveBlending}));TWIN.dots.frustumCulled=false;uni.add(TWIN.dots);
- TWIN.DPC=DPC;
- // floating label under Star 2
- const host=(Object.values(labEls)[0]||{}).parentElement||document.body;const lb=document.createElement('div');lb.className='lb';lb.id='twinLab';lb.style.display='none';/* a caption only: taps and clicks pass through to the nodes beneath */lb.style.pointerEvents='none';lb.style.cursor='default';host.appendChild(lb);TWIN.lab=lb;
+/* ===== The Mine · central asteroid · DEV (v2) ONLY · concept, labelled demo =====
+   One big dark, dirty floating island in the same style as the players' castle islands (flat-shaded jittered icosahedron, flat top),
+   amber aether seeping through cracks (thin additive veins + soft wisps hugging them, one shared time uniform), many dark tunnel
+   mouths with a faint amber rim, and a static Amber processing plant on top. Zoomed in / clicked: one Points object with deep miners
+   (inside the tunnels) and surface miners. No halo sprites, no post-processing of its own. Replaces the Soul Stone node (the token is
+   everywhere: the flows between wallets stay) and the old twin-core concept. */
+const AST={on:EDITION==='dev',R:5.4,K:3.3,z:0,t:0,g:null};   // built at R, shown ×K (≈18 world units: inside the pool orbit at 28 and the wallet shell at 43+)
+if(AST.on){
+ Object.assign(T.ru,{astLab:'Шахта · Amber',astTip:'Шахта. Премиальные гномы спускаются вглубь тоннелей, остальные добывают на поверхности. Наверху — перерабатывающий завод Amber. · демо',
+  astPick:'Нажми на Шахту и выбери: гном из коллекции 10K идёт вглубь, обычный — на поверхность.',
+  astPlant:'Завод переработки Amber',astNote:'Концепт · демо'});
+ Object.assign(T.en,{astLab:'Mine · Amber',astTip:'The Mine. Premium gnomes descend deep into the tunnels; other miners work the surface. On top stands the Amber processing plant. · demo',
+  astPick:'Tap the Mine and choose: a gnome from the 10K collection goes deep, a regular one works the surface.',
+  astPlant:'Amber Processing Plant',astNote:'Concept · demo'});
+ const R=AST.R,r=rng(5150),g=new THREE.Group();g.name='asteroid';uni.add(g);AST.g=g;
+ // rock: same recipe as the castle islands (ROCK_G), finer and bigger, darker and dirtier
+ const geo=new THREE.IcosahedronGeometry(1,3),p=geo.attributes.position,jit=new Map();
+ const crat=[];for(let k=0;k<9;k++){const v=new THREE.Vector3(r()*2-1,(r()*2-1)*.7,r()*2-1).normalize();crat.push([v,.18+r()*.2,.06+r()*.07])}
+ const _d=new THREE.Vector3();
+ for(let k=0;k<p.count;k++){const key=p.getX(k).toFixed(3)+p.getY(k).toFixed(3)+p.getZ(k).toFixed(3);let f=jit.get(key);
+  if(f==null){_d.set(p.getX(k),p.getY(k),p.getZ(k)).normalize();f=.86+r()*.2+.07*Math.sin(_d.x*4.1+_d.z*2.3)*Math.cos(_d.y*3.7);
+   for(const [c,a,dp] of crat){const ang=_d.angleTo(c);if(ang<a*1.35){const q=ang/a;f+=q<1?-dp*(1-q*q):dp*.5*Math.sin((q-1)/.35*Math.PI)}}jit.set(key,f)}
+  let x=p.getX(k)*f,y=p.getY(k)*f*.82,z=p.getZ(k)*f;if(y>.62)y=.62+(y-.62)*.15;if(y<-.5)y*=1.18;p.setXYZ(k,x*R,y*R,z*R)}
+ geo.computeVertexNormals();
+ {const cols=[];for(let k=0;k<p.count;k+=3){const y=(p.getY(k)+p.getY(k+1)+p.getY(k+2))/3/R,sh=.55+r()*.5-(y<-.2?.15:0),rust=r()<.18;   // dirty, battered: per-face soot / rust patches
+  for(let v=0;v<3;v++)cols.push(sh*(rust?1.18:1),sh*(rust?.95:1),sh*(rust?.78:1))}geo.setAttribute('color',new THREE.Float32BufferAttribute(cols,3))}
+ const rock=new THREE.Mesh(geo,new THREE.MeshStandardMaterial({color:0x34302b,vertexColors:true,flatShading:true,roughness:1,metalness:0,emissive:0x0c0602,emissiveIntensity:1}));rock.name='astRock';g.add(rock);AST.rock=rock;
+ // surface sampler (raycast onto the rock from outside, once at build time)
+ rock.updateMatrixWorld(true);const rc=new THREE.Raycaster(),_o=new THREE.Vector3(),_n=new THREE.Vector3(),_m3=new THREE.Matrix3();
+ const surf=dir=>{_o.copy(dir).normalize().multiplyScalar(R*3);rc.set(_o,_n.copy(_o).negate().normalize());const h=rc.intersectObject(rock,false)[0];if(!h)return null;
+  return {p:h.point.clone(),n:h.face.normal.clone().normalize()}};
+ const randDir=(ymin,ymax)=>new THREE.Vector3(r()*2-1,ymin+r()*(ymax-ymin),r()*2-1).normalize();
+ // aether cracks: jagged random walks on the sides → thin veins + wider, lifted, softer wisps (one ribbon geometry, attribute a = across, u = along, l = layer)
+ const VP=[],VA=[],VI=[];let vi=0;
+ const ribbon=(pts,w,lift,layer)=>{const n=pts.length;for(let k=0;k<n;k++){const s=pts[k],nx=pts[Math.min(n-1,k+1)].p.clone().sub(pts[Math.max(0,k-1)].p).normalize(),side=nx.clone().cross(s.n).normalize(),
+   tp=k/(n-1),ww=w*Math.sin(Math.PI*Math.min(.98,Math.max(.02,tp)))*(.7+.6*r()),c=s.p.clone().addScaledVector(s.n,.04+lift*(.4+tp*.6));
+   for(const sg of [-1,1]){const q=c.clone().addScaledVector(side,ww*sg);VP.push(q.x,q.y,q.z);VA.push(sg,tp,layer)}
+   if(k<n-1){VI.push(vi,vi+1,vi+2,vi+1,vi+3,vi+2)}vi+=2}};
+ const NCR=MOBILE?28:44;AST.cracks=0;
+ for(let c=0;c<NCR;c++){const yy=-.78+1.2*(c+.5)/NCR,ph=c*2.39996,rr=Math.sqrt(1-yy*yy);let d=new THREE.Vector3(Math.cos(ph)*rr,yy,Math.sin(ph)*rr);
+  /* spread evenly round the flanks */const pts=[];const step=.05+r()*.03;let hd=new THREE.Vector3(r()-.5,r()-.5,r()-.5);
+  const LEN=r()<.35?24+(r()*12|0):12+(r()*8|0);   // some long fissures wrap round the rock
+  for(let k=0;k<LEN;k++){const s=surf(d);if(!s)break;pts.push(s);hd.add(new THREE.Vector3(r()-.5,r()-.5,r()-.5).multiplyScalar(.9)).normalize();d=d.clone().addScaledVector(hd,step).normalize()}
+  if(pts.length<5)continue;AST.cracks++;
+  ribbon(pts,.055,0,0);ribbon(pts,.34,.26,1);
+  for(let br=0;br<(pts.length>20?2:1);br++)if(r()<.8){const b=pts.slice((pts.length*(.3+.4*r()))|0);const d2=b[0].p.clone().normalize();const bp=[b[0]];let hd2=new THREE.Vector3(r()-.5,r()-.5,r()-.5).normalize(),dd=d2;
+   for(let k=0;k<6+(r()*6|0);k++){hd2.add(new THREE.Vector3(r()-.5,r()-.5,r()-.5).multiplyScalar(.7)).normalize();dd=dd.clone().addScaledVector(hd2,step).normalize();const s=surf(dd);if(s)bp.push(s)}if(bp.length>3){ribbon(bp,.04,0,0);ribbon(bp,.24,.2,1)}}}
+ const cg=new THREE.BufferGeometry();cg.setAttribute('position',new THREE.Float32BufferAttribute(VP,3));cg.setAttribute('aul',new THREE.Float32BufferAttribute(VA,3));cg.setIndex(VI);
+ AST.uT={value:0};AST.uZ={value:0};
+ const aeth=new THREE.ShaderMaterial({uniforms:{uT:AST.uT,uZ:AST.uZ},transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide,
+  vertexShader:`attribute vec3 aul;varying vec3 vA;void main(){vA=aul;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+  fragmentShader:`uniform float uT;uniform float uZ;varying vec3 vA;
+   void main(){float across=1.-abs(vA.x);float u=vA.y;
+    if(vA.z<.5){float a=pow(across,1.6);float sh=.82+.18*sin(uT*1.1+u*9.);vec3 c=mix(vec3(1.,.42,.05),vec3(1.,.86,.42),a*a);gl_FragColor=vec4(c*a*sh*(.5+.16*uZ),1.);}
+    else{float fl=.5+.5*sin(u*14.-uT*1.6)*sin(u*5.+uT*.7);float a=pow(across,2.2)*(.35+.65*fl)*sin(3.1416*u);gl_FragColor=vec4(vec3(1.,.6,.16)*a*.3,1.);}}`});
+ const cm=new THREE.Mesh(cg,aeth);cm.renderOrder=6;cm.frustumCulled=false;g.add(cm);AST.aeth=aeth;
+ // tunnel mouths dug by gnomes: dark discs + faint amber rims (two merged meshes)
+ const NT=MOBILE?26:40,DK=[],RM=[],TN=[];const up=new THREE.Vector3(0,0,1),_q=new THREE.Quaternion();
+ for(let k=0;k<NT;k++){const s=surf(randDir(-.8,.55));if(!s)continue;const sz=.16+r()*.2;_q.setFromUnitVectors(up,s.n);
+  const dsk=new THREE.CircleGeometry(sz,9);dsk.applyQuaternion(_q);dsk.translate(s.p.x+s.n.x*.03,s.p.y+s.n.y*.03,s.p.z+s.n.z*.03);DK.push(dsk);
+  const rim=new THREE.RingGeometry(sz*.95,sz*1.12,12);rim.applyQuaternion(_q);rim.translate(s.p.x+s.n.x*.035,s.p.y+s.n.y*.035,s.p.z+s.n.z*.035);RM.push(rim);TN.push({p:s.p,n:s.n,sz})}
+ AST.tunnels=TN.length;
+ const dm=new THREE.Mesh(mergeGeometries(DK,false),new THREE.MeshBasicMaterial({color:0x050302,polygonOffset:true,polygonOffsetFactor:-2}));dm.renderOrder=4;g.add(dm);
+ AST.rimM=new THREE.MeshBasicMaterial({color:0xff9a30,transparent:true,opacity:.08,depthWrite:false,blending:THREE.AdditiveBlending});
+ const rmM=new THREE.Mesh(mergeGeometries(RM,false),AST.rimM);rmM.renderOrder=5;g.add(rmM);
+ // gnome miners (one Points): deep miners in the tunnels (amber), surface miners scattered (pale gold)
+ const MP=[],MC=[];for(const t of TN){for(let k=0;k<3;k++){const q=t.p.clone().addScaledVector(t.n,.06).add(new THREE.Vector3(r()-.5,r()-.5,r()-.5).multiplyScalar(t.sz*.7));MP.push(q.x,q.y,q.z);MC.push(1,.62,.16)}}
+ AST.deep=MP.length/3;
+ for(let k=0;k<(MOBILE?60:100);k++){const s=surf(randDir(-.6,.9));if(!s)continue;const q=s.p.addScaledVector(s.n,.08);MP.push(q.x,q.y,q.z);MC.push(.8,.72,.5)}
+ AST.surf=MP.length/3-AST.deep;
+ const mg=new THREE.BufferGeometry();mg.setAttribute('position',new THREE.Float32BufferAttribute(MP,3));mg.setAttribute('color',new THREE.Float32BufferAttribute(MC,3));
+ AST.pts=new THREE.Points(mg,new THREE.PointsMaterial({size:.5,map:DOT,vertexColors:true,transparent:true,opacity:0,depthWrite:false,blending:THREE.AdditiveBlending}));AST.pts.renderOrder=7;g.add(AST.pts);
+ // static Amber processing plant on the flat top (castle-like refinery; no smoke, no animation)
+ let top=-1e9;for(let k=0;k<p.count;k++)top=Math.max(top,p.getY(k));top-=.12;AST.top=top;
+ const parts=[[],[],[],[]];const P=(geo,x,y,z,m,ry=0)=>{if(ry)geo.rotateY(ry);geo.translate(x,top+y,z);parts[m].push(geo.index?geo.toNonIndexed():geo)};
+ const C=(rt,rb,h,s)=>new THREE.CylinderGeometry(rt,rb,h,s),K=(rr,h,s)=>new THREE.ConeGeometry(rr,h,s),B=(x,y,z)=>new THREE.BoxGeometry(x,y,z);
+ P(B(3.2,.35,2.4),0,.17,0,0);                                  // plinth
+ P(B(2.0,1.1,1.3),-.2,.9,0,0);P(K(1.35,.6,4),-.2,1.75,0,1,Math.PI/4);  // main hall + roof
+ for(const [x,z] of [[-1.35,-.95],[1.35,-.95],[-1.35,.95],[1.35,.95]]){P(C(.26,.3,1.6,8),x,1.15,z,0);P(K(.34,.55,8),x,2.22,z,1)}  // corner towers
+ P(C(.36,.46,2.6,10),.95,1.65,.15,0);P(C(.42,.42,.12,10),.95,2.98,.15,1);  // stack (cold, no smoke)
+ for(const z of [-.55,.25]){P(C(.32,.32,1.0,10),1.0,.85,z-.75,0);P(new THREE.SphereGeometry(.32,10,5,0,Math.PI*2,0,Math.PI/2),1.0,1.35,z-.75,1)}  // silos
+ P(new THREE.SphereGeometry(.5,12,6,0,Math.PI*2,0,Math.PI/2),-.2,1.45,.0,2);  // furnace dome (amber, emissive)
+ for(let k=0;k<5;k++)P(B(.16,.22,.04),-.95+k*.38,.95,.66,2);for(let k=0;k<5;k++)P(B(.16,.22,.04),-.95+k*.38,.95,-.66,2);  // lit windows
+ P(B(1.7,.12,.22),-1.6,.38,.9,0,.5);                             // conveyor from a tunnel
+ for(let k=0;k<14;k++){const a=k/14*Math.PI*2;P(B(.18,.22,.18),Math.cos(a)*1.85,.46,Math.sin(a)*1.45,0)}  // crenellated rim
+ // industrial: tank farm, refinery vats, gantry crane, conveyor ramp, pipes down into tunnel mouths (all static)
+ for(const [x,z,rr,h] of [[-2.35,-.55,.42,1.5],[-2.35,.45,.36,1.2],[-1.7,-1.55,.34,1.0]]){P(C(rr,rr,h,12),x,.35+h/2,z,3);P(new THREE.SphereGeometry(rr,12,5,0,Math.PI*2,0,Math.PI/2),x,.35+h,z,3);P(C(rr*1.04,rr*1.04,.06,12),x,.35+h*.35,z,0);P(C(rr*1.04,rr*1.04,.06,12),x,.35+h*.7,z,0)}
+ for(const [x,z] of [[1.95,.9],[2.5,.35],[2.45,1.15]]){P(C(.3,.26,.45,12),x,.57,z,3);P(C(.27,.27,.03,12),x,.8,z,2)}   // amber-lit vats
+ P(C(.04,.04,.9,6).rotateZ(Math.PI/2),2.2,.9,.75,3);                                   // vat feed pipe
+ {const gx=.2,gz=-1.45;for(const [dx,dz] of [[-.9,-.25],[.9,-.25],[-.9,.25],[.9,.25]])P(B(.08,1.6,.08),gx+dx,1.15,gz+dz,3);P(B(1.95,.1,.1),gx,1.95,gz-.25,3);P(B(1.95,.1,.1),gx,1.95,gz+.25,3);
+  P(B(.3,.16,.6),gx+.35,1.95,gz,3);P(C(.012,.012,.6,4),gx+.35,1.57,gz,3);P(B(.14,.1,.14),gx+.35,1.24,gz,0)}       // gantry crane frame
+ {const ramp=B(2.4,.08,.36);ramp.rotateZ(-.32);P(ramp,1.95,.75,-1.15,3,-.35);for(let k=0;k<4;k++){const lg=B(.06,.5-k*.13+.2,.06);P(lg,1.0+k*.6,.45-k*.06,-1.0-k*.2,3)}}   // conveyor ramp on legs
+ {const pp=[];const cyl=(a,b,rr)=>{const d=b.clone().sub(a),L=d.length();if(L<1e-3)return;const c=new THREE.CylinderGeometry(rr,rr,L,6);c.translate(0,L/2,0);
+   c.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize()));c.translate(a.x,a.y,a.z);pp.push(c.toNonIndexed())};
+  const up4=TN.filter(t=>t.p.y>-R*.1).sort((a,b)=>b.p.y-a.p.y).slice(0,5);AST.pipes=up4.length;
+  for(const t of up4){const hz=new THREE.Vector3(t.p.x,0,t.p.z).normalize(),a=hz.clone().multiplyScalar(1.7).setY(top+.4),e=hz.clone().multiplyScalar(Math.hypot(t.p.x,t.p.z)+.25).setY(Math.max(t.p.y+.6,top+.15)),
+    b=t.p.clone().addScaledVector(t.n,.45),c=t.p.clone().addScaledVector(t.n,.02);cyl(a,e,.06);cyl(e,b,.06);cyl(b,c,.06);
+    const fl=new THREE.CylinderGeometry(.1,.1,.06,8);fl.translate(e.x,e.y,e.z);pp.push(fl.toNonIndexed())}
+  parts[3].push(...pp)}
+ const merged=parts.map(a=>{const m=mergeGeometries(a,false);a.forEach(x=>x.dispose());return m});const pg=mergeGeometries(merged,true);
+ const plant=new THREE.Mesh(pg,[smat(0x5b5550),smat(0x8a5a2b),new THREE.MeshStandardMaterial({color:0xffb347,flatShading:true,roughness:.8,emissive:0xff9a2e,emissiveIntensity:.4}),new THREE.MeshStandardMaterial({color:0x6a6f74,flatShading:true,roughness:.55,metalness:.55})]);
+ plant.name='astPlant';g.add(plant);AST.plant=plant;
+ // the Soul Stone is the token itself (everywhere): its separate node is retired in this edition, the Mine takes the centre
+ {const c=NODES.contract;c.g.children.forEach(o=>{if(o!==c.hit)o.visible=false});const hi=hitList.indexOf(c.hit);if(hi>=0)hitList.splice(hi,1)}
+ g.scale.setScalar(AST.K);
+ {const m=NODES.reserve;m.inner.visible=false;m.hit.geometry=new THREE.SphereGeometry(R*.98*AST.K,14,10);m.lab=(top+3.6)*AST.K;m.dist=62}
 }
-const _twA=new THREE.Vector3(),_twB=new THREE.Vector3(),_twM=new THREE.Vector3(),_twQ=new THREE.Vector3();
-const C_MINE=[1,.48,.12],C_SPEND=[1,.86,.5];
-function twinBez(a,b,lift,u,out){_twM.copy(a).add(b).multiplyScalar(.5);_twM.y+=lift;const k=1-u;return out.set(k*k*a.x+2*k*u*_twM.x+u*u*b.x,k*k*a.y+2*k*u*_twM.y+u*u*b.y,k*k*a.z+2*k*u*_twM.z+u*u*b.z)}
-function updTwin(dt){if(!TWIN.on)return;TWIN.t+=dt;const u=TWIN.u=.3+.7*(1-Math.exp(-TWIN.t/150));   // demo timeline 0.3 → 1
- const R=NODES.reserve,off=morph>.3||S.panel==='inv'||(typeof EYE!=='undefined'&&EYE.f>.4);
- // Star 1: raw Amber · rough orange, duller, shrinking
- const s1=1-.32*u,fl=.85+.15*Math.sin(TWIN.t*5.3)*Math.sin(TWIN.t*2.1);R.g.scale.multiplyScalar(s1);
- RP.hot.material.color.setHex(0xd8641a);RP.hotw.material.color.setHex(0xb0521c);RP.cor.material.color.setHex(0xe06a22);
- RP.hot.material.opacity*=.8*(1-.35*u);RP.cor.material.opacity*=fl*(1-.45*u);RP.hotw.material.opacity*=.7;
- // Star 2: Living Treasury · binary companion of the Mine, grows
- const fut=eraK;TWIN.pos.copy(R.pos).add(_twQ.set(-9.5-2.5*fut,1.6+fut,7+3*fut));TWIN.g.position.copy(TWIN.pos);TWIN.g.visible=!off;
- const s2=(.62+.5*u)*(1+.35*fut);TWIN.g.scale.setScalar(s2);TWIN.r=2.6*s2;const pu=.5+.5*Math.sin(TWIN.t*1.3);
- TWIN.core.material.opacity=.8+.2*pu;TWIN.co.material.opacity=.32+.12*pu;TWIN.halo.material.opacity=.11+.06*u;TWIN.ray.material.opacity=.35+.25*pu;TWIN.ray.material.rotation+=dt*.05;TWIN.cry.rotation.y+=dt*.12;
- // streams (only islands that the castle LOD currently draws)
- const lp=TWIN.lines.geometry.attributes.position.array,lc=TWIN.lines.geometry.attributes.color.array,dp=TWIN.dots.geometry.attributes.position.array,dc=TWIN.dots.geometry.attributes.color.array;
- let n=0;if(!off)for(const sl of CAST.slots){if(sl.w<0||!sl.g.visible||n>=TWIN.MAXC-1)continue;const i=sl.w;
-  for(const mine of [true,false]){if(mine&&!SET.gn[i]&&i%3)continue;if(n>=TWIN.MAXC)break;
-   if(mine){_twA.copy(R.pos);_twB.copy(sl.g.position)}else{_twA.copy(sl.g.position);_twB.copy(TWIN.pos)}const lift=_twA.distanceTo(_twB)*.12,col=mine?C_MINE:C_SPEND,f=sl.f;
-   for(let s=0;s<TWIN.SEG;s++){const o=(n*TWIN.SEG+s)*6;twinBez(_twA,_twB,lift,s/TWIN.SEG,_twQ);lp[o]=_twQ.x;lp[o+1]=_twQ.y;lp[o+2]=_twQ.z;twinBez(_twA,_twB,lift,(s+1)/TWIN.SEG,_twQ);lp[o+3]=_twQ.x;lp[o+4]=_twQ.y;lp[o+5]=_twQ.z;
-    const fade=f*(mine?.8:1)*(.35+.65*Math.sin(Math.PI*(s+.5)/TWIN.SEG));for(let v=0;v<2;v++)for(let c=0;c<3;c++)lc[o+v*3+c]=col[c]*fade}
-   for(let d=0;d<TWIN.DPC;d++){const o=(n*TWIN.DPC+d)*3,uu=(TWIN.t*(mine?.16:.2)+d/TWIN.DPC+(i%17)*.059)%1;twinBez(_twA,_twB,lift,uu,_twQ);dp[o]=_twQ.x;dp[o+1]=_twQ.y;dp[o+2]=_twQ.z;
-    const a=Math.sin(Math.PI*uu)*f;dc[o]=col[0]*a;dc[o+1]=col[1]*a;dc[o+2]=col[2]*a}
-   n++}}
- TWIN.n=n;TWIN.lines.geometry.setDrawRange(0,n*TWIN.SEG*2);TWIN.dots.geometry.setDrawRange(0,n*TWIN.DPC);
- if(n){TWIN.lines.geometry.attributes.position.needsUpdate=TWIN.lines.geometry.attributes.color.needsUpdate=true;TWIN.dots.geometry.attributes.position.needsUpdate=TWIN.dots.geometry.attributes.color.needsUpdate=true}
- TWIN.lines.visible=TWIN.dots.visible=n>0;
- // label
- const lb=TWIN.lab;if(off||S.kiosk||morph>.5){lb.style.display='none'}else{_twQ.copy(TWIN.pos);_twQ.y-=TWIN.r*1.25;_twQ.project(camera);
-  if(_twQ.z>1||Math.abs(_twQ.x)>1.1||Math.abs(_twQ.y)>1.1||camera.position.distanceTo(TWIN.pos)>900)lb.style.display='none';
-  else{const tx=t('twLab');if(lb._t!==tx){lb.textContent=tx;lb._t=tx}lb.style.display='block';lb.style.left=(_twQ.x*.5+.5)*innerWidth+'px';lb.style.top=(-_twQ.y*.5+.5)*innerHeight+'px'}}}
-/* screen hit-test for Star 2 (hover tooltip / tap) */
-function twinHit(x,y){if(!TWIN.on||!TWIN.g.visible)return false;_twQ.copy(TWIN.pos).project(camera);if(_twQ.z>1)return false;
- _twM.copy(TWIN.pos).addScaledVector(_twA.set(1,0,0).applyQuaternion(camera.quaternion),TWIN.r).project(camera);
- const px=Math.max(14,Math.hypot((_twM.x-_twQ.x)*innerWidth/2,(_twM.y-_twQ.y)*innerHeight/2));return Math.hypot((_twQ.x*.5+.5)*innerWidth-x,(-_twQ.y*.5+.5)*innerHeight-y)<=px}
-/* Star 2 is nearer to the camera than a node hit at ray distance d → the star wins the pick */
-function twinFront(x,y,d){return twinHit(x,y)&&camera.position.distanceTo(TWIN.pos)-TWIN.r<d}
-const twinTipHTML=k=>`<b>${t(k)}</b><br>${t(k+'s')}<br><span style="color:#8f9cc4">${t('twNote')}</span>`;
+const _aV=new THREE.Vector3(),_aRay=new THREE.Raycaster(),_aN=new THREE.Vector2();
+function updAst(dt){if(!AST.on)return;AST.t+=dt;AST.uT.value=AST.t;
+ const m=NODES.reserve,off=morph>.3||S.panel==='inv';m.g.scale.setScalar(1);AST.g.position.copy(m.pos);AST.g.visible=!off;AST.g.rotation.y+=dt*.012;
+ const d=camera.position.distanceTo(m.pos),want=Math.max(cardKey==='reserve'?1:0,Math.min(1,Math.max(0,(135-d)/60)));AST.z+=(want-AST.z)*Math.min(1,dt*3);
+ AST.uZ.value=AST.z;AST.pts.material.opacity=AST.z*.95;AST.pts.visible=AST.z>.02;AST.rimM.opacity=.07+.2*AST.z}
+function astPlantHit(x,y){if(!AST.on||!AST.g.visible)return false;_aN.set(x/innerWidth*2-1,-(y/innerHeight)*2+1);_aRay.setFromCamera(_aN,camera);
+ const h=_aRay.intersectObjects([AST.plant,AST.rock],false);return !!h.length&&h[0].object===AST.plant}
+const astTipHTML=(x,y)=>astPlantHit(x,y)?`<b>${t('astPlant')}</b><br><span style="color:#8f9cc4">${t('astNote')}</span>`:
+ `<b>${t('astLab')}</b><br>${t('astTip')}<br>${t('astPick')}<br><span style="color:#8f9cc4">${t('astNote')}</span>`;
 
 /* ===== Loop ===== */
 const clock=new THREE.Clock();let frame=0,fpsAcc=0,fpsN=0,statT=0;window.__fps=0;
@@ -3693,7 +3788,7 @@ function tick(){requestAnimationFrame(tick);
   for(const o of a.sp){if(o.name==='spin'){o.rotation.y+=dt*.3;o.rotation.x+=dt*.1}else if(o.name==='spin2')o.rotation.y-=dt*.15;else if(o.name==='spinr'){o.rotation.z+=dt*.8;o.rotation.y+=dt*.3}else if(o.name==='coin')o.rotation.z+=dt*1.5;else if(o.name==='flame')o.scale.y=1+Math.sin(tm*9)*.15+n.glow*.4}}
  if(run)pulse*=.94;const pz=NODES.pool.inner.getObjectByName('pulse');if(pz){pz.material.opacity=.1+Math.min(.6,pulse*.35);pz.scale.setScalar(1+pulse*.03)}
  for(const o of flowLines){const mineLine=o.a==='reserve';const want=o.hov?.85:(mineLine&&!(MS.mineOn||eraK>.5)?.05:o.base);o.ln.material.opacity+=(want-o.ln.material.opacity)*.15;o.ln.visible=morph<.5}
- updEra(dt);updNet(dt);updRoy(dt);updWatch(dt);updGnF(dt);updCastles(dt);updTwin(dt);updViewShift(dt);updLinks();
+ updEra(dt);updNet(dt);updRoy(dt);updWatch(dt);updGnF(dt);updCastles(dt);updAst(dt);updViewShift(dt);updLinks();
  updParticles();updArcs(dt);updFind(dt);updTrail();updTM(dt);updMorph(dt);updInv(dt);updRegions(dt);
  if(mouseMoved&&frame%3===0){mouseMoved=false;const h=pick(mx,my);if(h&&h.k){setHover(h.k);hoverW=-1}else{setHover(null);hoverW=h&&h.w!=null?h.w:-1}showTip()}
  updFly();controls.update();updLabels();
