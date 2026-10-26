@@ -3012,7 +3012,7 @@ function updEyes(dt){const d=camera.position.distanceTo(controls.target);const w
  for(const [id,p] of [['eyeL',a],['eyeR',b]]){const e=$(id).style;e.left=p.x+'px';e.top=p.y+'px';e.width=wpx+'px';e.height=hpx+'px'}
  const bb=$('eyeB').style;bb.left=((a.x+b.x)/2)+'px';bb.top=Math.max(70,(a.y+b.y)/2-wpx*.95)+'px'}
 /* --- audits panel: one plain line, no dates or links --- */
-function renderAud(){$('audB').innerHTML=`<div class="k">${t('audK')}</div><h3 style="margin:4px 0 6px">${t('audH')}</h3><p>${t('audLine')}</p>`}
+function renderAud(){$('audB').innerHTML=`<div class="k">${t('audK')}</div><h3 style="margin:4px 0 6px">${t('audH')}</h3><p>${t('audLine')}</p><ul><li>${t('audTS')}</li><li>${t('audSPd')}</li></ul>`}
 function openAud(){closePanels('audP');$('audP').classList.add('open');renderAud()}
 function closeAud(){$('audP').classList.remove('open')}
 {const _cp=closePanels;closePanels=function(keep){if(keep!=='audP'&&$('audP').classList.contains('open'))closeAud();return _cp(keep)}}
@@ -3027,9 +3027,9 @@ function updKioskZoom(dt){if(!S.kiosk){KZ.t=0;return}KZ.t+=dt;const p=KZ.t%80;if
  dir.setLength(KZ.base+(EYE_D1+1100-KZ.base)*e);camera.position.copy(controls.target).add(dir)}
 function updWatch(dt){updShield(dt);updDrops(dt);if(S.src==='sim'&&!S.paused)simDropTick();updEyes(dt);updKioskZoom(dt)}
 try{if(localStorage.getItem('ed_eyes'))$('zHint').style.opacity='0'}catch(e){}
-Object.assign(T.ru,{zHint:'отдалите камеру до предела…',audK:'Пасхалка · за экосистемой наблюдают',audH:'Аудиты',audLine:'Аудиты смарт-контрактов имеются',
+Object.assign(T.ru,{zHint:'отдалите камеру до предела…',audK:'Пасхалка · за экосистемой наблюдают',audH:'Аудиты',audLine:'Аудиты смарт-контрактов имеются. Token Sniffer и SolidProof — независимые сервисы проверки: они смотрят код смарт-контрактов на уязвимости и скрытые функции, чтобы игроки могли доверять проекту.',audTS:'Token Sniffer — автоматический сканер контрактов токенов: ищет опасные и скрытые функции.',audSPd:'SolidProof — команда аудиторов смарт-контрактов: вручную проверяет код и логику контрактов.',
  dropT:'Дроп thirdweb: «{c}» · {n} NFT замков ушли в кошельки (пример)'});
-Object.assign(T.en,{zHint:'zoom all the way out…',audK:'Easter egg · the ecosystem is being watched',audH:'Audits',audLine:'Smart contract audits are in place',
+Object.assign(T.en,{zHint:'zoom all the way out…',audK:'Easter egg · the ecosystem is being watched',audH:'Audits',audLine:'Smart contract audits are in place. Token Sniffer and SolidProof are independent reviewers: they check smart contract code for vulnerabilities and hidden functions, so players can trust the project.',audTS:'Token Sniffer is an automated token contract scanner: it looks for risky and hidden functions.',audSPd:'SolidProof is a smart contract audit team: it reviews contract code and logic by hand.',
  dropT:'thirdweb drop: “{c}” · {n} castle NFTs went to wallets (example)'});
 
 /* ===== Round 6 strings (RU default, EN parity) ===== */
