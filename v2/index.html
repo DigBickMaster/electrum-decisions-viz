@@ -23,6 +23,10 @@ input[type=text]{font:inherit;color:#fff;background:#141c46;border:1px solid var
 #brand .t1{font-size:11px;letter-spacing:.28em;color:var(--gold);font-weight:700}
 #brand .t2{font-size:20px;font-weight:800;letter-spacing:.01em;background:linear-gradient(90deg,#fff2c4,#f6c75a 45%,#5eead4);-webkit-background-clip:text;background-clip:text;color:transparent}
 #brand .t3{font-size:12px;color:var(--mut)}
+#brand .gas{display:inline-flex;align-items:center;gap:5px;margin-left:8px;font-size:10px;letter-spacing:.04em;padding:2px 7px;border-radius:6px;border:1px solid var(--line);vertical-align:3px;pointer-events:auto;cursor:help;-webkit-text-fill-color:var(--mut);color:var(--mut);font-weight:600}
+#brand .gas i{width:7px;height:7px;border-radius:50%;background:#64748b;box-shadow:0 0 6px currentColor}
+#brand .gas[data-lv=ok] i{background:#22c55e;color:#22c55e}#brand .gas[data-lv=mid] i{background:#eab308;color:#eab308}#brand .gas[data-lv=hi] i{background:#ef4444;color:#ef4444}#brand .gas[data-lv=na] i{background:#64748b;color:transparent}
+body.kiosk #brand .gas{display:none}
 #brand .ed{display:inline-block;margin-left:6px;font-size:10px;letter-spacing:.12em;padding:2px 6px;border-radius:6px;border:1px solid var(--line);color:var(--mut);vertical-align:3px;-webkit-text-fill-color:var(--mut)}
 #topr{position:fixed;top:12px;right:12px;z-index:9;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
 #topr:has(#modeMenu.open){z-index:30}
@@ -37,6 +41,8 @@ input[type=text]{font:inherit;color:#fff;background:#141c46;border:1px solid var
 .st b{white-space:nowrap;font-variant-numeric:tabular-nums;font-weight:600;text-align:right}.st i{font-style:normal;color:var(--mut)}
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:1px;box-shadow:0 0 8px currentColor}
 #clock{font-size:11px;color:var(--mut);margin-top:6px}
+#chQuiet{font-size:11px;color:var(--gold);margin-top:4px;line-height:1.35}
+body.chain .lWell,body.chain .lArn,body.chain .lTrn{display:none!important}
 #legend{position:fixed;left:14px;bottom:108px;z-index:5;padding:10px 14px;width:252px;font-size:12px;max-height:38vh;overflow:auto}
 #legend div{padding:2px 0}
 #ctrl{position:fixed;left:50%;transform:translateX(-50%);bottom:30px;z-index:6;padding:10px 12px;display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:center;max-width:min(1180px,96vw)}
@@ -237,6 +243,7 @@ button.gold{background:linear-gradient(135deg,#b8862a,#f6c75a 42%,#efe9d6 60%,#d
  <button id="stMore" aria-expanded="false"><span></span><i>▾</i></button>
  <div id="stSlot"></div>
  <div id="clock"></div>
+ <div id="chQuiet" class="chainOnly" style="display:none"></div>
  <div id="stFoot"></div>
 </div>
 <div id="legend" class="pn"><h4 data-i="legend"></h4><div id="legI"></div></div>
@@ -671,7 +678,7 @@ const T={ru:{
  modeBtn:'Режим: {m}',mUni:'Вселенная',mUniD:'Amber Soul Stone, контракты и игроки',mWorld:'Карта мира',mWorldD:'Игроки по регионам, матчи дугами',mInv:'Инвестор',mInvD:'Здоровье экономики, план и факт',mSbx:'Что если',mSbxD:'Песочница: модель на 12 месяцев',mKiosk:'Стрим / киоск',mKioskD:'Полный экран без интерфейса',
  dataH:'Данные',srcSim:'Симуляция',srcDemo:'Демо',srcChain:'Блокчейн',
  cDay:'День симуляции',cMatches:'Сыграно матчей',cBurn:'Сожжено из пулов, Amber',cMintBB:'Минт → выкуп и сжигание',cStake:'Стейкерам, Amber',cBank:'В Банк Студии, Amber',cTour:'В турнирах, Amber',cMine:'Намайнено, Amber',cWallets:'Кошельков',cGnHands:'Гномов у игроков',cGnContract:'Гномов в контракте',
- chSupply:'Эмиссия, Amber',chDead:'На мёртвом адресе, Amber',chCirc:'Вне мёртвого адреса, Amber',chHolders:'Держателей сейчас',chAddr:'Адресов за всё время',chTx:'Переводов загружено',chBlock:'Последний блок',chGnome:'Гномы-NFT',chBattle:'Боевой контракт',chBank:'Банк Студии',chStake:'Стейкинг',chTour:'Турниры',notConn:'не подключён',
+ chSupply:'Эмиссия, Amber',chDead:'На мёртвом адресе, Amber',chCirc:'Вне мёртвого адреса, Amber',chHolders:'Держателей сейчас',chAddr:'Адресов за всё время (Amber и гномы)',chTx:'Переводов загружено',chBlock:'Последний блок',chGnome:'Гномы-NFT',chBattle:'Боевой контракт',chBank:'Банк Студии',chStake:'Стейкинг',chTour:'Турниры',notConn:'не подключён',
  clock:'День {d} · {h}:{m}',chainClock:'Обновлено {t} · узел {r}',
  legend:'Обозначения',
  pause:'Пауза',resume:'Продолжить',playMatch:'Сыграть матч',follow:'Проследить матч',stopFollow:'Выйти из матча',
@@ -744,7 +751,7 @@ const T={ru:{
  modeBtn:'Mode: {m}',mUni:'Universe',mUniD:'The Amber Soul Stone, contracts and players',mWorld:'World map',mWorldD:'Players by region, matches as arcs',mInv:'Investor',mInvD:'Economy health, plan vs fact',mSbx:'What if',mSbxD:'Sandbox: a 12-month model',mKiosk:'Stream / kiosk',mKioskD:'Full screen with no interface',
  dataH:'Data',srcSim:'Simulation',srcDemo:'Demo',srcChain:'Blockchain',
  cDay:'Simulation day',cMatches:'Matches played',cBurn:'Burned from pools, Amber',cMintBB:'Mint → buy & burn',cStake:'To stakers, Amber',cBank:'To the Studio Bank, Amber',cTour:'In tournaments, Amber',cMine:'Mined, Amber',cWallets:'Wallets',cGnHands:'Gnomes held by players',cGnContract:'Gnomes in the contract',
- chSupply:'Total supply, Amber',chDead:'At the dead address, Amber',chCirc:'Outside the dead address, Amber',chHolders:'Current holders',chAddr:'Addresses, all time',chTx:'Transfers loaded',chBlock:'Latest block',chGnome:'Gnome NFTs',chBattle:'Battle contract',chBank:'Studio Bank',chStake:'Staking',chTour:'Tournaments',notConn:'not connected',
+ chSupply:'Total supply, Amber',chDead:'At the dead address, Amber',chCirc:'Outside the dead address, Amber',chHolders:'Current holders',chAddr:'Addresses, all time (Amber and gnomes)',chTx:'Transfers loaded',chBlock:'Latest block',chGnome:'Gnome NFTs',chBattle:'Battle contract',chBank:'Studio Bank',chStake:'Staking',chTour:'Tournaments',notConn:'not connected',
  clock:'Day {d} · {h}:{m}',chainClock:'Updated {t} · node {r}',
  legend:'Legend',
  pause:'Pause',resume:'Resume',playMatch:'Play a match',follow:'Follow one match',stopFollow:'Leave the match',
@@ -2306,25 +2313,29 @@ function chainTmApply(v){if(v==null){setDrawn(NW);bhScale(CH.dead||0);if(typeof 
 
 /* --- investor data (chain) --- */
 function chainInvData(){const r=L==='ru',now=Date.now();let tx30=0;for(let q=CH.blk.length-1;q>=0;q--){if(blockTime(CH.blk[q])<now-30*864e5)break;tx30++}
- let holders=0;for(let k=0;k<CH.addrs.length;k++)if(CH.balA[k]>1e-9&&CH.addrs[k]!==ZERO)holders++;
+ const holders=chainHolders();
  const k=[[t('kSupply'),big(CH.supply||0)],[t('kDead'),big(CH.dead||0)],[t('kHolders'),fmt(holders)],[t('kTx30'),fmt(tx30)],[t('chMatches'),fmt(CH.bat.n.newGame||0)],[t('chGCirc'),GN.known?fmt(CH.gnm.circ)+' / '+fmt(GN_CIRC_MAX):'—']];
- const pv=[[r?'Сжигание с пула':'Burn per pool',pct(M.burn),fmt(CH.bat.n.endedGame||0)+(r?' завершённых матчей':' finished matches')],[r?'Банк Студии с пула':'Studio Bank per pool',pct(M.studio),CH.bals.bank!=null?fmt(Math.round(CH.bals.bank))+' Amber':'—'],
+ const pv=[[r?'Сжигание с пула':'Burn per pool',pct(M.burn),fmt(batCounts().win)+(r?' матчей с победителем (ничья не сжигает)':' matches with a winner (a draw burns nothing)')],[r?'Банк Студии с пула':'Studio Bank per pool',pct(M.studio),CH.bals.bank!=null?fmt(Math.round(CH.bals.bank))+' Amber':'—'],
   [r?'Стейкинг с пула':'Staking per pool',pct(M.stake),CH.bals.staking!=null?fmt(Math.round(CH.bals.staking))+' Amber':'—'],[r?'Гномы: в обороте максимум':'Gnomes: circulation maximum',fmt(GN_CIRC_MAX)+(r?' (лимит 10 000, #0 сожжён)':' (cap 10,000, #0 burned)'),GN.known?fmt(CH.gnm.circ)+(r?' в обороте':' in circulation'):'—'],
-  [r?'Старт майнинга':'Mining starts at',fmt(M.mineThr)+(r?' из ':' of ')+fmt(9999),GN.known?fmt(CH.gnm.hands)+(r?' у игроков':' held by players'):'—'],[r?'Турниры':'Tournaments','128 · 45/25/10/10 · 5%',t('soon')],[r?'Шахта (резерв майнинга)':'Mine (mining reserve)',big(M.reserve)+' Amber',t('soon')]];
+  [r?'Старт майнинга':'Mining starts at',fmt(M.mineThr)+(r?' из ':' of ')+fmt(9999),GN.known?fmt(CH.gnm.hands)+(r?' у игроков':' held by players'):'—'],...(()=>{const q=chainQuiet();return q&&q.quiet?[[r?'Игровые серверы':'Game servers',r?'на паузе до перезапуска':'paused until relaunch',(r?'последний матч ':'last match ')+(q.lastMatch?dateStr(q.lastMatch):'—')]]:[]})(),[r?'Турниры':'Tournaments','128 · 45/25/10/10 · 5%',t('soon')],[r?'Шахта (резерв майнинга)':'Mine (mining reserve)',big(M.reserve)+' Amber',t('soon')]];
  return {k,pv}}
 function chainChart(){const x=[],y=[];const n=CH.blk.length;if(!n)return {x:[0,1],y:[0,0]};for(let s=0;s<=60;s++){const q=Math.min(n-1,Math.floor((n-1)*s/60));x.push(CH.blk[q]);y.push(CH.deadCum[q])}return {x,y}}
 
 /* --- stats rows + node card rows --- */
 function chainClsRows(){const n=CLS.n;if(!n)return [[t('cPl'),'…']];const pend=CLS.codeDone?'':' …';
  return [[t('cPl'),fmt(n.p)],[t('cTr'),fmt(n.t)+pend],[t('cLk'),t('cLkV',{n:fmt(n.lw),p:fmt(n.lp)})],[t('cBot'),fmt(n.b)+pend],[t('cRt'),fmt(n.r)]]}
-function chainStatRows(){const g=GN.known;let holders=0;for(let k=0;k<CH.addrs.length;k++)if(CH.balA[k]>1e-9&&!SPEC[CH.addrs[k]])holders++;
+/* holders: one definition everywhere — balance above 1e-9 Amber (float dust filter), contracts/pools/dead excluded */
+function chainHolders(){let h=0;for(let k=0;k<CH.addrs.length;k++)if(CH.balA[k]>1e-9&&!SPEC[CH.addrs[k]])h++;return h}
+/* game servers: last on-chain battle event; quiet if older than 3 days */
+function chainQuiet(){const ev=CH.bat.ev;if(!ev||!ev.length)return null;let lm=0;for(const g of batGames().values())if(g.end&&g.b>lm)lm=g.b;const last=ev[ev.length-1].b,tl=blockTime(last);return {quiet:Date.now()-tl>3*864e5,lastEv:tl,lastMatch:lm?blockTime(lm):0}}
+function chainStatRows(){const g=GN.known;const holders=chainHolders();
  const v=x=>x==null?'—':fmt(Math.round(x));
  return [[t('chSupply'),v(CH.supply)],[t('chDead'),v(CH.dead)],[t('chDex'),v(CH.bals.dexPair)],[t('chStakeB'),v(CH.bals.staking)],[t('chBankB'),v(CH.bals.bank)],[t('chHolders'),fmt(holders)],[t('chAddr'),fmt(CH.addrs.length)],[t('chTx'),fmt(CH.blk.length)],
   ...chainClsRows(),...batRows(),[t('chGMint'),g?fmt(CH.gnm.minted):'—'],[t('chGCirc'),g?fmt(CH.gnm.circ)+' / '+fmt(GN_CIRC_MAX):'—'],[t('chGHands'),g?fmt(CH.gnm.hands):'—'],[t('chBlock'),CH.latest?fmt(CH.latest):'—']]}
 function chainNodeRows(key){if(S.src!=='chain'||CH.state!=='ok')return [];const v=x=>x==null?'—':fmt(Math.round(x))+' Amber';const r=L==='ru';
  const m={dex:[[r?'Баланс Amber сейчас':'Amber balance now',v(CH.bals.dexPair)]],staking:[[r?'Баланс Amber сейчас':'Amber balance now',v(CH.bals.staking)]],bank:[[r?'Баланс Amber сейчас':'Amber balance now',v(CH.bals.bank)]],
   burn:[[r?'На мёртвом адресе сейчас':'At the dead address now',v(CH.dead)],[t('chGDead'),GN.known?fmt(CH.gnm.dead):'—']],
-  pool:[...batRows(true),[r?'Баланс Amber сейчас':'Amber balance now',v(CH.bals.battle)]],
+  pool:[...batRows(true),[r?'Баланс Amber сейчас':'Amber balance now',v(CH.bals.battle)],...(()=>{const q=chainQuiet();return q?[[r?'Последний завершённый матч':'Last finished match',q.lastMatch?dateStr(q.lastMatch):'—'],...(q.quiet?[[r?'Игровые серверы':'Game servers',r?'на паузе до перезапуска':'paused until relaunch']]:[])]:[]})()],
   gnome:[[t('chGMint'),GN.known?fmt(CH.gnm.minted):'—'],[t('chGCirc'),GN.known?fmt(CH.gnm.circ)+' / '+fmt(GN_CIRC_MAX):'—'],[t('chGHands'),GN.known?fmt(CH.gnm.hands):'—'],[t('chGDead'),GN.known?fmt(CH.gnm.dead):'—'],[t('chGLeft'),GN.known?fmt(CH.gnm.left):'—']],
   contract:[[t('chSupply'),v(CH.supply)],[t('chDead'),v(CH.dead)]]};return m[key]||[]}
 
@@ -2362,7 +2373,7 @@ function recentMatchesHTML(){if(S.src!=='chain'||CH.state!=='ok'||!CH.bat.ev.len
  const eq=`${fmt(c.created)} = ${fmt(c.win)} + ${fmt(c.draw)} + ${fmt(c.cancel)}`+(c.open?` + ${fmt(c.open)}`:'');
  return `<h4 style="margin:12px 0 4px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut)">${r?'Сверка матчей (события контракта)':'Match reconciliation (contract events)'}</h4>`+rows(batRows())+
   `<p class="note">${r?`Создано = с победителем + ничья + отменено${c.open?' + открыто':''}: ${eq}. Номер матча декодируется из события endedGame (topics[1], например 0x…1a76 → #6774) и из calldata endGame (0x86514131: id, победитель). Победитель 0x000…0000 — ничья. endGame вызывает сервисный кошелёк ${A(BATV.op,'Оператор '+short(BATV.op))}.`:`Created = with a winner + draw + cancelled${c.open?' + open':''}: ${eq}. The match number is decoded from the endedGame event (topics[1], e.g. 0x…1a76 → #6774) and from the endGame calldata (0x86514131: id, winner). Winner 0x000…0000 means a draw. endGame is called by the ${A(BATV.op,'Operator '+short(BATV.op))} service wallet.`}</p>`+
-  `<h4 style="margin:12px 0 4px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut)">${r?'Последние завершённые матчи':'Latest finished matches'}</h4><div class="mlist">`+
+  `<h4 style="margin:12px 0 4px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut)">${r?'Последние завершённые матчи':'Latest finished matches'}</h4>`+((q=>q&&q.quiet?`<p class="note">${r?'Игровые серверы на паузе до перезапуска, поэтому новых матчей пока нет. Ниже — последние матчи из блокчейна.':'The game servers are paused until relaunch, so there are no new matches yet. Below are the latest matches from the blockchain.'}</p>`:'')(chainQuiet()))+`<div class="mlist">`+
   ended.map(g=>{const dr=g.w===ZERO;return `<div class="mrow"><div><b>#${g.id}</b> · ${short(g.c||'')} ⇄ ${short(g.p||'')} · ${r?'взнос':'contribution'} ${fmtA(g.s)} Amber</div>`+
    `<div class="sm">${dr?(r?'Ничья · возврат взноса':'Draw · contribution refund'):(r?'Победитель ':'Winner ')+short(g.w)} · ${matchLine(g.s,dr?'draw':'win',false)}</div>`+
    `<div class="sm">${dateStr(blockTime(g.b))} · <a href="${scanTx(g.tx)}" target="_blank" rel="noopener">endGame tx ${g.tx.slice(0,10)}… ↗</a></div></div>`}).join('')+'</div>'}
@@ -2791,7 +2802,8 @@ function updStats(){let r;
   [t('cTour'),fmt(Math.round(S.cT))],[t('cMine'),fmt(Math.round(S.cN))],[t('cWallets'),fmt(DRAWN)],...clsRows(),[t('cGnHands'),fmt(GN.hands)],[t('cGnContract'),fmt(GN.inC)]];
  const h=r.map((x,j)=>`<div class="st${j>3?" x2":""}${x[2]?' '+x[2]:''} tb-${typeof R6tab==='function'?R6tab(x[0]):'eco'}"><i>${x[0]}</i><b>${x[1]}</b></div>`).join('');if($('statRows')._h!==h){$('statRows').innerHTML=h;$('statRows')._h=h}
  if(typeof stBriefRender==='function')stBriefRender(r);
- if(S.src==='chain'){$('clock').textContent=CH.state==='ok'&&CH.updAt?t('chainClock',{t:new Date(CH.updAt).toLocaleTimeString(L==='ru'?'ru-RU':'en-GB'),r:(CH.rpc||'').replace(/^https?:\/\//,'').split('/')[0]}):''}
+ if(S.src==='chain'){$('clock').textContent=CH.state==='ok'&&CH.updAt?t('chainClock',{t:new Date(CH.updAt).toLocaleTimeString(L==='ru'?'ru-RU':'en-GB'),r:(CH.rpc||'').replace(/^https?:\/\//,'').split('/')[0]}):'';
+  const q=CH.state==='ok'&&typeof chainQuiet==='function'?chainQuiet():null,qe=$('chQuiet');if(qe){const s=q&&q.quiet?(L==='ru'?`Игровые серверы на паузе до перезапуска · последний матч ${q.lastMatch?dateStr(q.lastMatch):'—'} · новые матчи появятся здесь после запуска`:`Game servers are paused until relaunch · last match ${q.lastMatch?dateStr(q.lastMatch):'—'} · new matches will appear here after launch`):'';if(qe.textContent!==s)qe.textContent=s;qe.style.display=s?'':'none'}}
  else $('clock').textContent=simWhen(S.simT)}
 function fitLegend(){if(MOBILE||innerWidth<=820)return;const st=$('stats'),lg=$('legend');if(!st||!lg)return;const b=st.getBoundingClientRect().bottom;const h=Math.max(70,innerHeight-108-b-14);lg.style.maxHeight=h+'px'}
 setInterval(fitLegend,1000);addEventListener('resize',fitLegend);
@@ -3082,7 +3094,7 @@ Object.assign(T.ru,{techBtn:'Технологии',gchBtn:'Игровая сет
  lbNoteC:'По событиям боевого контракта (newGame, joinedGame, endedGame). Доля побед = победы / завершённые матчи; в таблице по доле — игроки от {n} завершённых матчей. Нажмите на строку — камера полетит к замку.',
  lbNoteS:'Пример из симуляции. Доля побед = победы / сыгранные матчи; в таблице по доле — игроки от {n} матчей. Нажмите на строку — камера полетит к замку.',
  lbHvPow:'По Мощи',lbHvWins:'По победам',lbHvName:'Улей',lbHvPower:'Мощь',lbHvMem:'Игроков',lbHvSoon:'Ульи появятся вместе с 4X-игрой.',
- hvNote:'Ульи соревнуются за ресурсы в 4X-игре.',hvDemo:'Демо: 30 ульев по 50–100 игроков, Мощь — пример.',hvLay:'Ульи',hvPlayers:'Игроков',hvPower:'Суммарная Мощь',hvWins:'Суммарно побед',hvTag:'рой',
+ hvNote:'Ульи соревнуются за ресурсы в 4X-игре.',hvDemo:'Демо: 30 ульев по 50–100 игроков, Мощь — пример.',hvLay:'Ульи',hvPlayers:'Игроков',hvPower:'Суммарная Мощь',hvWins:'Суммарно побед',hvTag:'улей',
  wxShare:'Поделиться',wxCastle:'Войти в замок',wxLink:'Показать связь',wxPower:'Мощь',
  shK:'Карточка замка',shH:'Поделиться замком',shShare:'Поделиться',shDl:'Скачать PNG',shCopy:'Копировать ссылку',shCopied:'Ссылка скопирована',shCopyFail:'Не удалось скопировать — ссылка: {u}',
  shNote:'Картинка создаётся прямо в браузере. Ссылка открывает вселенную сразу на этом замке.',
@@ -3993,7 +4005,7 @@ if(PR.on){const lw=$('layP').querySelector('[data-i="laySecCast"]');
   `<div><span class="leg2" style="background:${hexC(CLS_C.link)}"></span>${t('lLinkLine')}</div><div class="sm" id="lClsNote" style="margin:3px 0 6px;opacity:.85">${t('lClsNote')}</div>`};
  const _rlg=renderLegend;renderLegend=function(){_rlg();const li=$('legI');const ring=w=>`<span class="dot" style="background:transparent;border:${w}px solid #ffb347;box-sizing:border-box;width:11px;height:11px"></span>`;
   const pr=`<div class="sm" style="margin-top:6px">${t('lProsH')}</div><div>${ring(1)}${t('lPr1')}</div><div>${ring(2)}${t('lPr2')}</div><div>${ring(3.5)}${t('lPr3')}</div>`+
-   `<div><span class="leg2" style="background:#ffb347;height:3px"></span>${t('lStkD')}</div><div><span class="leg2" style="background:#fff0c8"></span>${t('lStkS')}</div><div><span class="leg2" style="background:#ffc457"></span>${t('lClaim')}</div><div><span class="leg2" style="background:linear-gradient(90deg,#fff0c8,#ffc457)"></span>${t('lUnstk')}</div><div><span class="leg2" style="background:${hexC(PR_EXT)}"></span>${t('lExtF')}</div>`;
+   `<div class="simOnly"><span class="leg2" style="background:#ffb347;height:3px"></span>${t('lStkD')}</div><div class="simOnly"><span class="leg2" style="background:#fff0c8"></span>${t('lStkS')}</div><div class="simOnly"><span class="leg2" style="background:#ffc457"></span>${t('lClaim')}</div><div class="simOnly"><span class="leg2" style="background:linear-gradient(90deg,#fff0c8,#ffc457)"></span>${t('lUnstk')}</div><div><span class="leg2" style="background:${hexC(PR_EXT)}"></span>${t('lExtF')}</div>`;
   /* the gnome-tier colour list is replaced by the ring thresholds (exact counts are not shown) */
   li.innerHTML=li.innerHTML.replace(new RegExp(`<div class="sm" style="margin-top:6px">${t('lGn').replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}</div>(<div><span class="dot"[^>]*></span>[^<]*</div>){5}`),pr)};
  Object.assign(R6API.r6,{stakeTx,claimTx,unstakeTx,
@@ -4333,6 +4345,48 @@ if(EDITION==='dev'){
  addEventListener('error',e=>{if(e&&e.message)gShow(gTx().fe+': '+e.message)});
  window.__glDiag=()=>({err:GLD.err,last:GLD.last,lost:GLD.lost});
 }
+
+/* ===== Polygon gas indicator (next to the brand) =====
+   Source: Polygon Gas Station v2 (CORS *), fallback: public RPC eth_gasPrice from CFG.network.rpcs.
+   Shown value: estimatedBaseFee + standard.maxPriorityFee (what a normal tx pays now), in gwei. Never converted to money.
+   Dot colour = current vs a baseline:
+     baseline = median of this device's samples over the last 24 h (localStorage, ≥10 samples over ≥30 min),
+     until then = median base fee + median tip of the last 1024 blocks (eth_feeHistory, ≈35 min).
+     A relative baseline is used because Polygon's normal level moves a lot (tens to hundreds of gwei), so fixed thresholds go stale.
+   green ≤ +15% · yellow ≤ +50% · red above. Refresh every 20 s, paused while the tab is hidden; on errors the dot turns grey. */
+const GAS={v:null,base:null,bsrc:'',src:'',at:0,err:0,lk:'ed_gas_v1',fh:null,fhAt:0,el:null};
+Object.assign(T.ru,{gasTip:'Газ Polygon сейчас: {v} gwei (базовая комиссия + приоритет). База для цвета: {b} gwei ({s}). Зелёный — около обычного, жёлтый — выше на 15–50%, красный — выше более чем на 50%. Источник: {src}. Обновление каждые 20 с.',
+ gasNo:'Газ Polygon: нет данных, источники не ответили. Повтор через 20 с.',gasB24:'медиана за 24 ч на этом устройстве',gasBfh:'медиана последних 1024 блоков'});
+Object.assign(T.en,{gasTip:'Polygon gas now: {v} gwei (base fee + priority). Colour baseline: {b} gwei ({s}). Green is about normal, yellow is 15–50% higher, red is more than 50% higher. Source: {src}. Refreshes every 20 s.',
+ gasNo:'Polygon gas: no data, the sources did not answer. Retrying in 20 s.',gasB24:'24-hour median on this device',gasBfh:'median of the last 1024 blocks'});
+const gasMed=a=>{const s=[...a].sort((x,y)=>x-y),n=s.length;return n?(n%2?s[(n-1)/2]:(s[n/2-1]+s[n/2])/2):null};
+function gasHist(){try{const a=JSON.parse(localStorage.getItem(GAS.lk)||'[]');const c=Date.now()-864e5;return Array.isArray(a)?a.filter(x=>x&&x[0]>c&&x[1]>0):[]}catch(e){return []}}
+function gasSave(v){try{const h=gasHist();const l=h[h.length-1];if(!l||Date.now()-l[0]>=60e3){h.push([Date.now(),+v.toFixed(2)]);while(h.length>1440)h.shift();localStorage.setItem(GAS.lk,JSON.stringify(h))}}catch(e){}}
+async function gasJ(url,body,ms){const c=new AbortController(),tm=setTimeout(()=>c.abort(),ms||8000);
+ try{const r=await fetch(url,body?{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body),signal:c.signal}:{signal:c.signal,cache:'no-store'});if(!r.ok)throw new Error('http '+r.status);return await r.json()}finally{clearTimeout(tm)}}
+const gasRpcs=()=>((CFG.network&&CFG.network.rpcs)||[]).map(x=>x.url).filter(Boolean);
+async function gasRpc(method,params){let e0;for(const u of gasRpcs()){try{const j=await gasJ(u,{jsonrpc:'2.0',id:1,method,params},6000);if(j&&j.result)return j.result;e0=new Error('no result')}catch(e){e0=e}}throw e0||new Error('no rpc')}
+async function gasNow(){try{const j=await gasJ('https://gasstation.polygon.technology/v2');const b=+j.estimatedBaseFee,p=+(j.standard&&j.standard.maxPriorityFee);if(b>0&&p>=0)return {v:b+p,src:'gasstation.polygon.technology'}}catch(e){}
+ const g=await gasRpc('eth_gasPrice',[]);const v=parseInt(g,16)/1e9;if(!(v>0))throw new Error('bad gasPrice');return {v,src:'RPC eth_gasPrice'}}
+async function gasFeeHist(){if(GAS.fh&&Date.now()-GAS.fhAt<10*60e3)return GAS.fh;
+ const r=await gasRpc('eth_feeHistory',['0x400','latest',[50]]);const b=(r.baseFeePerGas||[]).map(x=>parseInt(x,16)/1e9).filter(x=>x>0),p=(r.reward||[]).map(x=>parseInt(x[0],16)/1e9).filter(x=>x>=0);
+ if(!b.length)throw new Error('no feeHistory');GAS.fh=gasMed(b)+(gasMed(p)||0);GAS.fhAt=Date.now();return GAS.fh}
+function gasLevel(){if(!(GAS.v>0)||!(GAS.base>0))return 'na';const k=GAS.v/GAS.base;return k<=1.15?'ok':k<=1.5?'mid':'hi'}
+function gasRender(){const el=GAS.el||(GAS.el=$('gasB'));if(!el)return;const lv=GAS.v>0?gasLevel():'na';el.dataset.lv=lv;
+ const g=x=>x>=100?fmt(x):fmtA(Math.round(x*10)/10);
+ el.querySelector('b').textContent=GAS.v>0?g(GAS.v)+' gwei':'— gwei';
+ el.title=GAS.v>0?t('gasTip',{v:g(GAS.v),b:GAS.base>0?g(GAS.base):'—',s:GAS.bsrc==='24h'?t('gasB24'):t('gasBfh'),src:GAS.src}):t('gasNo')}
+async function gasTick(){if(document.hidden)return;try{const n=await gasNow();GAS.v=n.v;GAS.src=n.src;GAS.at=Date.now();GAS.err=0;gasSave(n.v);
+  const h=gasHist();if(h.length>=10&&h[h.length-1][0]-h[0][0]>=30*60e3){GAS.base=gasMed(h.map(x=>x[1]));GAS.bsrc='24h'}
+  else{try{GAS.base=await gasFeeHist();GAS.bsrc='fh'}catch(e){GAS.base=h.length?gasMed(h.map(x=>x[1])):null;GAS.bsrc='24h'}}}
+ catch(e){GAS.err++;if(GAS.err>=2||!GAS.v){GAS.v=null}}gasRender()}
+(()=>{const t2=document.querySelector('#brand .t2');if(!t2)return;const s=document.createElement('span');s.id='gasB';s.className='gas';s.dataset.lv='na';s.setAttribute('role','status');s.tabIndex=0;
+ s.innerHTML='<i></i><b>— gwei</b>';t2.appendChild(s);GAS.el=s;gasRender();gasTick();setInterval(gasTick,20000);
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&Date.now()-GAS.at>20000)gasTick()});
+ /* narrow screens: the brand row is shared with the top-right buttons, so the badge sits on the era line instead */
+ const place=()=>{const m=innerWidth<=820,e=$('eraTag');if(!m||!e){if(s._m){s._m=0;s.style.cssText=''}return}const r=e.getBoundingClientRect();s._m=1;
+  s.style.cssText=`position:fixed;top:${Math.round(r.top-3)}px;left:${Math.round((r.width?r.right:12)+8)}px;margin:0;vertical-align:0;z-index:5`};
+ let lL=L;setInterval(()=>{if(L!==lL){lL=L;gasRender()}place()},1000);addEventListener('resize',place);place()})();
 
 /* ===== Loop ===== */
 const clock=new THREE.Clock();let frame=0,fpsAcc=0,fpsN=0,statT=0;window.__fps=0;
