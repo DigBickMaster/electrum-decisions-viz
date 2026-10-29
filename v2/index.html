@@ -610,6 +610,17 @@ window.ED_CONFIG={
  //   студия и thirdweb ключей не хранят и не видят. Сайт никогда не просит ключ или фразу.
  authProvider:null,
 
+ // Вторичные рынки (узел «Вторичные рынки» / Secondary Markets на карте, только v2): площадки NFT с поддержкой Polygon,
+ // где гномов можно свободно покупать и продавать. collection пусто = «коллекция скоро», ссылка ведёт на главную площадки.
+ // Когда коллекция гномов появится, впишите в collection полный URL страницы коллекции на этой площадке.
+ // Проверено 29.10.2026: OpenSea, Rarible, OKX NFT, Element поддерживают Polygon NFT. Magic Eden убран: EVM/Polygon закрыт 09.03.2026.
+ secondaryMarkets:[
+  {id:'opensea', name:'OpenSea',  home:'https://opensea.io/',              collection:''},
+  {id:'rarible', name:'Rarible',  home:'https://rarible.com/',             collection:''},
+  {id:'okx',     name:'OKX NFT',  home:'https://web3.okx.com/nft',         collection:''},
+  {id:'element', name:'Element',  home:'https://element.market/',          collection:''}
+ ],
+
  // Аудиты: на сайте одна строка «Аудиты смарт-контрактов имеются» — без дат и ссылок.
  audits:null
 };
@@ -1296,7 +1307,34 @@ const EXT_POS=V(124,32,-50);
 addNode('ext',EXT_POS,g=>{const s=new THREE.Sprite(new THREE.SpriteMaterial({map:DOT,color:COL.lil,transparent:true,opacity:.35,depthWrite:false,blending:THREE.AdditiveBlending,fog:false}));s.scale.set(9,9,1);g.add(s);
  const r=new THREE.Mesh(new THREE.TorusGeometry(3.2,.06,6,64),new THREE.MeshBasicMaterial({color:COL.lil,transparent:true,opacity:.35,fog:false}));r.name='spinr';r.rotation.x=1.2;g.add(r)},
  new THREE.SphereGeometry(5,8,6),{lab:5,dist:40,ck:'castleNft'});
+/* --- dev (v2), founder t871–t874: four outer "moons" outside the shield — DEX (liquidity pool), Gnome NFT Minter, Secondary Markets
+   (ex-External marketplaces), Official Dealers (coming soon). Each has its own orbit (radius + tilt) and goes round VERY slowly
+   (one revolution in 4–7 minutes at 1× speed). Size by importance: DEX > Secondary Markets > Minter ≈ Dealers.
+   moonP() is mirrored in the wallet shader (uMA/uMB) so the DEX and NFT wallet swarms trail behind their moons. --- */
+const MOONS=EDITION==='dev'?{dex:{r:152,i:.14,o:0,a:.3,w:Math.PI*2/360,c:0x22d3ee},gnome:{r:166,i:.42,o:-.35,a:.85,w:Math.PI*2/250,c:COL.amber},
+ ext:{r:178,i:-.26,o:.5,a:-.55,w:Math.PI*2/300,c:COL.lil},dealers:{r:192,i:-.5,o:1.1,a:2.4,w:Math.PI*2/420,c:COL.gold}}:null;
+function moonP(m,lag,out){const th=m.a+(m.w?m.w*orbT:0)-lag,x=Math.cos(th)*m.r,z=Math.sin(th)*m.r,ci=Math.cos(m.i),si=Math.sin(m.i),y=-z*si,z1=z*ci,co=Math.cos(m.o),so=Math.sin(m.o);
+ return out.set(x*co+z1*so,y,-x*so+z1*co)}
+if(EDITION==='dev'){
+  {const st=new THREE.Group();st.name='spinr';for(let k=0;k<6;k++){const a=k/6*Math.PI*2,b=new THREE.Mesh(new THREE.BoxGeometry(.7,.7,.7),new THREE.MeshBasicMaterial({color:COL.lil,transparent:true,opacity:.55,fog:false}));b.position.set(Math.cos(a)*4.4,0,Math.sin(a)*4.4);st.add(b)}
+  st.rotation.x=.35;NODES.ext.inner.add(st);NODES.ext.inner.add(wire(new THREE.IcosahedronGeometry(1.6,1),COL.lil,.45))}
+ NODES.ext.g.scale.setScalar(1.9);NODES.ext.lab=6;
+ addNode('dealers',V(0,0,190),g=>{
+  const hx=new THREE.CylinderGeometry(1.7,1.7,1.1,6);g.add(new THREE.Mesh(hx,new THREE.MeshBasicMaterial({color:0x7a5a22,transparent:true,opacity:.55,fog:false})));g.add(wire(hx.clone().scale(1.15,1.15,1.15),COL.gold,.55));
+  const r=new THREE.Mesh(new THREE.TorusGeometry(3,.06,6,64),new THREE.MeshBasicMaterial({color:COL.gold,transparent:true,opacity:.35,fog:false}));r.rotation.x=1.25;r.name='spinr';g.add(r);
+  const s=new THREE.Sprite(new THREE.SpriteMaterial({map:DOT,color:COL.gold,transparent:true,opacity:.22,depthWrite:false,blending:THREE.AdditiveBlending,fog:false}));s.scale.set(9,9,1);g.add(s)},
+  new THREE.SphereGeometry(5,8,6),{lab:5.4,dist:40});
+ NODES.dealers.g.scale.setScalar(1.05);
+ // each moon's own orbit: a faint dotted ring in the moon's colour
+ for(const k in MOONS){const m=MOONS[k],n=MOBILE?200:360,p=new Float32Array(n*3),q=new THREE.Vector3(),m0={...m,a:0,w:0};
+  for(let j=0;j<n;j++){moonP(m0,-j/n*Math.PI*2,q);p.set([q.x,q.y,q.z],j*3)}
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(p,3));
+  const o=new THREE.Points(g,new THREE.PointsMaterial({size:.7,color:m.c,map:DOT,transparent:true,opacity:.3,depthWrite:false,blending:THREE.AdditiveBlending,fog:false}));o.name='moonOrbit_'+k;o.frustumCulled=false;uni.add(o)}
+ // Minter: outside the shield, off the DEX
+ NODES.gnome.orb=null;NODES.gnome.g.scale.setScalar(1.1);NODES.gnome.dist=30;NODES.dex.dist=80;
+}
 const FLOWS=[['contract','pool',COL.teal],['pool','burn',COL.burn],['pool','staking',COL.teal],['pool','bank',COL.gold],['contract','tour',COL.pink],['tour','bank',COL.gold],['reserve','gnome',COL.amber],['gnome','burn',COL.burn],['gnome','bank',COL.gold],['dex','contract',0x22d3ee],['ext','bank',COL.lil]];
+if(EDITION==='dev'){const i=FLOWS.findIndex(f=>f[0]==='reserve'&&f[1]==='gnome');if(i>=0)FLOWS.splice(i,1);FLOWS.push(['gnome','ext',COL.lil])}
 const flowLines=[];
 for(const [a,b,c] of FLOWS){
  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(new Float32Array(33*3),3).setUsage(THREE.DynamicDrawUsage));
@@ -1308,7 +1346,9 @@ function updFlowLines(){for(const o of flowLines){_fa.copy(NODES[o.a].pos);_fb.c
  o.ln.geometry.attributes.position.needsUpdate=true}}
 let orbT=0; // station orbit clock
 const _cmt=new THREE.Vector3();
-function updStations(){const ct=orbT*.05;NODES.tour.pos.set(84+Math.cos(ct)*8,22+Math.sin(ct*1.7)*3,-68+Math.sin(ct)*9);_cmt.copy(NODES.tour.pos).multiplyScalar(2);NODES.tour.inner.getObjectByName('tail').parent.lookAt(_cmt);
+const _mq=new THREE.Vector3();
+function updStations(){if(MOONS){for(const k of ['dex','gnome','ext','dealers'])if(NODES[k])moonP(MOONS[k],0,NODES[k].pos);DEX_POS.copy(NODES.dex.pos);
+  if(MOONS._u)MOONS._u.value=orbT}const ct=orbT*.05;NODES.tour.pos.set(84+Math.cos(ct)*8,22+Math.sin(ct*1.7)*3,-68+Math.sin(ct)*9);_cmt.copy(NODES.tour.pos).multiplyScalar(2);NODES.tour.inner.getObjectByName('tail').parent.lookAt(_cmt);
  for(const k in NODES){const n=NODES[k];if(!n.orb)continue;const o=n.orb,a=o.a+orbT*o.w;n.pos.set(Math.cos(a)*o.r,o.y+Math.sin(a*2)*.6,Math.sin(a)*o.r)}
  if(eraK>0&&!ASTER){NODES.reserve.pos.multiplyScalar(1-eraK);const a=orbT*.1+2.4,r=14*eraK;NODES.contract.pos.set(Math.cos(a)*r,Math.sin(a*2)*.5*eraK,Math.sin(a)*r)}}
 updStations();updFlowLines();
@@ -1356,15 +1396,16 @@ const TIERS=[[1,3,0xffe7a3,1.25],[4,9,0xffc93c,1.6],[10,19,0xc084fc,2.0],[20,39,
 /* wallet classes (by on-chain behaviour): 0 player · 1 trader (DEX only) · 2 trading bot · 3 router/aggregator (hidden) */
 const CLS_C={trader:0x4f8dff,link:0xff6a4d,bot:0x39ff14};
 const tierOf=n=>{if(!n)return -1;for(let i=0;i<TIERS.length;i++)if(n<=TIERS[i][1])return i;return 4};
-const wVS=`attribute vec3 o2;attribute vec3 gp;attribute float sz;attribute float hl;attribute vec3 col;attribute float rb;attribute vec4 cen;attribute float ag;attribute float shp;attribute float rg;uniform float uPR;
+const wVS=`attribute vec3 o2;attribute vec3 gp;attribute float sz;attribute float hl;attribute vec3 col;attribute float rb;attribute vec4 cen;attribute float ag;attribute float shp;attribute float rg;uniform float uPR;uniform float uDev;uniform float uMT;uniform vec4 uMA;uniform vec4 uMB;uniform float uMAw;uniform float uMBw;
+vec3 moonP(vec4 m,float w,float lag){float th=m.w+w*uMT-lag;vec3 q=vec3(cos(th)*m.x,0.,sin(th)*m.x);float ci=cos(m.y),si=sin(m.y);q=vec3(q.x,-q.z*si,q.z*ci);float co=cos(m.z),so=sin(m.z);return vec3(q.x*co+q.z*so,q.y,-q.x*so+q.z*co);}
 uniform float uS;uniform float uM;uniform float uT;uniform float uMorph;uniform float uGR;uniform float uEra;uniform float uCB;varying float vH;varying vec3 vC;varying float vSd;varying float vAg;varying float vShp;varying float vRg;
 void main(){vRg=rg*uPR;if(sz<0.){gl_Position=vec4(0.,0.,2.,1.);gl_PointSize=0.;vH=0.;vC=vec3(0.);vSd=0.;vAg=1.;vShp=0.;return;}float th=position.y+position.z*uT;float rr=mix(position.x,rb,uEra);vec3 p=vec3(cos(th)*rr,o2.x*(1.-uEra*.5),sin(th)*rr);vSd=fract(position.y*7.31);
  float ci=cos(o2.y),si=sin(o2.y);p=vec3(p.x,p.y*ci-p.z*si,p.y*si+p.z*ci);
  float co=cos(o2.z),so=sin(o2.z);p=vec3(p.x*co+p.z*so,p.y,-p.x*so+p.z*co);
- if(cen.w>.5){vec3 n=normalize(cen.xyz);p-=n*min(dot(p,n),0.)*.72;if(cen.w>1.5)p+=vec3(sin(uT*23.+position.y*9.),sin(uT*29.+position.y*5.),cos(uT*19.+position.y*7.))*.45;p+=cen.xyz;}
+ if(cen.w>.5&&cen.w<4.5){vec3 C=cen.xyz;if(uDev>.5)C=cen.w>2.5?moonP(uMB,uMBw,cen.x):moonP(uMA,uMAw,cen.x);vec3 n=normalize(C);p-=n*min(dot(p,n),0.)*.72;if(cen.w>1.5&&cen.w<2.5)p+=vec3(sin(uT*23.+position.y*9.),sin(uT*29.+position.y*5.),cos(uT*19.+position.y*7.))*.45;p+=C;}
  float cg=cos(uGR),sg=sin(uGR);vec3 g=vec3(gp.x*cg+gp.z*sg,gp.y,-gp.x*sg+gp.z*cg);
  p=mix(p,g,uMorph);
- vec4 mv=modelViewMatrix*vec4(p,1.);gl_Position=projectionMatrix*mv;float sm=(cen.w>1.5?2.1:cen.w>.5?1.8:1.)*(.78+.22*ag)*(uCB>.5?1.45:1.)*(vRg>.5?1.35:1.);gl_PointSize=clamp(uS*.15*sz*sm*(1.+hl*1.8)/-mv.z,1.3*sm*(uCB>.5?1.6:1.),uM*sz*sm*(1.+hl*1.5));vH=hl;vC=col;vAg=ag;vShp=shp;}`;
+ vec4 mv=modelViewMatrix*vec4(p,1.);gl_Position=projectionMatrix*mv;float sm=(cen.w>4.5?1.15:cen.w>2.5?1.6:cen.w>1.5?2.1:cen.w>.5?1.8:1.)*(.78+.22*ag)*(uCB>.5?1.45:1.)*(vRg>.5?1.35:1.);gl_PointSize=clamp(uS*.15*sz*sm*(1.+hl*1.8)/-mv.z,1.3*sm*(uCB>.5?1.6:1.),uM*sz*sm*(1.+hl*1.5));vH=hl;vC=col;vAg=ag;vShp=shp;}`;
 const wFS=`uniform float uO;uniform float uCB;varying float vH;varying vec3 vC;varying float vSd;varying float vAg;varying float vShp;varying float vRg;
 void main(){vec2 p=gl_PointCoord-.5;float d=length(p);float rgw=vRg>2.5?.075:vRg>1.5?.048:.026;float ring=vRg>.5?(1.-smoothstep(rgw*.5,rgw*.5+.02,abs(d-(.47-rgw*.5)))):0.;if(vRg>.5){p*=1.35;d*=1.35;}float an=atan(p.y,p.x);
  if(uCB>.5){float m;if(vShp<.5){m=step(abs(p.x)+abs(p.y),.46);}else if(vShp<1.5){m=step(d,.26);}else if(vShp<2.5){m=step(abs(d-.34),.09);}else{m=step(p.y,.32)*step(-.42+abs(p.x)*2.1,p.y);}
@@ -1378,7 +1419,8 @@ const WG=new THREE.BufferGeometry();
 const WA={pos:new Float32Array(MAXW*3),o2:new Float32Array(MAXW*3),gp:new Float32Array(MAXW*3),sz:new Float32Array(MAXW),hl:new Float32Array(MAXW),col:new Float32Array(MAXW*3),rb:new Float32Array(MAXW),cen:new Float32Array(MAXW*4),ag:new Float32Array(MAXW).fill(1),shp:new Float32Array(MAXW),rg:new Float32Array(MAXW)};
 const WATT={};
 for(const [k,n,dyn] of [['pos',3],['o2',3],['gp',3],['sz',1,1],['hl',1,1],['col',3,1],['rb',1,1],['cen',4,1],['ag',1,1],['shp',1,1],['rg',1,1]]){const a=new THREE.BufferAttribute(WA[k],n);if(dyn)a.setUsage(THREE.DynamicDrawUsage);WATT[k]=a;WG.setAttribute(k==='pos'?'position':k,a)}
-const WM=new THREE.ShaderMaterial({vertexShader:wVS,fragmentShader:wFS,uniforms:{uS:{value:uScale()},uM:{value:7*DPR},uT:{value:0},uMorph:{value:0},uGR:{value:0},uEra:{value:0},uO:{value:.6},uCB:{value:0},uPR:{value:1}},transparent:true,depthWrite:false,blending:THREE.NormalBlending});
+const WM=new THREE.ShaderMaterial({vertexShader:wVS,fragmentShader:wFS,uniforms:{uS:{value:uScale()},uM:{value:7*DPR},uT:{value:0},uMorph:{value:0},uGR:{value:0},uEra:{value:0},uO:{value:.6},uCB:{value:0},uPR:{value:1},uDev:{value:MOONS?1:0},uMT:{value:0},uMA:{value:MOONS?new THREE.Vector4(MOONS.dex.r,MOONS.dex.i,MOONS.dex.o,MOONS.dex.a):new THREE.Vector4()},uMAw:{value:MOONS?MOONS.dex.w:0},uMB:{value:MOONS?new THREE.Vector4(MOONS.ext.r,MOONS.ext.i,MOONS.ext.o,MOONS.ext.a):new THREE.Vector4()},uMBw:{value:MOONS?MOONS.ext.w:0}},transparent:true,depthWrite:false,blending:THREE.NormalBlending});
+if(MOONS)MOONS._u=WM.uniforms.uMT;
 const WPTS=new THREE.Points(WG,WM);WPTS.frustumCulled=false;scene.add(WPTS);WG.setDrawRange(0,0);
 let NW=0;          // wallets in the current set
 let DRAWN=0;       // wallets currently drawn (time machine / players slider)
@@ -1404,8 +1446,8 @@ function wPos(i,out=new THREE.Vector3()){
  const th=a0+w*wT,rr=r+(WA.rb[i]-r)*eraK;let x=Math.cos(th)*rr,y=h*(1-eraK*.5),z=Math.sin(th)*rr;
  const ci=Math.cos(inc),si=Math.sin(inc);let y2=y*ci-z*si,z2=y*si+z*ci;y=y2;z=z2;
  const co=Math.cos(om),so=Math.sin(om);let x2=x*co+z*so;z2=-x*so+z*co;x=x2;z=z2;
- const cw=WA.cen[i*4+3];if(cw>.5){const cx=WA.cen[i*4],cy=WA.cen[i*4+1],cz=WA.cen[i*4+2],l=Math.hypot(cx,cy,cz)||1,nx=cx/l,ny=cy/l,nz=cz/l,d=Math.min(0,x*nx+y*ny+z*nz)*.72;
-  x-=nx*d;y-=ny*d;z-=nz*d;if(cw>1.5){const T=wT,a=WA.pos[i*3+1];x+=Math.sin(T*23+a*9)*.45;y+=Math.sin(T*29+a*5)*.45;z+=Math.cos(T*19+a*7)*.45}x+=cx;y+=cy;z+=cz}
+ const cw=WA.cen[i*4+3];if(cw>.5&&cw<4.5){let cx=WA.cen[i*4],cy=WA.cen[i*4+1],cz=WA.cen[i*4+2];if(MOONS){moonP(cw>2.5?MOONS.ext:MOONS.dex,cx,_mq);cx=_mq.x;cy=_mq.y;cz=_mq.z}const l=Math.hypot(cx,cy,cz)||1,nx=cx/l,ny=cy/l,nz=cz/l,d=Math.min(0,x*nx+y*ny+z*nz)*.72;
+  x-=nx*d;y-=ny*d;z-=nz*d;if(cw>1.5&&cw<2.5){const T=wT,a=WA.pos[i*3+1];x+=Math.sin(T*23+a*9)*.45;y+=Math.sin(T*29+a*5)*.45;z+=Math.cos(T*19+a*7)*.45}x+=cx;y+=cy;z+=cz}
  if(morph>0){const gx=WA.gp[i*3],gy=WA.gp[i*3+1],gz=WA.gp[i*3+2],cg=Math.cos(gRot),sg=Math.sin(gRot);const X=gx*cg+gz*sg,Z=-gx*sg+gz*cg;
   x+=(X-x)*morph;y+=(gy-y)*morph;z+=(Z-z)*morph}
  return out.set(x,y,z)}
@@ -1780,8 +1822,8 @@ function updMint(dt){
   if(MS.minted>=M.mintAvail){MS.running=false;updBtns();toast(t('mintDone'),3000)}
   updMintBar()}
  if(MS.mineOn&&S.mine&&S.tok&&S.src==='sim'&&!S.paused&&!S.tm){S.cN+=M.monthRel/(30.4*86400)*dt*SIM_SEC*S.speed;MS.acc+=dt;
-  if(MS.acc>.18&&S.mode==='uni'){MS.acc=0;if(eraK<.5)spawn({fn:'reserve',tn:'gnome',c:COL.amber,s:1,d:1.4,arc:2});
-   if(Math.random()<.7&&MS.owners.length){const w=MS.owners[Math.floor(Math.random()*MS.owners.length)];if(w<DRAWN){const v=M.perGnome*SET.gn[w]/30.4/24;rec(w,[S.simT,'mine',v,SET.gn[w]]);WS.inA[w]+=v;const bh=minerBeh(w);spawn({fn:eraK>.5?'reserve':'gnome',tw:w,c:COL.amber,s:.85,d:2,arc:3,delay:eraK>.5?0:1.2,cb:()=>{if(bh===0)spawn({fw:w,tn:'dex',c:BEH_C[0],s:.8,d:1.6,arc:2});else if(bh===2)spawn({fw:w,tn:'dex',c:BEH_C[2],s:.8,d:1.8,arc:2,delay:5+Math.random()*6});else{setHL(w,Math.max(getHL(w),.9));setTimeout(()=>{if(!featured.has(w)&&FY.sel!==w)setHL(w,0)},900)}}})}}}}
+  if(MS.acc>.18&&S.mode==='uni'){MS.acc=0;if(eraK<.5&&EDITION!=='dev')spawn({fn:'reserve',tn:'gnome',c:COL.amber,s:1,d:1.4,arc:2});
+   if(Math.random()<.7&&MS.owners.length){const w=MS.owners[Math.floor(Math.random()*MS.owners.length)];if(w<DRAWN){const v=M.perGnome*SET.gn[w]/30.4/24;rec(w,[S.simT,'mine',v,SET.gn[w]]);WS.inA[w]+=v;const bh=minerBeh(w);spawn({fn:(eraK>.5||EDITION==='dev')?'reserve':'gnome',tw:w,c:COL.amber,s:.85,d:2,arc:3,delay:(eraK>.5||EDITION==='dev')?0:1.2,cb:()=>{if(bh===0)spawn({fw:w,tn:'dex',c:BEH_C[0],s:.8,d:1.6,arc:2});else if(bh===2)spawn({fw:w,tn:'dex',c:BEH_C[2],s:.8,d:1.8,arc:2,delay:5+Math.random()*6});else{setHL(w,Math.max(getHL(w),.9));setTimeout(()=>{if(!featured.has(w)&&FY.sel!==w)setHL(w,0)},900)}}})}}}}
 }
 function updMintBar(){const sim=S.src==='sim';
  $('mintTxt').textContent=sim?t('mintTxt',{n:fmt(MS.minted)}):t('mintTitle');$('mintP').style.width=(sim?MS.minted/M.mintAvail*100:0)+'%';$('mintP').parentNode.style.display=sim?'':'none';
@@ -2622,12 +2664,13 @@ function updLinks(){const L=linkList();const P=LINK.pos,S2=LINK.seg;let v=0;
  LINK.obj.geometry.setDrawRange(0,v/3);LINK.obj.geometry.attributes.position.needsUpdate=true;LINK.obj.material.opacity=S.clsF==='l'?.3:.9;LINK.obj.visible=v>0;LINK.vis=L.length}
 /* ===== Labels ===== */
 const LBL={contract:'nContract',reserve:'nReserve',pool:'nPool',staking:'nStake',bank:'nBank',tour:'nTour',gnome:'nGnome',burn:'nBurn',dex:'nDex',link:'nLink',shield:'nShield',tw:'nTw',poly:'nPoly',gchain:'nGchain',ext:'nExt',fiat:'nFiat'};
+if(typeof NODES!=='undefined'&&NODES.dealers)LBL.dealers='nDealers';
 const labEls={};
 for(const k in LBL){const e=document.createElement('div');e.className='lb'+(k==='poly'||k==='link'||k==='tw'||k==='gchain'?' neb':'')+(k==='gchain'?' gch':'')+(k==='ext'?' ext':'')+(k==='contract'?' gem':'')+(k==='shield'?' neb shield':'');e.dataset.k=k;$('labels').appendChild(e);labEls[k]=e;
  e.addEventListener('click',ev=>{ev.stopPropagation();openCard(k);beep(760,.06)});
  e.addEventListener('dblclick',ev=>{ev.stopPropagation();focusNode(k)});
  e.addEventListener('mouseenter',()=>setHover(k));e.addEventListener('mouseleave',()=>setHover(null))}
-function labText(k){if(k==='reserve'&&typeof AST!=='undefined'&&AST.on)return t('astLab');if(k==='contract'&&eraK<=.5&&innerWidth<700)return 'Amber';if(k==='reserve'){if(eraK>.5)return t('nMineOn')+(eraPreview()?' · '+t('eraPrev'):'');return t('nReserve')}
+function labText(k){if(EDITION==='dev'&&k==='ext')return t('nExt');if(k==='dealers')return t('nDealers')+' · '+t('soon').toLowerCase();if(k==='reserve'&&typeof AST!=='undefined'&&AST.on)return t('astLab');if(k==='contract'&&eraK<=.5&&innerWidth<700)return 'Amber';if(k==='reserve'){if(eraK>.5)return t('nMineOn')+(eraPreview()?' · '+t('eraPrev'):'');return t('nReserve')}
  if(k==='ext')return t('nExt')+(CA('castleNft')?'':' · '+t('soon').toLowerCase());if(k==='tour'&&(CFG.contracts.tournament||{}).address)return t('nTour').replace(/ · .*$/,'');return t(LBL[k])}
 const _p=new THREE.Vector3(),_fq=new THREE.Vector3(),_v2=new THREE.Vector3();
 function fiatLab(out){fiatGroup.updateMatrixWorld();let best=null,bs=1e9;
@@ -4341,6 +4384,55 @@ async function gasTick(){if(document.hidden)return;try{const n=await gasNow();GA
  const place=()=>{const m=innerWidth<=820,e=$('eraTag');if(!m||!e){if(s._m){s._m=0;s.style.cssText=''}return}const r=e.getBoundingClientRect();s._m=1;
   s.style.cssText=`position:fixed;top:${Math.round(r.top-3)}px;left:${Math.round((r.width?r.right:12)+8)}px;margin:0;vertical-align:0;z-index:5`};
  let lL=L;setInterval(()=>{if(L!==lL){lL=L;gasRender()}place()},1000);addEventListener('resize',place);place()})();
+/* ===== dev (v2), founder t871–t873: Secondary Markets, Official Dealers (coming soon), Minter outside the ecosystem =====
+   Live (prod) is untouched: everything here is behind EDITION==='dev'. Marketplace links: CFG.secondaryMarkets (a_cfg). */
+if(EDITION==='dev'){
+ Object.assign(T.ru,{nExt:'Вторичные рынки',nDealers:'Официальные дилеры',mkSoon:'коллекция скоро',mkHead:'Площадки с поддержкой Polygon'});
+ Object.assign(T.en,{nExt:'Secondary Markets',nDealers:'Official Dealers',mkSoon:'collection coming soon',mkHead:'Marketplaces that support Polygon'});
+ if(typeof EV_NODE!=='undefined')EV_NODE.mine=['reserve','w',COL.amber];
+ const mkList=()=>(CFG.secondaryMarkets||[]).map(m=>{const u=m.collection||m.home;
+  return `<li><a href="${u}" target="_blank" rel="noopener">${m.name} ↗</a>${m.collection?'':` <span class="sm" style="opacity:.7">· ${t('mkSoon')}</span>`}</li>`}).join('');
+ const _cd=card;card=function(k){const r=L==='ru';
+  if(k==='ext')return {k:r?'Вне экосистемы · '+t('mkSoon'):'Outside the ecosystem · '+t('mkSoon'),h:t('nExt'),
+   b:(r?'<p>Вторичный рынок — место, где игроки и коллекционеры свободно покупают и продают гномов-NFT друг у друга, вне игры. Внутриигрового рынка нет: сделки идут на независимых NFT-площадках в сети Polygon.</p>'
+        :'<p>The secondary market is where players and collectors freely buy and sell gnome NFTs with each other, outside the game. There is no in-game market: trades happen on independent NFT marketplaces on Polygon.</p>')
+    // placeholder: royalty line for gnome resales goes here once the founder approves the wording (no % for now)
+    +`<p class="k" style="margin-top:8px">${t('mkHead')}</p><ul class="mkL" style="margin:4px 0 6px 18px;padding:0;line-height:1.7">${mkList()}</ul>`,
+   n:[],x:`<p class="note">${r?'Ссылки пока ведут на главные страницы площадок; страницы коллекции гномов появятся позже.':'Links lead to the marketplaces’ home pages for now; the gnome collection pages will come later.'}</p>`};
+  if(k==='dealers')return {k:r?'Скоро':'Coming soon',h:t('nDealers'),
+   b:r?'<p>Независимые официальные дилеры помогут игрокам получить Amber. Скоро.</p>':'<p>Independent official dealers will help players get Amber. Coming soon.</p>',n:[],x:''};
+  const c=_cd(k);if(!c||typeof c!=='object')return c;const r2=r;
+  if(k==='gnome')c.b=(r2?'<p>Минтер стоит вне экосистемы: новые гномы-NFT появляются снаружи и улетают к игрокам и к трейдерам у DEX. Дальше их можно свободно передавать и продавать на вторичных рынках.</p>'
+                       :'<p>The Minter sits outside the ecosystem: new gnome NFTs appear out here and fly in to players and to traders around the DEX. After that they can be freely transferred and sold on secondary markets.</p>')+c.b;
+  if(k==='shield'&&c.b){c.b=c.b.split('Снаружи — внешние площадки и кольцо партнёра thirdweb').join('Снаружи — Минтер гномов, вторичные рынки, официальные дилеры (скоро) и кольцо партнёра thirdweb')
+   .split('Outside are the external marketplaces and the thirdweb partner ring').join('Outside are the Gnome Minter, the secondary markets, the official dealers (coming soon) and the thirdweb partner ring')}
+  return c};
+ /* ambient flow: small gnome motes leave the Minter toward the Secondary Markets, DEX traders and players */
+ const MK={t:1};
+ const mkPick=(f)=>{for(let n=0;n<24;n++){const i=Math.floor(Math.random()*DRAWN);if(f(i))return i}return -1};
+ const cenW=i=>WA.cen[i*4+3];
+ const _um=updMint;updMint=function(dt){_um(dt);
+  if(S.mode!=='uni'||S.paused||morph>.5)return;if((MK.t-=dt)>0)return;MK.t=.55+Math.random()*.6;
+  const u=Math.random();let o={fn:'gnome',c:COL.lil,s:.55,d:3+Math.random()*1.2,arc:7},w=-1;
+  if(u<.35)o.tn='ext';else{w=u<.6?mkPick(i=>cenW(i)===3):u<.8?mkPick(i=>cenW(i)===1):mkPick(i=>SET.cls[i]===0);if(w<0)o.tn='ext';else o.tw=w}
+  spawn(o)};
+ /* t874: wallets that used to hover round the DEX now orbit the WHOLE ecosystem like space debris, grouped by activity:
+    DEX-active (traders, bots) trail behind the DEX moon, NFT-active traders trail behind the Secondary Markets moon,
+    low-activity wallets drift as sparse debris on loose orbits. Demo mode: activity = SET.act (simulation); NFT-trade activity
+    is not in the data yet, so a deterministic ~22% of active traders stand for NFT traders. Blockchain mode: class (trader / bot)
+    comes from the chain; low activity / NFT split fall back to the same deterministic hash. All on the GPU (one Points draw). */
+ swarmOrbit=function(i,r,kind){const bot=kind===2,h=((i*2654435761+13)>>>0)/4294967296,h2=((i*40503+977)>>>0)%1000/1000;
+  const low=!bot&&(SET.kind==='sim'?SET.act[i]<.5:h2<.25),nft=!bot&&!low&&h<.22;
+  if(low){const rr=132+r()*100;WA.pos.set([rr,r()*Math.PI*2,(1.05/Math.pow(rr,1.5))*(.6+r()*.8)*11*(r()<.15?-1:1)],i*3);
+   WA.o2.set([(r()-.5)*34,(r()-.5)*1.5,r()*Math.PI*2],i*3);WA.rb[i]=rr;WA.cen.set([0,0,0,5],i*4);return}
+  if(nft){const lag=.36*Math.pow(r(),1.5),rr=(5+Math.sqrt(r())*8)*(1+lag*1.6);WA.pos.set([rr,r()*Math.PI*2,(.04+r()*.07)*(r()<.5?-1:1)],i*3);
+   WA.o2.set([(r()-.5)*3,(r()-.5)*2.6,r()*Math.PI*2],i*3);WA.rb[i]=rr;WA.cen.set([lag,0,0,3],i*4);return}
+  const lag=bot?.05*r():.45*Math.pow(r(),1.8),rr=bot?8+r()*4:(11+Math.sqrt(r())*12)*(1+lag*1.6);
+  WA.pos.set([rr,r()*Math.PI*2,(bot?.55+r()*.45:.05+r()*.08)*(r()<.5?-1:1)],i*3);WA.o2.set([(r()-.5)*(bot?1.5:4),(r()-.5)*2.6,r()*Math.PI*2],i*3);WA.rb[i]=rr;
+  WA.cen.set([lag,0,0,bot?2:1],i*4)};
+ for(let i=0;i<MAXW;i++){const c=SET.cls[i];if(c===1||c===2)swarmOrbit(i,rng((i*7919+31)>>>0),c)}wattDirty();
+ window.__mk={clusters:()=>{const o={dex:0,bot:0,nft:0,debris:0};for(let i=0;i<DRAWN;i++){const w=WA.cen[i*4+3];if(w===1)o.dex++;else if(w===2)o.bot++;else if(w===3)o.nft++;else if(w===5)o.debris++}return o}};
+}
 
 /* ===== Loop ===== */
 const clock=new THREE.Clock();let frame=0,fpsAcc=0,fpsN=0,statT=0;window.__fps=0;
