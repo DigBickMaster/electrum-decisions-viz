@@ -548,7 +548,8 @@ window.ED_CONFIG={
            'gameCanceled(uint256 indexed id,address indexed creator)']},
   staking:{address:'0x592A33B84907b883A0Dbc767A0024D9063f7B3fA',fromBlock:0,events:''},    // стейкинг (3% с пула)
   bank:{address:'0x622dEcbD2d1dde2AF9e12A89E2f71cb541d2564e',fromBlock:0,events:''},       // Банк Студии (1% с пула, 5% турниров)
-  gnomeNft:{address:'0x689f70bacd3cf75608c45e124e03c21fc5f5ab23',type:'erc721',fromBlock:65840712,maxSupply:9999,
+  gnomeNft:{address:'0x689f70bacd3cf75608c45e124e03c21fc5f5ab23',type:'erc721',fromBlock:65840712,maxSupply:9999,               // 10 000 в контракте (maxSupply()) минус сожжённый №0; живые цифры: GNL в e3_chain
+  
    mintHolder:'',                     // адрес, где лежат непроданные гномы (если пусто — сам контракт гномов)
    opensea:'https://opensea.io/assets/matic/0x689f70bacd3cf75608c45e124e03c21fc5f5ab23/',
    collection:'https://opensea.io/collection/amber-digger',
@@ -647,7 +648,7 @@ const M={
  tN:128, tEntry:10000, tPool:1280000, tP:[.45,.25,.10,.10], tBank:.05, tOpen:.05,
  tStart:15,
  gnomes:9999, gStaked:.8, mineMonths:60, perGnome:2083.54168750208, mineThr:7999, monthRel:16666666.6666667,
- mintAvail:5555, mintPx:300, mintBurn:.8, mintRev:1666500, mintBB:1333200,
+ mintAvail:6593, mintPx:300, mintBurn:.8, mintRev:1977900, mintBB:1582320,
  roy:.01,
  lock:[[6,1],[12,1.25],[18,1.5],[24,2]],
  payer:.015, arppu:9, rw:2.5
@@ -702,12 +703,12 @@ const T={ru:{
  f6:'3% пула, {v} Amber, уходят в контракт стейкинга и делятся между стейкерами.',
  f7:'Фиксированный 1%, {v} Amber, уходит в Банк Студии Electrum Decisions. Так с каждого матча.',
  f8:'Итог: пул {p} Amber разделён полностью. 90% победителю, 6% сожжено, 3% стейкерам, 1% студии.',
- mintTitle:'Гномы-NFT · всего максимум 9 999',
- mintTxt:'Раунд минта: {n} из 5 555 · 5 555 × $300 = $1 666 500; 80% = $1 333 200 → выкуп и сжигание Amber',
- gnTxt:'У игроков: {h} · в контракте: {c} · всего максимум 9 999',
- mineWait:'Майнинг стартует при 7 999 из 9 999 гномов у игроков',mineOn:'7 999 из 9 999 достигнуто — майнинг включён',
- toastTour:'Турнир: 128 игроков собираются в контракт турниров',toastMine:'7 999 из 9 999 гномов у игроков — майнинг включён! Резерв начинает раздачу.',
- tourNo:'Турнир уже идёт — дождитесь финала.',mintDone:'Раунд минта завершён: 5 555 из 5 555. Больше 9 999 гномов не бывает.',
+ mintTitle:'Гномы-NFT · сминчено {gMin} из {gTot} · осталось {gRem}',
+ mintTxt:'Минт: {n} из {gRem} оставшихся · 80% выручки → выкуп и сжигание Amber',
+ gnTxt:'У игроков: {h} · в контракте: {c} · всего {gTot}',
+ mineWait:'Майнинг стартует при 7 999 из {gTot} гномов у игроков',mineOn:'7 999 из {gTot} достигнуто — майнинг включён',
+ toastTour:'Турнир: 128 игроков собираются в контракт турниров',toastMine:'7 999 из {gTot} гномов у игроков — майнинг включён! Резерв начинает раздачу.',
+ tourNo:'Турнир уже идёт — дождитесь финала.',mintDone:'Минт завершён: сминчены все {gTot}. Больше {gTot} гномов не бывает.',
  wNote:'Это условный игрок из симуляции, не реальный адрес.',wPlay:'Сыграть этим кошельком',wHistB:'Моя история',
  findK:'ПОИСК ПО ВСЕЛЕННОЙ',findH:'Найди себя',fPh:'Ник или адрес 0x…',fPhC:'Адрес кошелька 0x…',fHintSim:'Например: {ex}',fHintChain:'Введите адрес 0x… Поиск по нику появится, когда подключат игровой API.',fNone:'Ничего не найдено.',fNoAddr:'Этого адреса нет в загруженной истории Amber.',fApiFail:'Игровой API не ответил.',
  hTitle:'История',hFrom:'С первой транзакции: {d}',hPlay:'▶ Проиграть путь',hStop:'■ Стоп',
@@ -730,7 +731,7 @@ const T={ru:{
  t4h:'Чёрная дыра',t4:'6% каждого пула улетают на мёртвый адрес 0x…dEaD. Оттуда ничего не возвращается, а диск чёрной дыры растёт с каждым сжиганием.',
  t5h:'Стейкинг и Банк',t5:'3% пула получают стейкеры, фиксированный 1% — Банк Студии Electrum Decisions. Студия зарабатывает на обороте, а не на исходах матчей.',
  t6h:'Турниры',t6:'Сетка на выбывание на 128 игроков. 45/25/10/10% призёрам, 5% Банку студии, ещё 5% — решение не принято.',
- t7h:'Гномы-NFT',t7:'Всего максимум 9 999 гномов. Непроданные лежат в контракте, сминченные улетают владельцам. Раунд минта: 5 555 × $300, 80% выкупает и сжигает Amber. При 7 999 из 9 999 у игроков включается майнинг.',
+ t7h:'Гномы-NFT',t7:'Всего {gTot} гномов (10 000 минус сожжённый №0), сминчено {gMin}, осталось {gRem}. Непроданные лежат в контракте, сминченные улетают владельцам. Минт по $300, 80% выкупает и сжигает Amber. При 7 999 из {gTot} у игроков включается майнинг.',
  t8h:'Фиат-кольцо',t8:'Основа бизнеса: бесплатная игра, реклама и покупки в магазинах приложений. Токенов здесь нет. Всё, что внутри кольца, — дополнительный потенциал.'
 },en:{
  sub:'The Amber token universe',edDev:'DEV',edProd:'LIVE',
@@ -775,12 +776,12 @@ const T={ru:{
  f6:'3% of the pool, {v} Amber, goes to the staking contract and is shared among stakers.',
  f7:'A fixed 1%, {v} Amber, goes to the Electrum Decisions Studio Bank. Same for every match.',
  f8:'Done: the {p} Amber pool is fully split. 90% to the winner, 6% burned, 3% to stakers, 1% to the studio.',
- mintTitle:'Gnome NFTs · 9,999 maximum in total',
- mintTxt:'Mint round: {n} of 5,555 · 5,555 × $300 = $1,666,500; 80% = $1,333,200 → buy & burn Amber',
- gnTxt:'Held by players: {h} · in the contract: {c} · 9,999 maximum in total',
- mineWait:'Mining starts at 7,999 of 9,999 gnomes held by players',mineOn:'7,999 of 9,999 reached — mining is on',
- toastTour:'Tournament: 128 players gather in the tournament contract',toastMine:'7,999 of 9,999 gnomes held by players — mining is on! The reserve starts paying out.',
- tourNo:'A tournament is already running — wait for the final.',mintDone:'Mint round complete: 5,555 of 5,555. There are never more than 9,999 gnomes.',
+ mintTitle:'Gnome NFTs · {gMin} of {gTot} minted · {gRem} remaining',
+ mintTxt:'Mint: {n} of the {gRem} remaining · 80% of proceeds → buy & burn Amber',
+ gnTxt:'Held by players: {h} · in the contract: {c} · {gTot} in total',
+ mineWait:'Mining starts at 7,999 of {gTot} gnomes held by players',mineOn:'7,999 of {gTot} reached — mining is on',
+ toastTour:'Tournament: 128 players gather in the tournament contract',toastMine:'7,999 of {gTot} gnomes held by players — mining is on! The reserve starts paying out.',
+ tourNo:'A tournament is already running — wait for the final.',mintDone:'Mint complete: all {gTot} minted. There are never more than {gTot} gnomes.',
  wNote:'This is a simulated player, not a real address.',wPlay:'Play with this wallet',wHistB:'My history',
  findK:'SEARCH THE UNIVERSE',findH:'Find yourself',fPh:'Username or 0x… address',fPhC:'Wallet address 0x…',fHintSim:'For example: {ex}',fHintChain:'Enter a 0x… address. Username search will appear once the game API is connected.',fNone:'Nothing found.',fNoAddr:'This address is not in the loaded Amber history.',fApiFail:'The game API did not respond.',
  hTitle:'History',hFrom:'Since the first transaction: {d}',hPlay:'▶ Replay the path',hStop:'■ Stop',
@@ -803,7 +804,7 @@ const T={ru:{
  t4h:'The black hole',t4:'6% of every pool falls to the dead address 0x…dEaD. Nothing ever comes back, and the black hole’s disk grows with every burn.',
  t5h:'Staking and the Bank',t5:'Stakers get 3% of the pool and the Electrum Decisions Studio Bank a fixed 1%. The studio earns on volume, not on match outcomes.',
  t6h:'Tournaments',t6:'A 128-player single-elimination bracket. 45/25/10/10% to the top four, 5% to the studio’s Bank, another 5% not yet decided.',
- t7h:'Gnome NFTs',t7:'9,999 gnomes maximum in total. Unsold ones sit in the contract; minted ones fly to their owners. Mint round: 5,555 × $300, 80% buys and burns Amber. At 7,999 of 9,999 held by players, mining switches on.',
+ t7h:'Gnome NFTs',t7:'{gTot} gnomes in total (10,000 minus burned #0), {gMin} minted, {gRem} remaining. Unsold ones sit in the contract; minted ones fly to their owners. Mint at $300, 80% buys and burns Amber. At 7,999 of {gTot} held by players, mining switches on.',
  t8h:'The fiat ring',t8:'The core of the business: free play, ads and in-store purchases. No tokens here. Everything inside the ring is extra upside.'
 }};
 /* dev (v2): the outer ring is free play, so no «Фиат/Fiat» wording (live keeps its texts until it is rebuilt on purpose) */
@@ -814,17 +815,19 @@ if(EDITION==='dev'){Object.assign(T.ru,{nFiat:'Бесплатный режим �
 /* dev (v2): the spectator map talks only in tokens: no $, no mint price, no mint split (investor panel inv* untouched) */
 const MINT_AMB_G=+(CFG.mintBurnAmberPerGnome||12000); /* ILLUSTRATIVE sim-only: Amber bought back and burned per minted gnome (no on-chain figure yet) */
 if(EDITION==='dev'){Object.assign(T.ru,{cMintBB:'Минт → выкуплено и сожжено, Amber',
-  mintTxt:'Раунд минта: {n} из 5 555 NFT · минт выкупает Amber в пуле и сжигает его',
-  t7:'Всего максимум 9 999 гномов. Непроданные лежат в контракте, сминченные улетают владельцам. Раунд минта: 5 555 NFT; минт выкупает Amber и сжигает его. При 7 999 из 9 999 у игроков включается майнинг.',
+  mintTxt:'Минт: {n} из {gRem} оставшихся · минт выкупает Amber в пуле и сжигает его',
+  t7:'Всего {gTot} гномов (10 000 минус сожжённый №0), сминчено {gMin}, осталось {gRem}. Непроданные лежат в контракте, сминченные улетают владельцам. Минт выкупает Amber и сжигает его. При 7 999 из {gTot} у игроков включается майнинг.',
   sbNote:T.ru.sbNote.replace('Всё в штуках Amber, без цены.','Всё в штуках Amber.')});
  Object.assign(T.en,{cMintBB:'Mint → bought back and burned, Amber',
-  mintTxt:'Mint round: {n} of 5,555 NFTs · the mint buys back Amber in the pool and burns it',
-  t7:'9,999 gnomes maximum in total. Unsold ones sit in the contract; minted ones fly to their owners. Mint round: 5,555 NFTs; the mint buys back Amber and burns it. At 7,999 of 9,999 held by players, mining switches on.',
+  mintTxt:'Mint: {n} of the {gRem} remaining · the mint buys back Amber in the pool and burns it',
+  t7:'{gTot} gnomes in total (10,000 minus burned #0), {gMin} minted, {gRem} remaining. Unsold ones sit in the contract; minted ones fly to their owners. The mint buys back Amber and burns it. At 7,999 of {gTot} held by players, mining switches on.',
   sbNote:T.en.sbNote.replace('Everything in Amber units, no price.','Everything in Amber units.')})}
 let L='ru';try{L=localStorage.getItem('ed_lang')||'ru'}catch(e){}
 {const q=new URLSearchParams(location.search).get('lang');if(q)L=q}
 if(!T[L])L='ru';
-const t=(k,v)=>{let s=T[L][k]??k; if(v)for(const a in v)s=s.split('{'+a+'}').join(v[a]); return s};
+var GNL={tot:9999,min:3406,rem:6593,roy:.05,live:false}; // gnome numbers: fallback, refreshed live from the contract (e3_chain gnLive)
+const t=(k,v)=>{let s=T[L][k]??k; if(v)for(const a in v)s=s.split('{'+a+'}').join(v[a]); return gS(s)};
+function gS(s){if(typeof s!=='string'||s.indexOf('{g')<0)return s;const g={gTot:fmt(GNL.tot),gMin:fmt(GNL.min),gRem:fmt(GNL.rem),gRoy:pct(GNL.roy)};for(const a in g)s=s.split('{'+a+'}').join(g[a]);return s}
 const clean=s=>s.replace(/\u00a0|\u202f/g,' ');
 const fmt=n=>clean(new Intl.NumberFormat(L==='ru'?'ru-RU':'en-US',{maximumFractionDigits:0}).format(Math.round(n)));
 const fmt2=(n,d)=>clean(new Intl.NumberFormat(L==='ru'?'ru-RU':'en-US',{minimumFractionDigits:d,maximumFractionDigits:d}).format(n));
@@ -894,8 +897,8 @@ function card(key){
  n:[[r?'Студия':'Studio','Electrum Decisions'],[r?'Игра':'Game','Decision Arena'],[r?'Сеть':'Network','Polygon']],
  x:`<p class="note">${r?'Щит — образ студии, а не смарт-контракт. Отдалите камеру до предела — за экосистемой кто-то наблюдает.':'The shield is an image of the studio, not a smart contract. Zoom all the way out: something is watching the ecosystem.'}</p>`}),
  ext:()=>{const c=CA('castleNft');return {k:r?'Вне игры · '+(c?'контракт подключён':'скоро'):'Outside the game · '+(c?'contract connected':'coming soon'),h:t('nExt'),b:r?
- `<p>Внутриигрового рынка нет и не будет: NFT продают и покупают вне игры, на внешних площадках.</p><p>С перепродаж будущих NFT замков (косметика) студия получает роялти 1% в POL/USDC — площадки перечисляют его автоматически в Банк Студии. Роялти зашито в контракт NFT замков: ровно 1%, изменить его нельзя. Скоро. Это дополнительный доход в криптовалюте сверх модели, поэтому в расчётах модели он не учтён. У гномов роялти нет.</p>`:
- `<p>There is no in-game market and there never will be: NFTs are bought and sold outside the game, on external marketplaces.</p><p>On resales of the future castle NFTs (cosmetics) the studio gets a 1% royalty in POL/USDC, paid automatically by the marketplaces into the Studio Bank. The royalty is hardcoded in the castle NFT contract: fixed at 1%, it cannot be changed. Coming soon. It is extra crypto income on top of the model, so the model’s numbers leave it out. Gnomes carry no royalty.</p>`,
+ `<p>Внутриигрового рынка нет и не будет: NFT продают и покупают вне игры, на внешних площадках.</p><p>С перепродаж будущих NFT замков (косметика) студия получает роялти 1% в POL/USDC — площадки перечисляют его автоматически в Банк Студии. Роялти зашито в контракт NFT замков: ровно 1%, изменить его нельзя. Скоро. Это дополнительный доход в криптовалюте сверх модели, поэтому в расчётах модели он не учтён. У гномов роялти {gRoy}.</p>`:
+ `<p>There is no in-game market and there never will be: NFTs are bought and sold outside the game, on external marketplaces.</p><p>On resales of the future castle NFTs (cosmetics) the studio gets a 1% royalty in POL/USDC, paid automatically by the marketplaces into the Studio Bank. The royalty is hardcoded in the castle NFT contract: fixed at 1%, it cannot be changed. Coming soon. It is extra crypto income on top of the model, so the model’s numbers leave it out. Gnomes carry a {gRoy} royalty.</p>`,
  n:[[r?'Роялти':'Royalty',pct(M.roy)+' · POL/USDC'],[r?'Размер роялти в контракте':'Royalty rate in the contract',r?'1% · зашито, не меняется':'1% · hardcoded, unchangeable'],[r?'Получатель':'Recipient',t('nBank')],[r?'Контракт NFT замков':'Castle NFT contract',c?`<a href="${scanAddr(c)}" target="_blank" rel="noopener">${short(c)} ↗</a>`:t('soon')]]}},
  contract:()=>({k:r?'Камень души · токен в сети Polygon':'The Soul Stone · a token on Polygon',h:t('nContract'),b:r?
  `<p>Amber — центр всей экономики. Каждый взнос в пул матча, каждая награда, сжигание и майнинг — это движение Amber между кошельками и контрактами вокруг Камня души. Гномы добывают его, а золотой эфир внутри камня — это энергия, которую черпают игроки.</p><p>Новых Amber не выпускается: все 10 млрд уже выпущены. Дальше предложение может только уменьшаться.</p>`:
@@ -910,7 +913,7 @@ function card(key){
  burn:()=>({k:r?'Мёртвый адрес · 6% каждого пула':'The dead address · 6% of every pool',h:t('nBurn'),b:r?
  `<p>6% каждого пула боевой контракт отправляет на мёртвый адрес 0x…dEaD. Это чёрная дыра: ключа к адресу нет ни у кого, и Amber оттуда не возвращаются никогда. Диск растёт и светится ярче с каждым сжиганием.</p><p>Сюда же падает Amber, купленный на 80% от минта гномов. Сколько Amber при этом сгорит, зависит от рынка, поэтому эту часть мы показываем в долларах и в Amber не прогнозируем.</p>`:
  `<p>The battle contract sends 6% of every pool to the dead address 0x…dEaD. This is the black hole: nobody holds a key to it, and Amber never comes back. The disk grows and glows brighter with every burn.</p><p>Amber bought with 80% of the gnome mint falls in here too. How much Amber that burns depends on the market, so we show that part in dollars and do not forecast it in Amber.</p>`,
- n:[[r?'С каждого пула':'From every pool',pct(M.burn)],[r?'Из пула 20 000':'From a 20,000 pool',fmt(M.exBurn)+' Amber'],[r?'Минт гномов: на выкуп и сжигание':'Gnome mint: buy & burn',usd(M.mintBB)],[r?'Новая эмиссия':'New issuance',t('none')],[r?'Адрес':'Address',short(DEAD)]],
+ n:[[r?'С каждого пула':'From every pool',pct(M.burn)],[r?'Из пула 20 000':'From a 20,000 pool',fmt(M.exBurn)+' Amber'],[r?'Минт гномов: на выкуп и сжигание':'Gnome mint: buy & burn',usd(M.mintAvail*M.mintPx*M.mintBurn)],[r?'Новая эмиссия':'New issuance',t('none')],[r?'Адрес':'Address',short(DEAD)]],
  x:`<p class="note"><a href="${scanAddr(CFG.contracts.dead.address)}" target="_blank" rel="noopener">0x…dEaD · Polygonscan ↗</a></p>`}),
  staking:()=>({k:r?'LP-стейкинг · награды в Amber':'LP staking · rewards in Amber',h:r?'LP-стейкинг':'LP staking',b:r?
  `<p>Это LP-стейкинг: в него вносят LP-токены пула QuickSwap WPOL/Amber, а награды начисляются в Amber.</p><p>Каждый бой отправляет 3% пула в пул стейкинга. Эти Amber делятся между теми, кто сейчас в стейкинге, по LP × множитель срока.</p><p>Когда срок заканчивается, LP и накопленные Amber возвращаются автоматически: Chainlink раз в сутки проверяет, у кого срок закончился. Награда приходит одним переводом вместе с LP.</p><p>Досрочный выход возвращает только ваши LP, без награды. Эта награда остаётся другим стейкерам.</p>`:
@@ -926,10 +929,10 @@ function card(key){
  `<p>A single-elimination tournament: 128 players, 7 rounds, one player drops out of each match. All contributions go into a prize pool in the tournament contract, and after the final it pays out to the top four and the studio’s Bank.</p>`,
  n:[[r?'Игроков в сетке (пример модели)':'Players in the bracket (model example)',fmt(M.tN)],[r?'Взнос':'Contribution',fmt(M.tEntry)+' Amber'],[r?'Призовой пул':'Prize pool',fmt(M.tPool)+' Amber'],[r?'1-е место':'1st place',pct(M.tP[0])+' · '+fmt(M.tPool*M.tP[0])],[r?'2-е место':'2nd place',pct(M.tP[1])+' · '+fmt(M.tPool*M.tP[1])],[r?'3-е место':'3rd place',pct(M.tP[2])+' · '+fmt(M.tPool*M.tP[2])],[r?'4-е место':'4th place',pct(M.tP[3])+' · '+fmt(M.tPool*M.tP[3])],[r?'Банк Студии Electrum Decisions':'Electrum Decisions Studio Bank',pct(M.tBank)+' · '+fmt(M.tPool*M.tBank)],[r?'Оставшиеся 5%':'Remaining 5%',(r?'решение не принято · ':'not yet decided · ')+fmt(M.tPool*M.tOpen)]],
  x:`<p class="note">${r?'Куда пойдут оставшиеся 5% (сжигание, стейкинг, призы или Банк), студия ещё решает. Пока они остаются в пуле.':'The studio has not yet decided where the remaining 5% goes (burn, staking, prizes or Bank). For now it stays in the pool.'}</p><div class="btns simOnly"><button onclick="window.__tour()">${t('launchTour')}</button></div>`}),
- gnome:()=>({k:r?'В обороте максимум 9 999 NFT':'9,999 NFTs maximum in circulation',h:t('nGnome'),b:r?
- `<p>Лимит контракта — 10 000 гномов, но гном #0 сожжён ещё при минте и лежит на мёртвом адресе 0x…dEaD. Поэтому в обороте может быть максимум 9 999 гномов. Непроданные гномы лежат кучкой в самом контракте, сминченные улетают в кошельки владельцев. Застейканный гном майнит Amber из резерва майнинга; новые Amber при этом не выпускаются.</p><p>Раунд минта — 5 555 гномов по $300 в USDC внутри общего лимита 9 999. 80% выручки сразу выкупает Amber в пуле, и купленные Amber сжигаются. Майнинг включается, когда у игроков 7 999 из 9 999 гномов.</p>`:
- `<p>The contract limit is 10,000 gnomes, but gnome #0 was burned at mint and sits at the dead address 0x…dEaD. So at most 9,999 gnomes can ever be in circulation. Unsold gnomes sit in a cluster inside the contract; minted ones fly to their owners’ wallets. A staked gnome mines Amber from the mining reserve; no new Amber is created.</p><p>The mint round is 5,555 gnomes at $300 in USDC within the overall 9,999 cap. 80% of the revenue immediately buys Amber in the pool, and that Amber is burned. Mining switches on once players hold 7,999 of 9,999 gnomes.</p>`,
- n:[[r?'Лимит контракта':'Contract limit',fmt(10000)],[r?'Сожжён при минте':'Burned at mint',r?'1 (#0, мёртвый адрес)':'1 (#0, dead address)'],[r?'В обороте максимум':'Circulation maximum',fmt(M.gnomes)],[r?'Раунд минта':'Mint round',fmt(M.mintAvail)+' × '+usd(M.mintPx)+' = '+usd(M.mintRev)],[r?'На выкуп и сжигание Amber (80%)':'Buy & burn Amber (80%)',usd(M.mintBB)],[r?'Старт майнинга':'Mining starts at',fmt(M.mineThr)+(r?' из ':' of ')+fmt(M.gnomes)],[r?'Резерв майнинга':'Mining reserve',big(M.reserve)+' Amber'],[r?'Из резерва в месяц':'Released per month',big(M.monthRel)+' Amber'],[r?'На гнома в месяц':'Per gnome per month','≈'+fmt2(M.perGnome,2)+' Amber']],
+ gnome:()=>({k:r?'Сминчено {gMin} из {gTot} · осталось {gRem}':'{gMin} of {gTot} minted · {gRem} remaining',h:t('nGnome'),b:r?
+ `<p>Лимит контракта — 10 000 гномов, но гном #0 сожжён ещё при минте и лежит на мёртвом адресе 0x…dEaD. Поэтому всего гномов {gTot}: сминчено {gMin}, осталось минтить {gRem}. Непроданные гномы лежат кучкой в самом контракте, сминченные улетают в кошельки владельцев. Застейканный гном майнит Amber из резерва майнинга; новые Amber при этом не выпускаются.</p><p>Оставшиеся {gRem} гномов минтятся по $300 в USDC. 80% выручки сразу выкупает Amber в пуле, и купленные Amber сжигаются. Майнинг включается, когда у игроков 7 999 из {gTot} гномов.</p>`:
+ `<p>The contract limit is 10,000 gnomes, but gnome #0 was burned at mint and sits at the dead address 0x…dEaD. So there are {gTot} gnomes in total: {gMin} minted, {gRem} left to mint. Unsold gnomes sit in a cluster inside the contract; minted ones fly to their owners’ wallets. A staked gnome mines Amber from the mining reserve; no new Amber is created.</p><p>The remaining {gRem} gnomes mint at $300 in USDC. 80% of the revenue immediately buys Amber in the pool, and that Amber is burned. Mining switches on once players hold 7,999 of {gTot} gnomes.</p>`,
+ n:[[r?'Лимит контракта':'Contract limit',fmt(10000)],[r?'Сожжён при минте':'Burned at mint',r?'1 (#0, мёртвый адрес)':'1 (#0, dead address)'],[r?'Сминчено':'Minted',fmt(GNL.min)],[r?'В обороте максимум':'Circulation maximum',fmt(M.gnomes)],[r?'Осталось минтить':'Left to mint',fmt(M.mintAvail)+' × '+usd(M.mintPx)+' = '+usd(M.mintAvail*M.mintPx)],[r?'На выкуп и сжигание Amber (80%)':'Buy & burn Amber (80%)',usd(M.mintAvail*M.mintPx*M.mintBurn)],[r?'Старт майнинга':'Mining starts at',fmt(M.mineThr)+(r?' из ':' of ')+fmt(M.gnomes)],[r?'Резерв майнинга':'Mining reserve',big(M.reserve)+' Amber'],[r?'Из резерва в месяц':'Released per month',big(M.monthRel)+' Amber'],[r?'На гнома в месяц':'Per gnome per month','≈'+fmt2(M.perGnome,2)+' Amber']],
  x:`<p class="note">${r?'Расчёт модели: 80% гномов застейканы, раздача равномерная примерно 5 лет. Цвет и размер кошелька на схеме — сколько у него гномов (см. легенду).':'Model calculation: 80% of gnomes staked, even payout over about 5 years. A wallet’s colour and size on the map show how many gnomes it holds (see the legend).'}</p><div class="btns simOnly"><button onclick="window.__mint()">${t('mintBtn')}</button></div>`}),
  reserve:()=>({k:r?'Скоро · 1 млрд Amber':'Coming soon · 1 bn Amber',h:t('nReserve'),b:r?
  `<p>Это 1 млрд Amber, отложенный под майнинг гномов. Он входит в уже выпущенные 10 млрд и новой эмиссией не является. Резерв раздаётся постепенно, равными долями, примерно за 5 лет.</p>`:
@@ -957,9 +960,9 @@ function devTok(key,c,r){const rep=(a,b)=>{if(c.b)c.b=c.b.split(a).join(b);if(c.
  if(key==='burn'){rep('Сюда же падает Amber, купленный на 80% от минта гномов. Сколько Amber при этом сгорит, зависит от рынка, поэтому эту часть мы показываем в долларах и в Amber не прогнозируем.','Сюда же падает Amber, выкупленный в пуле за счёт минта гномов. Сколько Amber при этом сгорит, зависит от рынка, поэтому в Amber эту часть мы не прогнозируем.');
   rep('Amber bought with 80% of the gnome mint falls in here too. How much Amber that burns depends on the market, so we show that part in dollars and do not forecast it in Amber.','Amber bought back in the pool through the gnome mint falls in here too. How much Amber that burns depends on the market, so we do not forecast that part in Amber.');
   rows(([a,v])=>/^(Минт гномов: на выкуп|Gnome mint: buy)/.test(a)?[r?'Минт гномов':'Gnome mint',r?'выкуп и сжигание Amber':'Amber buy-back and burn']:[a,v])}
- if(key==='gnome'){rep('Раунд минта — 5 555 гномов по $300 в USDC внутри общего лимита 9 999. 80% выручки сразу выкупает Amber в пуле, и купленные Amber сжигаются.','Раунд минта — 5 555 гномов (NFT) внутри общего лимита 9 999. Минт сразу выкупает Amber в пуле, и выкупленные Amber сжигаются.');
-  rep('The mint round is 5,555 gnomes at $300 in USDC within the overall 9,999 cap. 80% of the revenue immediately buys Amber in the pool, and that Amber is burned.','The mint round is 5,555 gnomes (NFTs) within the overall 9,999 cap. The mint immediately buys back Amber in the pool, and that Amber is burned.');
-  rows(([a,v])=>/^(Раунд минта|Mint round)$/.test(a)?[a,fmt(M.mintAvail)+' NFT']:/^(На выкуп и сжигание|Buy & burn)/.test(a)?null:[a,v])}
+ if(key==='gnome'){rep('Оставшиеся {gRem} гномов минтятся по $300 в USDC. 80% выручки сразу выкупает Amber в пуле, и купленные Amber сжигаются.','Осталось минтить {gRem} из {gTot} гномов (NFT). Минт сразу выкупает Amber в пуле, и выкупленные Amber сжигаются.');
+  rep('The remaining {gRem} gnomes mint at $300 in USDC. 80% of the revenue immediately buys Amber in the pool, and that Amber is burned.','{gRem} of {gTot} gnomes (NFTs) are left to mint. The mint immediately buys back Amber in the pool, and that Amber is burned.');
+  rows(([a,v])=>/^(Осталось минтить|Left to mint)$/.test(a)?[a,fmt(M.mintAvail)+' NFT']:/^(На выкуп и сжигание|Buy & burn)/.test(a)?null:[a,v])}
  if(key==='fiat'){c.k=r?'Бесплатная игра · без токенов':'Free play · no tokens';
   c.b=r?'<p>Большинство игроков играет бесплатно, без кошелька и без Amber. Это спокойное внешнее кольцо карты.</p><p>Токен-режим — слой поверх бесплатной игры: Amber, гномы-NFT и замки-NFT.</p>':'<p>Most players play for free, with no wallet and no Amber. This is the calm outer ring of the map.</p><p>Token mode is a layer on top of free play: Amber, gnome NFTs and castle NFTs.</p>';
   c.n=[];c.x=''}
@@ -988,7 +991,7 @@ Object.assign(T.ru,{
  linkNote:'Связанные кошельки — игрок и трейдер, между которыми был хотя бы один прямой перевод Amber (только обычные кошельки, без контрактов; кошельки-распределители с множеством таких связей не учитываются). Это след в сети, а не вывод о владельце.',
  botNote:'Торговые боты определяются только по поведению: очень много сделок, покупка и продажа в одном или соседнем блоке, покупки в первые блоки после добавления ликвидности, контракты, которые раз за разом торгуют с пулом. Они не часть экосистемы Decision Arena: DEX публичный, и повлиять на них мы не можем. Метка описывает только поведение.',
  rs_swaps:'очень много сделок с DEX',rs_day:'много сделок за сутки',rs_sandwich:'покупка и продажа в одном или соседнем блоке',rs_snipe:'покупки в первые блоки после добавления ликвидности',rs_contract:'контракт, который раз за разом торгует с пулом',wcWhy:'Признаки',
-gnF:'Показаны кошельки с гномами: {n}. Гномов всего максимум 9 999.',gnF0:'Сейчас ни у одного кошелька игрока нет гномов.',
+gnF:'Показаны кошельки с гномами: {n}. Гномов всего {gTot}.',gnF0:'Сейчас ни у одного кошелька игрока нет гномов.',
  lBeh:'Майнеры: что делают с добычей',bSell:'продаёт сразу → DEX',bHold:'держит',bLater:'продаёт позже',
  lCastle:'Кошелёк = замок на астероиде (приблизьте камеру)',lNet:'Polygon — ткань пространства; кольца Chainlink и thirdweb',
  sk0:'Каменная крепость',sk1:'Ледяной шпиль',sk2:'Янтарная цитадель',sk3:'Деревянный форт',sk4:'Обсидиановый бастион',sk5:'Небесный храм',
@@ -1018,7 +1021,7 @@ Object.assign(T.en,{
  linkNote:'Linked wallets: a player and a trader with at least one direct Amber transfer between them (regular wallets only, no contracts; distribution wallets with many such links are left out). It is an on-chain trace, not a statement about who owns them.',
  botNote:'Trading bots are identified by behaviour only: very many trades, a buy and a sell in the same or the next block, buys in the first blocks after liquidity is added, contracts that trade with the pool again and again. They are not part of the Decision Arena ecosystem: the DEX is public, and we cannot control them. The label describes behaviour only.',
  rs_swaps:'very many DEX trades',rs_day:'many trades within a day',rs_sandwich:'a buy and a sell in the same or the next block',rs_snipe:'buys in the first blocks after liquidity is added',rs_contract:'a contract that trades with the pool again and again',wcWhy:'Signals',
-gnF:'Showing wallets with gnomes: {n}. There are 9,999 gnomes maximum in total.',gnF0:'No player wallet holds a gnome right now.',
+gnF:'Showing wallets with gnomes: {n}. There are {gTot} gnomes in total.',gnF0:'No player wallet holds a gnome right now.',
  lBeh:'Miners: what they do with the output',bSell:'sells right away → DEX',bHold:'holds',bLater:'sells later',
  lCastle:'Wallet = a castle on an asteroid (zoom in)',lNet:'Polygon spacetime fabric; Chainlink and thirdweb rings',
  sk0:'Stone keep',sk1:'Ice spire',sk2:'Amber citadel',sk3:'Wooden fort',sk4:'Obsidian bastion',sk5:'Sky temple',
@@ -2123,6 +2126,18 @@ async function rpc(method,params,opt={}){let last;const list=RPCS.filter(r=>!opt
   await sleep(600)}
  throw last||new Error('no rpc')}
 const ethCall=(to,data,tag='latest')=>rpc('eth_call',[{to,data},tag]);
+/* t885: live gnome numbers from the gnome contract. totalSupply() counts #0 (burned to 0x…dEaD), maxSupply() = 10,000.
+   total = maxSupply − burned, minted = totalSupply − burned, remaining = total − minted. royaltyInfo (ERC-2981) if supported, else 5%.
+   Cached in localStorage; fallback = GNL defaults (3,406 / 9,999 / 6,593 / 5%). */
+async function gnLive(){const g=CA('gnomeNft');if(!g)return;const D='000000000000000000000000000000000000000000000000000000000000';
+ try{const c=JSON.parse(localStorage.getItem('ed_gnl')||'null');if(c&&c.min>0){Object.assign(GNL,c,{live:'cache'});gnApply()}}catch(e){}
+ try{const ts=parseInt(await ethCall(g,'0x18160ddd'),16);let mx=10000;try{const v=parseInt(await ethCall(g,'0xd5abeb01'),16);if(v>0)mx=v}catch(e){}
+  let burned=0;try{const o=await ethCall(g,'0x6352211e'+D+'0000');if(/dead$/i.test(o)||/^0x0*$/.test(o))burned=1}catch(e){burned=1}
+  let roy=.05;try{const sup=await ethCall(g,'0x01ffc9a72a55205a'+D.slice(0,56));if(parseInt(sup,16)===1){const r=await ethCall(g,'0x2a55205a'+D+'0001'+D+'2710');const v=parseInt(r.slice(66,130),16);if(v>0&&v<10000)roy=v/10000}}catch(e){}
+  if(!(ts>0))return;const tot=mx-burned,min=Math.max(0,ts-burned);Object.assign(GNL,{tot,min,rem:Math.max(0,tot-min),roy,live:true});
+  try{localStorage.setItem('ed_gnl',JSON.stringify({tot,min,rem:GNL.rem,roy}))}catch(e){}gnApply()}catch(e){console.warn('gnLive',e)}}
+function gnApply(){M.gnomes=GNL.tot;M.mintAvail=GNL.rem;try{if(typeof updBtns==='function')updBtns()}catch(e){}}
+setTimeout(()=>gnLive(),300);setInterval(()=>gnLive(),300000);
 // adaptive eth_getLogs scan: grows span on success, divides by 3 on error, backs off, then switches node
 async function scanLogs(filter,from,to,onChunk,onProg){
  const list=RPCS.filter(r=>r.archive).sort((a,b)=>b.maxRange-a.maxRange);let ri=0,b=from,span=Math.min(500000,list[0].maxRange),errs=0,req=0;
@@ -2728,8 +2743,7 @@ canvas.addEventListener('dblclick',e=>{const h=pick(e.clientX,e.clientY);if(h&&h
 let cardKey=null;
 function openCard(k){cardKey=k;const c=card(k);let kk=c.k,hh=c.h,extra='';
  if(k==='reserve'&&eraK>.5){hh=t('nMineOn');kk=t('nMineSub')+(eraPreview()?' · '+t('eraPrev'):'')}
- if(k==='gnome'&&SET.kind==='chain'&&GN.known)extra='<div class="gths" id="cThumbs"></div>';
- if(k==='gnome')extra+=`<p class="note"><a href="${CFG.contracts.gnomeNft.collection||'https://opensea.io/collection/amber-digger'}" target="_blank" rel="noopener">OpenSea · amber-digger ↗</a></p>`;
+ if(k==='gnome')extra+=`<p class="note"><a href="#" onclick="window.__gnl&&window.__gnl.open('ext');return false">${L==='ru'?'Вторичные рынки →':'Secondary Markets →'}</a></p>`;
  if(k==='reserve'&&typeof AST!=='undefined'&&AST.on){hh=t('astLab')}
  $('cBody').innerHTML=`<div class="k">${kk}</div><h3>${hh}</h3>${k==='reserve'&&typeof AST!=='undefined'&&AST.on?`<p>${t('astTip')}</p><p>${t('astPick')}</p>`:''}${c.b}${rows(c.n||[])}${extra}${c.x||''}`;$('card').classList.add('open');
  if($('cThumbs')){const ids=[];for(const [w,a] of SET.gids)for(const id of a)ids.push(id);if(!ids.length&&CH.gnm&&CH.gnm.own)ids.push(...CH.gnm.own.keys());gnomeThumbs(ids,$('cThumbs'))}
@@ -4396,7 +4410,7 @@ if(EDITION==='dev'){
   if(k==='ext')return {k:r?'Вне экосистемы · '+t('mkSoon'):'Outside the ecosystem · '+t('mkSoon'),h:t('nExt'),
    b:(r?'<p>Вторичный рынок — место, где игроки и коллекционеры свободно покупают и продают гномов-NFT друг у друга, вне игры. Внутриигрового рынка нет: сделки идут на независимых NFT-площадках в сети Polygon.</p>'
         :'<p>The secondary market is where players and collectors freely buy and sell gnome NFTs with each other, outside the game. There is no in-game market: trades happen on independent NFT marketplaces on Polygon.</p>')
-    // placeholder: royalty line for gnome resales goes here once the founder approves the wording (no % for now)
+    +`<p>${r?'Роялти с перепродаж гномов: '+pct(GNL.roy)+' на всех площадках.':'Royalty on gnome resales: '+pct(GNL.roy)+' on every marketplace.'}</p>`
     +`<p class="k" style="margin-top:8px">${t('mkHead')}</p><ul class="mkL" style="margin:4px 0 6px 18px;padding:0;line-height:1.7">${mkList()}</ul>`,
    n:[],x:`<p class="note">${r?'Ссылки пока ведут на главные страницы площадок; страницы коллекции гномов появятся позже.':'Links lead to the marketplaces’ home pages for now; the gnome collection pages will come later.'}</p>`};
   if(k==='dealers')return {k:r?'Скоро':'Coming soon',h:t('nDealers'),
@@ -4433,6 +4447,21 @@ if(EDITION==='dev'){
  for(let i=0;i<MAXW;i++){const c=SET.cls[i];if(c===1||c===2)swarmOrbit(i,rng((i*7919+31)>>>0),c)}wattDirty();
  window.__mk={clusters:()=>{const o={dex:0,bot:0,nft:0,debris:0};for(let i=0;i<DRAWN;i++){const w=WA.cen[i*4+3];if(w===1)o.dex++;else if(w===2)o.bot++;else if(w===3)o.nft++;else if(w===5)o.debris++}return o}};
 }
+
+/* t884/t885: gnome numbers ({gTot},{gMin},{gRem},{gRoy}) are filled from GNL in every card */
+{const _cG=card;card=function(k){const c=_cG(k);if(c&&typeof c==='object'){for(const p of ['k','h','b','x'])if(typeof c[p]==='string')c[p]=gS(c[p]);if(Array.isArray(c.n))c.n=c.n.map(r=>Array.isArray(r)?r.map(gS):r);if(k==='gnome')c.b+=gnMintBox()}return c}}
+
+/* t889: two mint options in the Gnome Minter popup. Buttons are visual only: disabled, no wallet, no transactions.
+   Premium remaining 0 → no button, pointer to Secondary Markets. Debug: ?gnrem0=1 forces remaining = 0. */
+if(/[?&]gnrem0=1/.test(location.search)){GNL.rem=0;GNL.force0=true}
+function gnMintBox(){const r=L==='ru',rem=GNL.force0?0:GNL.rem,B='display:inline-block;margin-top:6px;padding:6px 14px;border-radius:8px;border:1px solid #556;opacity:.5;cursor:not-allowed;background:#223;color:#ccd';
+ const note=`<div class="sm" style="opacity:.7;margin-top:4px">${r?'Минт доступен на основном сайте.':'Minting is available on the main site.'}</div>`;
+ const prem=rem>0?`<div class="sm">${r?'Сминчено':'Minted'} ${fmt(GNL.min)} / ${fmt(GNL.tot)} · ${r?'осталось':'remaining'} ${fmt(rem)}</div><button disabled style="${B}">${r?'Минт премиум-гнома':'Mint a premium gnome'}</button>${note}`
+  :`<div class="sm">${r?'Все '+fmt(GNL.tot)+' премиум-гномов сминчены. Ищите их на вторичных рынках.':'All '+fmt(GNL.tot)+' premium gnomes are minted. Look for them on the secondary markets.'}</div><a href="#" onclick="window.__gnl.open('ext');return false" style="display:inline-block;margin-top:6px">${t('nExt')} →</a>`;
+ return `<div class="gnMint" style="margin-top:10px;border-top:1px solid #334;padding-top:8px"><p class="k">${r?'Минт':'Mint'}</p>
+ <div style="margin:6px 0 10px"><b>${r?'Премиум-гномы':'Premium gnomes'}</b> <span class="sm" style="opacity:.7">· ${r?'коллекция 10 000':'10K collection'}</span><br>${prem}</div>
+ <div><b>${r?'Гномы для всех':'Gnomes for everyone'}</b> <span class="sm" style="opacity:.7">· ${r?'скоро':'soon'}</span><br><button disabled style="${B}">${r?'Минт · скоро':'Mint · soon'}</button></div></div>`}
+window.__gnl={get:()=>({GNL:Object.assign({},GNL),mintAvail:M.mintAvail,gnomes:M.gnomes,roy:M.roy}),open:k=>openCard(k),lang:l=>setLang(l)};
 
 /* ===== Loop ===== */
 const clock=new THREE.Clock();let frame=0,fpsAcc=0,fpsN=0,statT=0;window.__fps=0;
