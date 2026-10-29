@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-<title>Decision Arena · Electrum Decisions — вселенная Amber</title>
-<meta name="description" content="Interactive 3D universe of the Decision Arena / Electrum Decisions Amber token economy.">
+<title>Мониторинг экосистемы · Shattered Worlds</title>
+<meta name="description" content="Ecosystem Monitor: interactive 3D view of the Shattered Worlds Amber token ecosystem, by Electrum Decisions.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22%3E%3Ccircle cx=%228%22 cy=%228%22 r=%226%22 fill=%22%23f6c75a%22/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -193,6 +193,7 @@ body.chain .simOnly{display:none!important}body:not(.chain) .chainOnly{display:n
 :root{--silver:#d9dfe9;--alloy:linear-gradient(135deg,#f6d27a 0%,#efe6c8 34%,#cfd6e2 52%,#9aa6ba 70%,#f2c66a 100%)}
 #brand .t1{background:linear-gradient(90deg,#f6c75a 0%,#f3e6c0 40%,#d9dfe9 60%,#c9a24a 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
 #brand .t2{background:linear-gradient(90deg,#fff2c4,#f6c75a 38%,#eef1f6 66%,#b4bfd1);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none}
+#brand .t1.bsub{font-size:10.5px;letter-spacing:.14em;margin-top:2px}
 #brand .t1::after{content:'';display:block;width:118px;height:1px;margin:4px 0 2px;background:linear-gradient(90deg,rgba(246,199,90,.9),rgba(217,223,233,.7),transparent)}
 #brand .ed{border-color:rgba(217,223,233,.35)}
 .pn{border-color:rgba(160,170,200,.24);box-shadow:0 10px 40px rgba(0,0,0,.35),inset 0 1px 0 rgba(246,199,90,.30),inset 0 -1px 0 rgba(217,223,233,.12)}
@@ -206,7 +207,9 @@ button.gold{background:linear-gradient(135deg,#b8862a,#f6c75a 42%,#efe9d6 60%,#d
 .lb.neb{background:transparent;border-color:transparent;font-size:10.5px;font-weight:500;letter-spacing:.32em;text-transform:uppercase;color:rgba(214,206,255,.55);padding:2px 6px}
 .lb.neb[data-k=link]{color:rgba(170,190,255,.55)}.lb.neb[data-k=tw]{color:rgba(240,170,220,.55)}
 
-.lb.shield{color:#f6e3a8;border-color:rgba(246,199,90,.45);background:linear-gradient(90deg,rgba(40,32,14,.75),rgba(30,34,48,.75));letter-spacing:.08em}
+.lb.shield .sw{display:block;text-align:center}
+.lb.shield .by{display:block;text-align:center;margin-top:2px;font-size:8.5px;font-weight:400;letter-spacing:.26em;text-transform:none;color:rgba(232,226,200,.6)}
+.lb.shield{cursor:default;text-align:center;line-height:1.25;padding:4px 10px 3px;color:#f6e3a8;border-color:rgba(246,199,90,.45);background:linear-gradient(90deg,rgba(40,32,14,.75),rgba(30,34,48,.75));letter-spacing:.08em}
 .lb.ext{background:rgba(20,16,40,.45);border-color:rgba(196,181,253,.25);color:rgba(221,214,254,.8);font-size:11px}
 .lb.neb:hover,.lb.neb.hl{border-color:rgba(217,223,233,.35);color:#fff;box-shadow:none}
 .ev em.md{display:block;font-style:normal;font-size:10.5px;color:#9fb0d8;line-height:1.35;margin-top:1px}
@@ -220,7 +223,7 @@ button.gold{background:linear-gradient(135deg,#b8862a,#f6c75a 42%,#efe9d6 60%,#d
 <body>
 <canvas id="c"></canvas>
 <div id="labels"></div>
-<div id="brand"><div class="t1">ELECTRUM DECISIONS</div><div class="t2">Decision Arena<span class="ed" id="edTag"></span></div><div class="t3" data-i="sub"></div></div>
+<div id="brand"><div class="t2"><span data-i="brandT"></span><span class="ed" id="edTag"></span></div><div class="t1 bsub">Shattered Worlds · by Electrum Decisions</div><div class="t3" data-i="sub"></div></div>
 <div id="topr">
  <button id="bFind" data-i="find"></button>
  <button id="bSound" data-i="soundOff"></button>
@@ -323,7 +326,7 @@ button.gold{background:linear-gradient(135deg,#b8862a,#f6c75a 42%,#efe9d6 60%,#d
 <div id="cap" class="pn"><div class="s" id="capS"></div><div class="m" id="capM"></div><div id="capX"></div><div class="row" id="capR"></div></div>
 <button id="kx" data-i="kExit"></button>
 <div id="intro" class="modal"><div class="pn">
- <div class="k">ELECTRUM DECISIONS · DECISION ARENA</div>
+ <div class="k" data-i="introK"></div>
  <h2 data-i="introH"></h2>
  <p data-i="intro1"></p><p data-i="intro2"></p><p data-i="intro3"></p><p id="intro4"></p><p class="note" data-i="intro5" style="opacity:.75;font-size:11.5px"></p>
  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px"><button class="gold" id="iGo" data-i="start"></button><button id="iTour" data-i="tourStart"></button><button id="iLang">English</button></div>
@@ -507,7 +510,7 @@ ul.tech{margin:6px 0 4px;padding-left:18px;font-size:13px;line-height:1.5}ul.tec
 <div id="shareP" class="modal hidden"><div class="pn"><button class="x" id="shX" style="position:absolute;top:10px;right:10px;padding:3px 9px">✕</button><div class="k" data-i="shK"></div><h2 data-i="shH"></h2><img id="shImg" alt=""><div class="btns"><button class="gold" id="shGo" data-i="shShare"></button><button id="shDl" data-i="shDl"></button><button id="shCp" data-i="shCopy"></button></div><p class="note" id="shNote"></p></div></div>
 <div id="authP" class="modal hidden"><div class="pn" style="position:relative"><button class="x" id="authX" style="position:absolute;top:10px;right:10px;padding:3px 9px">✕</button><div id="authB"></div></div></div>
 <div id="cv"><div id="cvTop"><div class="tt"><div class="k" id="cvK"></div><h2 id="cvH"></h2><div class="sm" id="cvS"></div></div><button id="cvLb" class="on"></button><button id="cvX">✕</button></div><canvas id="cvC"></canvas><div id="cvLab"></div><div id="cvTip"></div><div id="cvInfo" class="pn"></div><div id="cvNote" class="pn"></div></div>
-<a id="embLogo" target="_blank" rel="noopener">ELECTRUM DECISIONS ↗</a>
+<a id="embLogo" target="_blank" rel="noopener"><span data-i="brandT"></span> ↗</a>
 <script>
 /* =====================================================================
    ED_CONFIG — ЕДИНЫЙ БЛОК НАСТРОЕК / SHARED CONFIG (dev = /v2/, prod = /live/)
@@ -521,6 +524,8 @@ ul.tech{margin:6px 0 4px;padding-left:18px;font-size:13px;line-height:1.5}ul.tec
    Если events пустое, контракт всё равно читается: по переводам Amber на его адрес
    и с его адреса (Transfer токена Amber) и по его балансу Amber.
    ===================================================================== */
+// GAME_URL — будущий сайт игры Shattered Worlds для надписи на щите. Сайта пока нет: ссылка НЕ подключена (t917).
+// window.GAME_URL='';
 window.ED_CONFIG={
  edition:'dev',               // 'dev' (/v2/) или 'prod' (/live/) — подставляется при сборке
  // Демо-турниры (только dev, симуляция): межсерверный раз в crossMin–crossMax с, турнир сервера раз в serverMin–serverMax с
@@ -661,7 +666,7 @@ const DEAD=CFG.contracts.dead.address.toLowerCase();
 
 /* ===== i18n ===== */
 const T={ru:{
- sub:'Вселенная токена Amber',edDev:'DEV',edProd:'LIVE',
+ sub:'Вселенная токена Amber',brandT:'Мониторинг экосистемы',introK:'SHATTERED WORLDS · МОНИТОРИНГ ЭКОСИСТЕМЫ',edDev:'DEV',edProd:'LIVE',
  tour:'Экскурсия',find:'Найти себя',soundOff:'Звук: выкл',soundOn:'Звук: вкл',resetView:'Сбросить вид',about:'О схеме',
  modeBtn:'Режим: {m}',mUni:'Вселенная',mUniD:'Amber Soul Stone, контракты и игроки',mWorld:'Карта мира',mWorldD:'Игроки по регионам, матчи дугами',mInv:'Инвестор',mInvD:'Здоровье экономики, план и факт',mSbx:'Что если',mSbxD:'Песочница: модель на 12 месяцев',mKiosk:'Стрим / киоск',mKioskD:'Полный экран без интерфейса',
  dataH:'Данные',srcSim:'Симуляция',srcDemo:'Демо',srcChain:'Блокчейн',
@@ -680,14 +685,14 @@ const T={ru:{
  intro1:'В центре — Amber Soul Stone, Камень души: токен Amber в сети Polygon, который добывают гномы. Внутри него пульсирует золотой эфир. Вокруг него, как станции на орбитах, работают контракты системы: боевой контракт матчей, стейкинг, Банк Студии Electrum Decisions, турниры и гномы-NFT. Ближе всего к Камню — майнинг (скоро), боевой контракт и гномы; дальше — пояс астероидов из кошельков; за поясом — стейкинг и Банк.',
  intro5:'Эта вселенная — ещё и наглядная модель мира будущей 4X-стратегии: замки на астероидах. Пока это только визуализация.',
  intro2:'Рой игроков: каждая точка — игрок и его кошелёк. Игроки черпают золотой эфир из Камня души и сходятся 1 на 1: оба вносят равные суммы в пул матча, а боевой контракт делит пул: 90% победителю, 6% сжигается, 3% стейкерам, фиксированный 1% студии.',
- intro3:'Сбоку — чёрная дыра, мёртвый адрес 0x…dEaD. Всё сожжённое улетает туда навсегда. Внешнее спокойное кольцо — бесплатный фиат-режим без токенов. За щитом Electrum Decisions, напротив чёрной дыры, — пул ликвидности DEX и внешние маркетплейсы.',
+ intro3:'За щитом Shattered Worlds, вне экосистемы, — чёрная дыра, мёртвый адрес 0x…dEaD. Всё сожжённое улетает туда навсегда. Внешнее спокойное кольцо — бесплатный фиат-режим без токенов. Тоже за щитом, на своих орбитах, — пул ликвидности DEX и внешние маркетплейсы.',
  intro4s:'Сейчас показана симуляция. Найдите себя по нику, отмотайте историю машиной времени или откройте режим инвестора.',
  intro4c:'Сейчас показаны реальные данные Amber из блокчейна. Контракты, которые ещё не подключены, появятся сами, когда в настройки впишут их адреса.',
  start:'Смотреть',tourStart:'Экскурсия',
  noGL:'Браузер не поддерживает WebGL. Откройте страницу в свежем Chrome, Safari или Edge.',
  lWallet:'Кошельки игроков',lHold:'Держатели без матчей (только DEX) — тусклее, меньше',lRefund:'Ничья: возврат взноса обоим',lEnergy:'Энергия Amber к игрокам',lEntry:'Взнос в пул матча',lWin:'Доля победителя',lBurn:'Сжигание → чёрная дыра',lStake:'Стейкинг',lBank:'Банк Студии Electrum Decisions',lTour:'Турниры',lMine:'Майнинг гномов',lMint:'Минт гномов',lFiat:'Фиат-режим (без токенов)',lGn:'Владельцы гномов по числу NFT:',
  gt1:'1–3 гнома',gt2:'4–9 гномов',gt3:'10–19 гномов',gt4:'20–39 гномов',gt5:'40 и больше',
- nShield:'Electrum Decisions',nContract:'Amber Soul Stone · Камень души',nPool:'Боевой контракт',nBurn:'Чёрная дыра · 0x…dEaD',nStake:'Стейкинг',nBank:'Банк Студии',nTour:'Турниры · скоро',nDex:'Пул ликвидности · DEX',nPoly:'Polygon',nLink:'Chainlink',nTw:'thirdweb',nExt:'Внешние площадки',soon:'Скоро',nGnome:'Гномы-NFT',nReserve:'Шахта · скоро',nFiat:'Фиат-режим · free-to-play',
+ nShield:'Shattered Worlds',nContract:'Amber Soul Stone · Камень души',nPool:'Боевой контракт',nBurn:'Чёрная дыра · 0x…dEaD',nStake:'Стейкинг',nBank:'Банк Студии',nTour:'Турниры · скоро',nDex:'Пул ликвидности · DEX',nPoly:'Polygon',nLink:'Chainlink',nTw:'thirdweb',nExt:'Внешние площадки',soon:'Скоро',nGnome:'Гномы-NFT',nReserve:'Шахта · скоро',nFiat:'Фиат-режим · free-to-play',
  tipClick:'Нажмите — подробности, двойной клик — приблизить',simWallet:'Симулированный игрок',chainWallet:'Кошелёк в блокчейне',
  playK:'СЫГРАЙТЕ САМИ',playH:'Матч 1 на 1',playP:'Выберите размер взноса в пул матча. Оба игрока вносят одинаково, боевой контракт делит пул по фиксированным долям.',
  playOwn:'Свой взнос, Amber (10 – 250 000):',playGo:'Начать матч',playPick:'Выбрать два кошелька на схеме',cancel:'Отмена',
@@ -734,7 +739,7 @@ const T={ru:{
  t7h:'Гномы-NFT',t7:'Всего {gTot} гномов (10 000 минус сожжённый №0), сминчено {gMin}, осталось {gRem}. Непроданные лежат в контракте, сминченные улетают владельцам. Минт по $300, 80% выкупает и сжигает Amber. При 7 999 из {gTot} у игроков включается майнинг.',
  t8h:'Фиат-кольцо',t8:'Основа бизнеса: бесплатная игра, реклама и покупки в магазинах приложений. Токенов здесь нет. Всё, что внутри кольца, — дополнительный потенциал.'
 },en:{
- sub:'The Amber token universe',edDev:'DEV',edProd:'LIVE',
+ sub:'The Amber token universe',brandT:'Ecosystem Monitor',introK:'SHATTERED WORLDS · ECOSYSTEM MONITOR',edDev:'DEV',edProd:'LIVE',
  tour:'Guided tour',find:'Find yourself',soundOff:'Sound: off',soundOn:'Sound: on',resetView:'Reset view',about:'About',
  modeBtn:'Mode: {m}',mUni:'Universe',mUniD:'The Amber Soul Stone, contracts and players',mWorld:'World map',mWorldD:'Players by region, matches as arcs',mInv:'Investor',mInvD:'Economy health, plan vs fact',mSbx:'What if',mSbxD:'Sandbox: a 12-month model',mKiosk:'Stream / kiosk',mKioskD:'Full screen with no interface',
  dataH:'Data',srcSim:'Simulation',srcDemo:'Demo',srcChain:'Blockchain',
@@ -753,14 +758,14 @@ const T={ru:{
  intro1:'At the centre is the Amber Soul Stone: the Amber token on Polygon, mined by the gnomes. Golden ether pulses inside it. Around it, like stations in orbit, the system’s contracts run: the battle contract for matches, staking, the Electrum Decisions Studio Bank, tournaments and the gnome NFTs. Closest to the Stone are mining (soon), the battle contract and the gnomes; then the asteroid belt of wallets; beyond the belt, staking and the Bank.',
  intro5:'This universe is also a visual model of the world of the future 4X strategy game: castles on asteroids. For now it is only a visualization.',
  intro2:'A swarm of players: each dot is a player and their wallet. Players draw golden ether from the Soul Stone and meet 1v1: both put equal amounts into the match pool, and the battle contract splits it: 90% to the winner, 6% burned, 3% to stakers, a fixed 1% to the studio.',
- intro3:'Off to the side is a black hole, the dead address 0x…dEaD. Everything burned falls in for good. The calm outer ring is the free-to-play fiat mode with no tokens. Outside the Electrum Decisions shield, opposite the black hole, sit the DEX liquidity pool and the external marketplaces.',
+ intro3:'Outside the Shattered Worlds shield, beyond the ecosystem, is a black hole, the dead address 0x…dEaD. Everything burned falls in for good. The calm outer ring is the free-to-play fiat mode with no tokens. Also outside the shield, on their own orbits, sit the DEX liquidity pool and the external marketplaces.',
  intro4s:'You are looking at a simulation. Find yourself by username, rewind with the time machine or open investor mode.',
  intro4c:'You are looking at real Amber data from the blockchain. Contracts not yet connected will appear by themselves once their addresses are added to the config.',
  start:'Explore',tourStart:'Guided tour',
  noGL:'This browser does not support WebGL. Please open the page in a recent Chrome, Safari or Edge.',
  lWallet:'Player wallets',lHold:'Holders without matches (DEX only) — dimmer, smaller',lRefund:'Draw: contribution refunded to both',lEnergy:'Amber energy to players',lEntry:'Match pool contribution',lWin:'Winner’s share',lBurn:'Burn → black hole',lStake:'Staking',lBank:'Electrum Decisions Studio Bank',lTour:'Tournaments',lMine:'Gnome mining',lMint:'Gnome mint',lFiat:'Fiat mode (no tokens)',lGn:'Gnome owners by NFTs held:',
  gt1:'1–3 gnomes',gt2:'4–9 gnomes',gt3:'10–19 gnomes',gt4:'20–39 gnomes',gt5:'40 or more',
- nShield:'Electrum Decisions',nContract:'Amber Soul Stone',nPool:'Battle contract',nBurn:'Black hole · 0x…dEaD',nStake:'Staking',nBank:'Studio Bank',nTour:'Tournaments · soon',nDex:'Liquidity pool · DEX',nPoly:'Polygon',nLink:'Chainlink',nTw:'thirdweb',nExt:'External marketplaces',soon:'Coming soon',nGnome:'Gnome NFTs',nReserve:'Mine · soon',nFiat:'Fiat mode · free-to-play',
+ nShield:'Shattered Worlds',nContract:'Amber Soul Stone',nPool:'Battle contract',nBurn:'Black hole · 0x…dEaD',nStake:'Staking',nBank:'Studio Bank',nTour:'Tournaments · soon',nDex:'Liquidity pool · DEX',nPoly:'Polygon',nLink:'Chainlink',nTw:'thirdweb',nExt:'External marketplaces',soon:'Coming soon',nGnome:'Gnome NFTs',nReserve:'Mine · soon',nFiat:'Fiat mode · free-to-play',
  tipClick:'Click for details, double-click to zoom in',simWallet:'Simulated player',chainWallet:'Wallet on the blockchain',
  playK:'PLAY IT YOURSELF',playH:'A 1v1 match',playP:'Pick the match pool contribution. Both players put in the same amount and the battle contract splits the pool by fixed shares.',
  playOwn:'Your own contribution, Amber (10 – 250,000):',playGo:'Start the match',playPick:'Pick two wallets on the map',cancel:'Cancel',
@@ -891,9 +896,9 @@ function card(key){
  `<p>As the player base grows, the studio is considering its own game network on Polygon technology. In such a network, transaction fees would be paid in Amber.</p><p>Some game data may be published on-chain. The 4X game will have a publicly viewable database.</p>`,
  n:[[r?'Статус':'Status',r?'в планах':'planned'],[r?'Технология':'Technology','Polygon'],[r?'Комиссии сети':'Network fees',r?'в Amber (рассматривается)':'in Amber (under consideration)']],
  x:`<p class="note">${r?'Это направление, которое студия рассматривает, а не объявленный запуск: без сроков и обещаний. Янтарная сетка под тканью Polygon видна только в эпохе будущего.':'This is a direction the studio is considering, not an announced launch: no dates and no promises. The amber grid under the Polygon fabric is only visible in the future era.'}</p>`}),
- shield:()=>({k:r?'Эфирный щит экосистемы':'Ether shield of the ecosystem',h:'Electrum Decisions',b:r?
- `<p>Тонкий эфирный щит — студия Electrum Decisions. Он держит всю экосистему вместе: камень Amber, боевой контракт, стейкинг, Банк Студии, гномов, шахту и кошельки игроков.</p><p>Внутри щита — всё, что создаёт и поддерживает студия. Снаружи — внешние площадки и кольцо партнёра thirdweb; кольцо Chainlink проходит через щит.</p>`:
- `<p>The thin ether shield is the Electrum Decisions studio. It holds the whole ecosystem together: the Amber stone, the battle contract, staking, the Studio Bank, the gnomes, the mine and the player wallets.</p><p>Inside the shield is everything the studio builds and runs. Outside are the external marketplaces and the thirdweb partner ring; the Chainlink ring passes through the shield.</p>`,
+ shield:()=>({k:r?'Эфирный щит экосистемы':'Ether shield of the ecosystem',h:'Shattered Worlds',b:r?
+ `<p>Тонкий эфирный щит — Shattered Worlds, общая экосистема игр студии Electrum Decisions. Он держит всю экосистему вместе: камень Amber, боевой контракт, стейкинг, Банк Студии, гномов, шахту и кошельки игроков.</p><p>Внутри щита — всё, что создаёт и поддерживает студия. Снаружи — чёрная дыра (мёртвый адрес 0x…dEaD), пул ликвидности DEX, внешние площадки и кольцо партнёра thirdweb; кольцо Chainlink проходит через щит.</p>`:
+ `<p>The thin ether shield is Shattered Worlds, the shared ecosystem of the Electrum Decisions studio’s games. It holds the whole ecosystem together: the Amber stone, the battle contract, staking, the Studio Bank, the gnomes, the mine and the player wallets.</p><p>Inside the shield is everything the studio builds and runs. Outside are the black hole (the dead address 0x…dEaD), the DEX liquidity pool, the external marketplaces and the thirdweb partner ring; the Chainlink ring passes through the shield.</p>`,
  n:[[r?'Студия':'Studio','Electrum Decisions'],[r?'Игра':'Game','Decision Arena'],[r?'Сеть':'Network','Polygon']],
  x:`<p class="note">${r?'Щит — образ студии, а не смарт-контракт. Отдалите камеру до предела — за экосистемой кто-то наблюдает.':'The shield is an image of the studio, not a smart contract. Zoom all the way out: something is watching the ecosystem.'}</p>`}),
  ext:()=>{const c=CA('castleNft');return {k:r?'Вне игры · '+(c?'контракт подключён':'скоро'):'Outside the game · '+(c?'contract connected':'coming soon'),h:t('nExt'),b:r?
@@ -911,8 +916,8 @@ function card(key){
  n:[[r?'Победителю':'To the winner',pct(M.win)],[r?'Сжигание':'Burn',pct(M.burn)],[r?'Стейкерам':'To stakers',pct(M.stake)],[r?'Студии (фиксированно)':'Studio (fixed)',pct(M.studio)],[r?'Пример: взносы 2 × 10 000':'Example: contributions 2 × 10,000',(r?'пул ':'pool ')+fmt(M.exPool)],[r?'Из пула 20 000':'From a 20,000 pool',`${fmt(M.exWin)} / ${fmt(M.exBurn)} / ${fmt(M.exStake)} / ${fmt(M.exStudio)}`],[r?'Средний взнос в модели':'Average contribution in the model',fmt(M.avgEntry)+' Amber']],
  x:`<p class="note">${r?'Средний взнос — допущение модели по распределению взносов от 10 до 250 000 Amber.':'The average contribution is a model assumption based on a spread from 10 to 250,000 Amber.'}</p><p class="note">${r?'Как контракт завершает матч: сервисный кошелёк «Оператор» вызывает endGame, победитель сразу получает 90% пула. Ничья — это endGame с победителем 0x000…0000: каждому полностью возвращается его взнос в пул матча, без сжигания, стейкинга и Банка. Отмена (никто не присоединился) возвращает взнос создателю. Доли 6% / 3% / 1% копятся в контракте и уходят на мёртвый адрес, в стейкинг и в Банк пакетом, когда наберётся 100 Amber. Сервисный сбор 0,01 POL с игрока: одна часть покрывает газ Оператора, другая превращается в LINK для Chainlink Automation.':'How the contract finishes a match: the “Operator” service wallet calls endGame and the winner gets 90% of the pool at once. A draw is endGame with winner 0x000…0000: each player’s match pool contribution is refunded in full, with no burn, staking or Bank share. A cancellation (nobody joined) refunds the creator. The 6% / 3% / 1% shares accrue in the contract and go to the dead address, staking and the Bank in one batch once 100 Amber has built up. Service fee 0.01 POL per player: one part covers the Operator’s gas, the other becomes LINK for Chainlink Automation.'}</p>${typeof recentMatchesHTML==='function'?recentMatchesHTML():''}<div class="btns simOnly"><button onclick="window.__play()">${t('playMatch')}</button></div>`}),
  burn:()=>({k:r?'Мёртвый адрес · 6% каждого пула':'The dead address · 6% of every pool',h:t('nBurn'),b:r?
- `<p>6% каждого пула боевой контракт отправляет на мёртвый адрес 0x…dEaD. Это чёрная дыра: ключа к адресу нет ни у кого, и Amber оттуда не возвращаются никогда. Диск растёт и светится ярче с каждым сжиганием.</p><p>Сюда же падает Amber, купленный на 80% от минта гномов. Сколько Amber при этом сгорит, зависит от рынка, поэтому эту часть мы показываем в долларах и в Amber не прогнозируем.</p>`:
- `<p>The battle contract sends 6% of every pool to the dead address 0x…dEaD. This is the black hole: nobody holds a key to it, and Amber never comes back. The disk grows and glows brighter with every burn.</p><p>Amber bought with 80% of the gnome mint falls in here too. How much Amber that burns depends on the market, so we show that part in dollars and do not forecast it in Amber.</p>`,
+ `<p>6% каждого пула боевой контракт отправляет на мёртвый адрес 0x…dEaD. Это чёрная дыра: ключа к адресу нет ни у кого, и Amber оттуда не возвращаются никогда. Диск растёт и светится ярче с каждым сжиганием. Чёрная дыра — за щитом Shattered Worlds, вне экосистемы.</p><p>Сюда же падает Amber, купленный на 80% от минта гномов. Сколько Amber при этом сгорит, зависит от рынка, поэтому эту часть мы показываем в долларах и в Amber не прогнозируем.</p>`:
+ `<p>The battle contract sends 6% of every pool to the dead address 0x…dEaD. This is the black hole: nobody holds a key to it, and Amber never comes back. The disk grows and glows brighter with every burn. The black hole sits outside the Shattered Worlds shield, beyond the ecosystem.</p><p>Amber bought with 80% of the gnome mint falls in here too. How much Amber that burns depends on the market, so we show that part in dollars and do not forecast it in Amber.</p>`,
  n:[[r?'С каждого пула':'From every pool',pct(M.burn)],[r?'Из пула 20 000':'From a 20,000 pool',fmt(M.exBurn)+' Amber'],[r?'Минт гномов: на выкуп и сжигание':'Gnome mint: buy & burn',usd(M.mintAvail*M.mintPx*M.mintBurn)],[r?'Новая эмиссия':'New issuance',t('none')],[r?'Адрес':'Address',short(DEAD)]],
  x:`<p class="note"><a href="${scanAddr(CFG.contracts.dead.address)}" target="_blank" rel="noopener">0x…dEaD · Polygonscan ↗</a></p>`}),
  staking:()=>({k:r?'LP-стейкинг · награды в Amber':'LP staking · rewards in Amber',h:r?'LP-стейкинг':'LP staking',b:r?
@@ -1175,8 +1180,10 @@ addNode('gnome',V(32,0,0),g=>{
  const b=new THREE.Mesh(new THREE.CylinderGeometry(1.6,2.1,.5,6),bmat(0x3b2a7a));b.position.y=-2.6;g.add(b);
  g.add(wire(new THREE.CylinderGeometry(1.6,2.1,.5,6).translate(0,-2.6,0),COL.lil,.7));
 },new THREE.SphereGeometry(3.6,10,8),{lab:4.6,dist:20,orb:{r:37,a:2.95,w:.004,y:-4},ck:'gnomeNft'});
-/* --- black hole at the dead address --- */
-const BH_POS=V(-104,10,-36);
+/* --- black hole at the dead address — OUTSIDE the shield (founder t920: it is outside the ecosystem).
+   r≈138 (shield R 120, max disk ≈8.5 → inner edge ≈129), upper right, beyond the shield's silhouette in open sky clear of the HUD;
+   ≥71 from every moon orbit at all times (DEX: ≥71 past its ≤30 trader swarm); no moon label on top of it at load (desktop or mobile). --- */
+const BH_POS=V(102,92,-7);
 const BHN=new THREE.Vector3(.25,1,.18).normalize(),BHE1=new THREE.Vector3(1,0,0).cross(BHN).normalize(),BHE2=BHN.clone().cross(BHE1).normalize();
 const diskVS=`attribute vec3 d;uniform float uT;uniform float uR;uniform float uS;uniform vec3 uE1;uniform vec3 uE2;uniform vec3 uN;varying float vR;varying float vA;
 void main(){float r=d.x*uR;float a=d.y+uT*(2.2/(.35+d.x*d.x*1.6));vec3 p=(cos(a)*uE1+sin(a)*uE2)*r+uN*d.z*(.25+.6*d.x);
@@ -1245,7 +1252,7 @@ const netGroup=new THREE.Group();uni.add(netGroup);
 const POLY_C=0x8247e5,LINK_C=0x375bd2,TW_C1=0xe0489c,TW_C2=0x9a4cf0;
 const FAB_Y=-20;
 // depth of the sheet: a broad well under the ecosystem + small dimples under the heavy bodies
-const WELLS=[[0,0,16,92],[-104,-36,10,18],[0,0,3,16],[-55,94,3,14],[54,96,3,14],[134,40,5,16]];
+const WELLS=[[0,0,16,92],[102,-7,10,18],[0,0,3,16],[-55,94,3,14],[54,96,3,14],[134,40,5,16]];
 function fabH(x,z){let h=0;for(const w of WELLS){const dx=x-w[0],dz=z-w[1];h-=w[2]*Math.exp(-(dx*dx+dz*dz)/(w[3]*w[3]))}return h}
 {const N=MOBILE?34:52,E=210,S=MOBILE?80:130,pos=[],col=[];const c0=new THREE.Color(POLY_C);
  const push=(x,z)=>{const r=Math.hypot(x,z),f=Math.max(0,1-r/E);const a=Math.pow(f,1.25)*(.55+.45*Math.exp(-r*r/9000));pos.push(x,FAB_Y+fabH(x,z),z);col.push(c0.r*a,c0.g*a,c0.b*a)};
@@ -2682,8 +2689,8 @@ const LBL={contract:'nContract',reserve:'nReserve',pool:'nPool',staking:'nStake'
 if(typeof NODES!=='undefined'&&NODES.dealers)LBL.dealers='nDealers';
 const labEls={};
 for(const k in LBL){const e=document.createElement('div');e.className='lb'+(k==='poly'||k==='link'||k==='tw'||k==='gchain'?' neb':'')+(k==='gchain'?' gch':'')+(k==='ext'?' ext':'')+(k==='contract'?' gem':'')+(k==='shield'?' neb shield':'');e.dataset.k=k;$('labels').appendChild(e);labEls[k]=e;
- e.addEventListener('click',ev=>{ev.stopPropagation();openCard(k);beep(760,.06)});
- e.addEventListener('dblclick',ev=>{ev.stopPropagation();focusNode(k)});
+ if(k!=='shield'){e.addEventListener('click',ev=>{ev.stopPropagation();openCard(k);beep(760,.06)});
+ e.addEventListener('dblclick',ev=>{ev.stopPropagation();focusNode(k)})}
  e.addEventListener('mouseenter',()=>setHover(k));e.addEventListener('mouseleave',()=>setHover(null))}
 function labText(k){if(EDITION==='dev'&&k==='ext')return t('nExt');if(k==='dealers')return t('nDealers')+' · '+t('soon').toLowerCase();if(k==='reserve'&&typeof AST!=='undefined'&&AST.on)return t('astLab');if(k==='contract'&&eraK<=.5&&innerWidth<700)return 'Amber';if(k==='reserve'){if(eraK>.5)return t('nMineOn')+(eraPreview()?' · '+t('eraPrev'):'');return t('nReserve')}
  if(k==='ext')return t('nExt')+(CA('castleNft')?'':' · '+t('soon').toLowerCase());if(k==='tour'&&(CFG.contracts.tournament||{}).address)return t('nTour').replace(/ · .*$/,'');return t(LBL[k])}
@@ -2699,7 +2706,7 @@ function labVisible(k){if(k==='contract'&&ASTER)return false;if(S.kiosk&&k!=='co
  if(S.panel==='inv')return false;return true}
 function updLabels(){const P=[];for(const k in labEls){const e=labEls[k];if(!labVisible(k)){e.style.display='none';continue}
   labWorld(k,_p);_p.project(camera);if(_p.z>1||_p.x<-1.2||_p.x>1.2||_p.y<-1.2||_p.y>1.2){e.style.display='none';continue}
-  const tx=labText(k);if(e._t!==tx){e.textContent=tx;e._t=tx}
+  const tx=labText(k);if(e._t!==tx){if(k==='shield')e.innerHTML='<span class="sw">'+tx+'</span><span class="by">by Electrum Decisions</span>';else e.textContent=tx;e._t=tx}
   e.style.display='block';const w=e.offsetWidth||80,h=e.offsetHeight||18,hw=w/2+4;const lx=Math.min(innerWidth-hw,Math.max(hw,(_p.x*.5+.5)*innerWidth)),ly=(-_p.y*.5+.5)*innerHeight;
   // simple label de-overlap: nudge vertically away from labels already placed this frame
   let dy=0;for(let t=0;t<5;t++){let hit=null;for(const q of P)if(Math.abs(q.x-lx)<(q.w+w)/2+3&&Math.abs(q.y-(ly+dy))<(q.h+h)/2+1){hit=q;break}if(!hit)break;dy=(ly+dy>=hit.y?hit.y+(hit.h+h)/2+2:hit.y-(hit.h+h)/2-2)-ly}
@@ -2770,7 +2777,7 @@ function applyI18n(){document.documentElement.lang=L;
  $('intro4').textContent=S.src==='chain'?t('intro4c'):t('intro4s');
  for(const k in labEls){labEls[k].textContent=labText(k);labEls[k]._t=null}
  $('bLang').textContent=L==='ru'?'EN':'RU';$('iLang').textContent=L==='ru'?'English':'Русский';
- document.title=L==='ru'?'Decision Arena · Electrum Decisions — вселенная Amber':'Decision Arena · Electrum Decisions — the Amber universe';
+ document.title=L==='ru'?'Мониторинг экосистемы · Shattered Worlds':'Ecosystem Monitor · Shattered Worlds';
  renderLegend();updBtns();updMintBar();updRanges();updEraUI();updFoot();bannerRefresh();updStats();renderModeMenu();
  if(cardKey)openCard(cardKey);if(capMode==='fm'&&FM)fmStep(FM.step);else if(capMode==='tour')tourStep(tourI);
  if(!$('play').classList.contains('hidden'))updPlay();if(FY.sel>=0&&FY.h)renderHist(true);if(S.panel==='inv')renderInv();if(S.panel==='sbx')renderSbx();if(S.tm)tmApply(S.tm.v)}
@@ -3316,7 +3323,7 @@ function shareDraw(i,s){const c=document.createElement('canvas');c.width=1200;c.
  const bg=g.createLinearGradient(0,0,1200,630);bg.addColorStop(0,'#090d26');bg.addColorStop(1,'#1b1240');g.fillStyle=bg;g.fillRect(0,0,1200,630);
  try{composer.render();const src=renderer.domElement,sw=src.width,sh=src.height,ar=560/630;let w2=sh*ar,x0=(sw-w2)/2;if(w2>sw){w2=sw;x0=0}g.globalAlpha=.9;g.drawImage(src,x0,0,w2,sh,640,0,560,630);g.globalAlpha=1;
   const fd=g.createLinearGradient(640,0,820,0);fd.addColorStop(0,'#0b0f2a');fd.addColorStop(1,'rgba(11,15,42,0)');g.fillStyle=fd;g.fillRect(640,0,180,630)}catch(e){}
- g.fillStyle='#f6c75a';g.font='700 22px Inter,system-ui,sans-serif';g.fillText('ELECTRUM DECISIONS · AMBER',60,74);
+ g.fillStyle='#f6c75a';g.font='700 22px Inter,system-ui,sans-serif';g.fillText('SHATTERED WORLDS · AMBER',60,74);
  g.fillStyle='#fff';g.font='700 46px Inter,system-ui,sans-serif';g.fillText(SET.kind==='sim'?'@'+SET.name[i]:short(SET.addr[i]),60,150);
  g.fillStyle='#aab4d6';g.font='24px Inter,system-ui,sans-serif';g.fillText(t('scTitle')+(s.sim?' · '+t('scSim'):''),60,192);
  const F=(x,l,v,y)=>{g.fillStyle='#9aa6cc';g.font='600 18px Inter,system-ui,sans-serif';g.fillText(l.toUpperCase(),x,y);g.fillStyle='#fff';g.font='700 44px Inter,system-ui,sans-serif';g.fillText(v,x,y+50)};
@@ -3330,7 +3337,7 @@ async function shareOpen(i){$('shareP').classList.remove('hidden');$('shImg').re
 function shareDl(){if(!R6share||!R6share.data)return;const a=document.createElement('a');a.href=R6share.data;a.download='amber-castle-'+SET.addr[R6share.i].slice(2,8)+'.png';document.body.appendChild(a);a.click();a.remove()}
 async function shareCopy(){if(!R6share)return;try{await navigator.clipboard.writeText(R6share.url);toast(t('shCopied'),2200)}catch(e){toast(t('shCopyFail',{u:R6share.url}),6000)}}
 $('shGo').onclick=async()=>{if(!R6share||!R6share.c)return;try{const blob=await new Promise(r=>R6share.c.toBlob(r,'image/png'));const f=new File([blob],'amber-castle.png',{type:'image/png'});
- if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Electrum Decisions · Amber',url:R6share.url});return}}catch(e){if(e&&e.name==='AbortError')return}shareDl();shareCopy()};
+ if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Shattered Worlds · Amber',url:R6share.url});return}}catch(e){if(e&&e.name==='AbortError')return}shareDl();shareCopy()};
 $('shDl').onclick=shareDl;$('shCp').onclick=shareCopy;$('shX').onclick=()=>$('shareP').classList.add('hidden');
 /* ---------- deep link ?wallet=0x… ---------- */
 function deepTick(dt){const a=R6.deep;if(!a)return;R6.deepT+=dt;const ready=SET.kind==='sim'?S.src==='sim':(S.src==='chain'&&CH.state==='ok'&&NW>0);
@@ -4417,8 +4424,8 @@ if(EDITION==='dev'){
   const c=_cd(k);if(!c||typeof c!=='object')return c;const r2=r;
   if(k==='gnome')c.b=(r2?'<p>Минтер стоит вне экосистемы: новые гномы-NFT появляются снаружи и улетают к игрокам и к трейдерам у DEX. Дальше их можно свободно передавать и продавать на вторичных рынках.</p>'
                        :'<p>The Minter sits outside the ecosystem: new gnome NFTs appear out here and fly in to players and to traders around the DEX. After that they can be freely transferred and sold on secondary markets.</p>')+c.b;
-  if(k==='shield'&&c.b){c.b=c.b.split('Снаружи — внешние площадки и кольцо партнёра thirdweb').join('Снаружи — Минтер гномов, вторичные рынки, официальные дилеры (скоро) и кольцо партнёра thirdweb')
-   .split('Outside are the external marketplaces and the thirdweb partner ring').join('Outside are the Gnome Minter, the secondary markets, the official dealers (coming soon) and the thirdweb partner ring')}
+  if(k==='shield'&&c.b){c.b=c.b.split('Снаружи — чёрная дыра (мёртвый адрес 0x…dEaD), пул ликвидности DEX, внешние площадки и кольцо партнёра thirdweb').join('Снаружи — чёрная дыра (мёртвый адрес 0x…dEaD), пул ликвидности DEX, Минтер гномов, вторичные рынки, официальные дилеры (скоро) и кольцо партнёра thirdweb')
+   .split('Outside are the black hole (the dead address 0x…dEaD), the DEX liquidity pool, the external marketplaces and the thirdweb partner ring').join('Outside are the black hole (the dead address 0x…dEaD), the DEX liquidity pool, the Gnome Minter, the secondary markets, the official dealers (coming soon) and the thirdweb partner ring')}
   return c};
  /* ambient flow: small gnome motes leave the Minter toward the Secondary Markets, DEX traders and players */
  const MK={t:1};
